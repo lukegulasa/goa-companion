@@ -4,10 +4,16 @@ import * as ProgressPrimitive from "@radix-ui/react-progress"
 
 import { cn } from "@/lib/utils"
 
+interface ProgressProps extends React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> {
+  boostedValue?: number;
+  baseColor?: string;
+  boostedColor?: string;
+}
+
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
->(({ className, value, ...props }, ref) => (
+  ProgressProps
+>(({ className, value, boostedValue, baseColor, boostedColor, ...props }, ref) => (
   <ProgressPrimitive.Root
     ref={ref}
     className={cn(
@@ -16,10 +22,23 @@ const Progress = React.forwardRef<
     )}
     {...props}
   >
+    {/* Base value indicator */}
     <ProgressPrimitive.Indicator
-      className="h-full w-full flex-1 bg-primary transition-all"
-      style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+      className={cn("h-full flex-1 transition-all", baseColor || "bg-primary")}
+      style={{ width: `${value || 0}%` }}
     />
+    
+    {/* Boosted value indicator (if provided) */}
+    {boostedValue !== undefined && boostedValue > (value || 0) && (
+      <ProgressPrimitive.Indicator
+        className={cn("h-full flex-1 transition-all absolute top-0", boostedColor || "bg-purple-500")}
+        style={{ 
+          width: `${boostedValue}%`, 
+          left: `${value || 0}%`,
+          width: `${boostedValue - (value || 0)}%`
+        }}
+      />
+    )}
   </ProgressPrimitive.Root>
 ))
 Progress.displayName = ProgressPrimitive.Root.displayName

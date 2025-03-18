@@ -22,8 +22,8 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
   };
 
   // Calculate progress percentage (0-100%) based on a stat value (1-8)
-  const calculateProgress = (stat: { base: number }) => {
-    return (stat.base / 8) * 100;
+  const calculateProgress = (value: number) => {
+    return (value / 8) * 100;
   };
 
   return (
@@ -67,8 +67,11 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
                 </span>
               </div>
               <Progress 
-                value={calculateProgress(hero.stats.attack)} 
+                value={calculateProgress(hero.stats.attack.base)} 
+                boostedValue={hero.stats.attack.boosted ? calculateProgress(hero.stats.attack.boosted) : undefined}
                 className="h-1.5 bg-red-100 dark:bg-red-950/30" 
+                baseColor="bg-red-400"
+                boostedColor="bg-red-600"
               />
             </div>
             <div className="space-y-1">
@@ -79,8 +82,11 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
                 </span>
               </div>
               <Progress 
-                value={calculateProgress(hero.stats.initiative)} 
+                value={calculateProgress(hero.stats.initiative.base)} 
+                boostedValue={hero.stats.initiative.boosted ? calculateProgress(hero.stats.initiative.boosted) : undefined}
                 className="h-1.5 bg-yellow-100 dark:bg-yellow-950/30" 
+                baseColor="bg-yellow-400"
+                boostedColor="bg-yellow-600"
               />
             </div>
             <div className="space-y-1">
@@ -91,8 +97,11 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
                 </span>
               </div>
               <Progress 
-                value={calculateProgress(hero.stats.defense)} 
+                value={calculateProgress(hero.stats.defense.base)} 
+                boostedValue={hero.stats.defense.boosted ? calculateProgress(hero.stats.defense.boosted) : undefined}
                 className="h-1.5 bg-blue-100 dark:bg-blue-950/30" 
+                baseColor="bg-blue-400"
+                boostedColor="bg-blue-600"
               />
             </div>
             <div className="space-y-1">
@@ -103,8 +112,11 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
                 </span>
               </div>
               <Progress 
-                value={calculateProgress(hero.stats.movement)} 
+                value={calculateProgress(hero.stats.movement.base)} 
+                boostedValue={hero.stats.movement.boosted ? calculateProgress(hero.stats.movement.boosted) : undefined}
                 className="h-1.5 bg-green-100 dark:bg-green-950/30" 
+                baseColor="bg-green-400"
+                boostedColor="bg-green-600"
               />
             </div>
           </div>

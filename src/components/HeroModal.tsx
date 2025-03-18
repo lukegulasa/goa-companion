@@ -26,8 +26,8 @@ const HeroModal: React.FC = () => {
     : selectedHero.statTotal.base.toString();
 
   // Calculate progress percentage (0-100%) based on a stat value (1-8)
-  const calculateProgress = (base: number) => {
-    return (base / 8) * 100;
+  const calculateProgress = (value: number) => {
+    return (value / 8) * 100;
   };
 
   return (
@@ -79,7 +79,10 @@ const HeroModal: React.FC = () => {
                 </span>
                 <Progress 
                   value={calculateProgress(selectedHero.stats.attack.base)} 
+                  boostedValue={selectedHero.stats.attack.boosted ? calculateProgress(selectedHero.stats.attack.boosted) : undefined}
                   className="h-2 mt-1.5 bg-red-100 dark:bg-red-950/30" 
+                  baseColor="bg-red-400"
+                  boostedColor="bg-red-600"
                 />
               </div>
               
@@ -94,7 +97,10 @@ const HeroModal: React.FC = () => {
                 </span>
                 <Progress 
                   value={calculateProgress(selectedHero.stats.initiative.base)} 
+                  boostedValue={selectedHero.stats.initiative.boosted ? calculateProgress(selectedHero.stats.initiative.boosted) : undefined}
                   className="h-2 mt-1.5 bg-yellow-100 dark:bg-yellow-950/30" 
+                  baseColor="bg-yellow-400"
+                  boostedColor="bg-yellow-600"
                 />
               </div>
               
@@ -109,7 +115,10 @@ const HeroModal: React.FC = () => {
                 </span>
                 <Progress 
                   value={calculateProgress(selectedHero.stats.defense.base)} 
+                  boostedValue={selectedHero.stats.defense.boosted ? calculateProgress(selectedHero.stats.defense.boosted) : undefined}
                   className="h-2 mt-1.5 bg-blue-100 dark:bg-blue-950/30" 
+                  baseColor="bg-blue-400"
+                  boostedColor="bg-blue-600"
                 />
               </div>
               
@@ -124,7 +133,10 @@ const HeroModal: React.FC = () => {
                 </span>
                 <Progress 
                   value={calculateProgress(selectedHero.stats.movement.base)} 
+                  boostedValue={selectedHero.stats.movement.boosted ? calculateProgress(selectedHero.stats.movement.boosted) : undefined}
                   className="h-2 mt-1.5 bg-green-100 dark:bg-green-950/30" 
+                  baseColor="bg-green-400"
+                  boostedColor="bg-green-600"
                 />
               </div>
             </div>
