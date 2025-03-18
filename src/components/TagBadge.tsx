@@ -1,14 +1,7 @@
 
 import React from 'react';
 import { tagColors } from '@/lib/data';
-import { tagDefinitions } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 interface TagBadgeProps {
   tag: string;
@@ -34,7 +27,7 @@ const TagBadge: React.FC<TagBadgeProps> = ({
     large: 'text-sm py-1.5 px-3'
   };
   
-  const tagBadge = (
+  return (
     <span 
       className={cn(
         'hero-tag transition-all duration-150 inline-flex items-center justify-center',
@@ -49,27 +42,6 @@ const TagBadge: React.FC<TagBadgeProps> = ({
       {tag}
     </span>
   );
-
-  if (tagDefinitions[tag]) {
-    return (
-      <TooltipProvider delayDuration={300}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            {tagBadge}
-          </TooltipTrigger>
-          <TooltipContent 
-            side="top" 
-            align="center" 
-            className="max-w-xs tag-tooltip"
-          >
-            <p>{tagDefinitions[tag]}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
-  }
-
-  return tagBadge;
 };
 
 export default TagBadge;
