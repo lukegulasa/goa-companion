@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { useGallery } from '@/context/GalleryContext';
 import { Star, Shield, Zap, ArrowRight, Activity } from 'lucide-react';
 import TagBadge from './TagBadge';
+import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 
 const HeroModal: React.FC = () => {
@@ -23,6 +24,11 @@ const HeroModal: React.FC = () => {
   const statTotal = selectedHero.statTotal.boosted 
     ? `${selectedHero.statTotal.base} (${selectedHero.statTotal.boosted})` 
     : selectedHero.statTotal.base.toString();
+
+  // Calculate progress percentage (0-100%) based on a stat value (1-8)
+  const calculateProgress = (base: number) => {
+    return (base / 8) * 100;
+  };
 
   return (
     <Dialog open={isModalOpen} onOpenChange={closeModal}>
@@ -71,6 +77,10 @@ const HeroModal: React.FC = () => {
                 <span className="text-xl font-bold">
                   {formatStat(selectedHero.stats.attack.base, selectedHero.stats.attack.boosted)}
                 </span>
+                <Progress 
+                  value={calculateProgress(selectedHero.stats.attack.base)} 
+                  className="h-2 mt-1.5 bg-red-100 dark:bg-red-950/30" 
+                />
               </div>
               
               {/* Initiative */}
@@ -82,6 +92,10 @@ const HeroModal: React.FC = () => {
                 <span className="text-xl font-bold">
                   {formatStat(selectedHero.stats.initiative.base, selectedHero.stats.initiative.boosted)}
                 </span>
+                <Progress 
+                  value={calculateProgress(selectedHero.stats.initiative.base)} 
+                  className="h-2 mt-1.5 bg-yellow-100 dark:bg-yellow-950/30" 
+                />
               </div>
               
               {/* Defense */}
@@ -93,6 +107,10 @@ const HeroModal: React.FC = () => {
                 <span className="text-xl font-bold">
                   {formatStat(selectedHero.stats.defense.base, selectedHero.stats.defense.boosted)}
                 </span>
+                <Progress 
+                  value={calculateProgress(selectedHero.stats.defense.base)} 
+                  className="h-2 mt-1.5 bg-blue-100 dark:bg-blue-950/30" 
+                />
               </div>
               
               {/* Movement */}
@@ -104,6 +122,10 @@ const HeroModal: React.FC = () => {
                 <span className="text-xl font-bold">
                   {formatStat(selectedHero.stats.movement.base, selectedHero.stats.movement.boosted)}
                 </span>
+                <Progress 
+                  value={calculateProgress(selectedHero.stats.movement.base)} 
+                  className="h-2 mt-1.5 bg-green-100 dark:bg-green-950/30" 
+                />
               </div>
             </div>
             

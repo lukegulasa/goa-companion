@@ -3,6 +3,7 @@ import React from 'react';
 import { Hero } from '@/lib/types';
 import TagBadge from './TagBadge';
 import { Star, Shield, Zap, Gauge, MoveHorizontal } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 interface HeroCardProps {
   hero: Hero;
@@ -18,6 +19,11 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
   // Helper function to format a stat with its boosted value if available
   const formatStat = (stat: { base: number; boosted?: number }) => {
     return stat.boosted ? `${stat.base} (${stat.boosted})` : stat.base.toString();
+  };
+
+  // Calculate progress percentage (0-100%) based on a stat value (1-8)
+  const calculateProgress = (stat: { base: number }) => {
+    return (stat.base / 8) * 100;
   };
 
   return (
@@ -51,31 +57,55 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
         
         {/* Stats */}
         <div className="mt-auto p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-          {/* Individual stats with icons */}
+          {/* Individual stats with icons and progress bars */}
           <div className="grid grid-cols-2 gap-2 mb-3">
-            <div className="flex items-center gap-1.5">
-              <Gauge className="w-3.5 h-3.5 text-red-500" />
-              <span className="text-xs text-gray-700 dark:text-gray-300">
-                ATK: {formatStat(hero.stats.attack)}
-              </span>
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5">
+                <Gauge className="w-3.5 h-3.5 text-red-500" />
+                <span className="text-xs text-gray-700 dark:text-gray-300">
+                  ATK: {formatStat(hero.stats.attack)}
+                </span>
+              </div>
+              <Progress 
+                value={calculateProgress(hero.stats.attack)} 
+                className="h-1.5 bg-red-100 dark:bg-red-950/30" 
+              />
             </div>
-            <div className="flex items-center gap-1.5">
-              <Zap className="w-3.5 h-3.5 text-yellow-500" />
-              <span className="text-xs text-gray-700 dark:text-gray-300">
-                INI: {formatStat(hero.stats.initiative)}
-              </span>
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5">
+                <Zap className="w-3.5 h-3.5 text-yellow-500" />
+                <span className="text-xs text-gray-700 dark:text-gray-300">
+                  INI: {formatStat(hero.stats.initiative)}
+                </span>
+              </div>
+              <Progress 
+                value={calculateProgress(hero.stats.initiative)} 
+                className="h-1.5 bg-yellow-100 dark:bg-yellow-950/30" 
+              />
             </div>
-            <div className="flex items-center gap-1.5">
-              <Shield className="w-3.5 h-3.5 text-blue-500" />
-              <span className="text-xs text-gray-700 dark:text-gray-300">
-                DEF: {formatStat(hero.stats.defense)}
-              </span>
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5">
+                <Shield className="w-3.5 h-3.5 text-blue-500" />
+                <span className="text-xs text-gray-700 dark:text-gray-300">
+                  DEF: {formatStat(hero.stats.defense)}
+                </span>
+              </div>
+              <Progress 
+                value={calculateProgress(hero.stats.defense)} 
+                className="h-1.5 bg-blue-100 dark:bg-blue-950/30" 
+              />
             </div>
-            <div className="flex items-center gap-1.5">
-              <MoveHorizontal className="w-3.5 h-3.5 text-green-500" />
-              <span className="text-xs text-gray-700 dark:text-gray-300">
-                MOV: {formatStat(hero.stats.movement)}
-              </span>
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5">
+                <MoveHorizontal className="w-3.5 h-3.5 text-green-500" />
+                <span className="text-xs text-gray-700 dark:text-gray-300">
+                  MOV: {formatStat(hero.stats.movement)}
+                </span>
+              </div>
+              <Progress 
+                value={calculateProgress(hero.stats.movement)} 
+                className="h-1.5 bg-green-100 dark:bg-green-950/30" 
+              />
             </div>
           </div>
           
