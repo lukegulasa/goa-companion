@@ -130,3 +130,15 @@
     @apply bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border border-white/20 dark:border-gray-800/50 shadow-lg;
   }
 }
+
+/* Fix for tooltips to be visible above other UI elements */
+[data-radix-tooltip-content] {
+  z-index: 100 !important;
+  max-width: 300px;
+}
+
+/* Ensure dialog content doesn't obscure tooltips */
+[data-radix-dialog-content] {
+  z-index: 50;
+}
+

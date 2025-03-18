@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { tagColors } from '@/lib/data';
 import { tagDefinitions } from '@/lib/types';
@@ -51,12 +52,12 @@ const TagBadge: React.FC<TagBadgeProps> = ({
 
   if (tagDefinitions[tag]) {
     return (
-      <TooltipProvider>
+      <TooltipProvider delayDuration={300}>
         <Tooltip>
           <TooltipTrigger asChild>
             {tagBadge}
           </TooltipTrigger>
-          <TooltipContent className="max-w-xs">
+          <TooltipContent side="top" align="center" className="max-w-xs z-[100]">
             <p>{tagDefinitions[tag]}</p>
           </TooltipContent>
         </Tooltip>
