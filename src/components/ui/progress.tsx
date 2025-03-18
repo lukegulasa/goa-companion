@@ -33,7 +33,6 @@ const Progress = React.forwardRef<
       <ProgressPrimitive.Indicator
         className={cn("h-full flex-1 transition-all absolute top-0", boostedColor || "bg-purple-500")}
         style={{ 
-          width: `${boostedValue}%`, 
           left: `${value || 0}%`,
           width: `${boostedValue - (value || 0)}%`
         }}
