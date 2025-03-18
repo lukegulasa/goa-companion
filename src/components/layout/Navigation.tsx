@@ -17,7 +17,7 @@ const Navigation: React.FC = () => {
   const isMobile = useIsMobile();
 
   return (
-    <header className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-10">
+    <header className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-50">
       <div className="container max-w-6xl mx-auto py-2 px-3 sm:px-6 sm:py-4 flex justify-between items-center">
         <div>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">

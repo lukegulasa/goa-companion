@@ -13,7 +13,7 @@ const Index: React.FC = () => {
 
   return (
     <GalleryProvider>
-      <div className="container max-w-6xl mx-auto pt-4 px-4 sm:px-6">
+      <div className="container max-w-6xl mx-auto pt-4 px-4 sm:px-6 relative z-0">
         <div className="flex justify-end mb-4">
           <Button 
             variant="outline" 
