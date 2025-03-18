@@ -78,15 +78,15 @@ export const GameParticipants: React.FC<GameParticipantsProps> = ({
                     <Select
                       value={participant.team}
                       onValueChange={(value) => 
-                        onUpdateParticipant(index, 'team', value as 'Atlantis' | 'Blight')
+                        onUpdateParticipant(index, 'team', value as 'Red' | 'Blue')
                       }
                     >
                       <SelectTrigger className="w-[130px]">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Atlantis">Atlantis</SelectItem>
-                        <SelectItem value="Blight">Blight</SelectItem>
+                        <SelectItem value="Red">Red</SelectItem>
+                        <SelectItem value="Blue">Blue</SelectItem>
                       </SelectContent>
                     </Select>
                   </TableCell>

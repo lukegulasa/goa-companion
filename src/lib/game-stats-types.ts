@@ -10,7 +10,7 @@ export interface Player {
 export interface GamePlayer {
   playerId: string;
   playerName: string;
-  team: 'Atlantis' | 'Blight';
+  team: 'Red' | 'Blue';
   heroId: number;
   heroName: string;
 }
@@ -19,8 +19,8 @@ export interface Game {
   id: string;
   date: string; // ISO string
   players: GamePlayer[];
-  winningTeam: 'Atlantis' | 'Blight';
-  victoryMethod: 'Wave Counter' | 'Base Push' | 'Hero Kills';
+  winningTeam: 'Red' | 'Blue';
+  victoryMethod?: 'Wave Counter' | 'Base Push' | 'Hero Kills';
 }
 
 // Form schemas for validation
@@ -30,8 +30,8 @@ export const newPlayerSchema = z.object({
 
 export const gameLogSchema = z.object({
   date: z.date(),
-  winningTeam: z.enum(['Atlantis', 'Blight']),
-  victoryMethod: z.enum(['Wave Counter', 'Base Push', 'Hero Kills']),
+  winningTeam: z.enum(['Red', 'Blue']),
+  victoryMethod: z.enum(['Wave Counter', 'Base Push', 'Hero Kills']).optional(),
 });
 
 export type GameLogFormValues = z.infer<typeof gameLogSchema>;

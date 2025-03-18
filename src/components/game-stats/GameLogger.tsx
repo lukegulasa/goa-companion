@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { GameLogFormValues, gameLogSchema, GamePlayer } from '@/lib/game-stats-types';
 import { GameParticipants } from './GameParticipants';
@@ -44,10 +45,11 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
     resolver: zodResolver(gameLogSchema),
     defaultValues: {
       date: new Date(),
-      winningTeam: 'Atlantis',
-      victoryMethod: 'Wave Counter',
+      winningTeam: 'Red',
     },
   });
+
+  const [showVictoryMethod, setShowVictoryMethod] = React.useState(false);
 
   // Add a player to the current game
   const addPlayerToGame = (playerId: string) => {
@@ -62,7 +64,7 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
       {
         playerId,
         playerName: player.name,
-        team: 'Atlantis', // Default team
+        team: 'Red', // Default team
         heroId: 0, // Will be updated when selected
         heroName: '',
       },
@@ -95,11 +97,21 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
     setGameParticipants(updatedParticipants);
   };
 
+  const handleSubmit = (data: GameLogFormValues) => {
+    // If victory method is not needed, filter it out
+    if (!showVictoryMethod) {
+      const { victoryMethod, ...rest } = data;
+      onLogGame(rest);
+    } else {
+      onLogGame(data);
+    }
+  };
+
   return (
     <div className="bg-card rounded-lg border shadow-sm p-6">
       <h2 className="text-xl font-semibold mb-4">Log a Game</h2>
       <Form {...gameLogForm}>
-        <form onSubmit={gameLogForm.handleSubmit(onLogGame)} className="space-y-6">
+        <form onSubmit={gameLogForm.handleSubmit(handleSubmit)} className="space-y-6">
           {/* Date Picker */}
           <FormField
             control={gameLogForm.control}
@@ -167,12 +179,12 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
                       className="flex flex-col space-y-1"
                     >
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="Atlantis" id="atlantis" />
-                        <label htmlFor="atlantis">Atlantis</label>
+                        <RadioGroupItem value="Red" id="red" />
+                        <label htmlFor="red">Red</label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="Blight" id="blight" />
-                        <label htmlFor="blight">Blight</label>
+                        <RadioGroupItem value="Blue" id="blue" />
+                        <label htmlFor="blue">Blue</label>
                       </div>
                     </RadioGroup>
                   </FormControl>
@@ -181,37 +193,52 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
               )}
             />
 
-            {/* Victory Method */}
-            <FormField
-              control={gameLogForm.control}
-              name="victoryMethod"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Victory Method</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex flex-col space-y-1"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="Wave Counter" id="wave" />
-                        <label htmlFor="wave">Wave Counter</label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="Base Push" id="base" />
-                        <label htmlFor="base">Base Push</label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="Hero Kills" id="kills" />
-                        <label htmlFor="kills">Hero Kills</label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+            {/* Optional Victory Method */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="victoryMethodToggle" 
+                  checked={showVictoryMethod}
+                  onCheckedChange={(checked) => setShowVictoryMethod(!!checked)} 
+                />
+                <label htmlFor="victoryMethodToggle" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Add Victory Method
+                </label>
+              </div>
+
+              {showVictoryMethod && (
+                <FormField
+                  control={gameLogForm.control}
+                  name="victoryMethod"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <FormLabel>Victory Method</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Wave Counter" id="wave" />
+                            <label htmlFor="wave">Wave Counter</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Base Push" id="base" />
+                            <label htmlFor="base">Base Push</label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="Hero Kills" id="kills" />
+                            <label htmlFor="kills">Hero Kills</label>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               )}
-            />
+            </div>
           </div>
 
           <Button 
