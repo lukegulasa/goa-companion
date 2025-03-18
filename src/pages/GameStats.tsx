@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { format } from 'date-fns';
@@ -47,6 +46,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
+import { GalleryProvider } from '@/context/GalleryContext';
 
 // Types for our game log
 interface Player {
@@ -81,7 +81,7 @@ const gameLogSchema = z.object({
   victoryMethod: z.enum(['Wave Counter', 'Base Push', 'Hero Kills']),
 });
 
-const GameStats: React.FC = () => {
+const GameStatsContent: React.FC = () => {
   const [players, setPlayers] = useLocalStorage<Player[]>('game-players', []);
   const [gameLogs, setGameLogs] = useLocalStorage<Game[]>('game-logs', []);
   const [gameParticipants, setGameParticipants] = useState<GamePlayer[]>([]);
@@ -588,6 +588,14 @@ const GameStats: React.FC = () => {
         </TabsContent>
       </Tabs>
     </div>
+  );
+};
+
+const GameStats: React.FC = () => {
+  return (
+    <GalleryProvider>
+      <GameStatsContent />
+    </GalleryProvider>
   );
 };
 
