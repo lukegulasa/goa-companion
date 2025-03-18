@@ -57,7 +57,11 @@ const TagBadge: React.FC<TagBadgeProps> = ({
           <TooltipTrigger asChild>
             {tagBadge}
           </TooltipTrigger>
-          <TooltipContent side="top" align="center" className="max-w-xs z-[100]">
+          <TooltipContent 
+            side="top" 
+            align="center" 
+            className="max-w-xs tag-tooltip"
+          >
             <p>{tagDefinitions[tag]}</p>
           </TooltipContent>
         </Tooltip>
