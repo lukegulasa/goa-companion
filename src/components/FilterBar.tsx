@@ -2,11 +2,11 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuGroup, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
 import { getAllTags } from '@/lib/data';
 import { useGallery } from '@/context/GalleryContext';
 import TagBadge from './TagBadge';
-import { Star, Filter, SortAsc, SortDesc, X, ArrowUpAZ, ArrowDownAZ, Star as StarIcon } from 'lucide-react';
+import { Star, Filter, SortAsc, SortDesc, X, ArrowUpAZ, ArrowDownAZ, Star as StarIcon, Gauge, Shield, Zap, MoveHorizontal } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -129,7 +129,8 @@ const FilterBar: React.FC = () => {
                 Sort
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuLabel>General</DropdownMenuLabel>
               <DropdownMenuItem 
                 onClick={() => setSortOption('nameAsc')}
                 className={cn("flex gap-2", sortOption === 'nameAsc' && "bg-muted")}
@@ -171,6 +172,73 @@ const FilterBar: React.FC = () => {
               >
                 <SortDesc className="h-4 w-4" />
                 Stat Total (High to Low)
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Stats</DropdownMenuLabel>
+              
+              {/* Attack */}
+              <DropdownMenuItem 
+                onClick={() => setSortOption('attackAsc')}
+                className={cn("flex gap-2", sortOption === 'attackAsc' && "bg-muted")}
+              >
+                <Gauge className="h-4 w-4 text-red-500" />
+                Attack (Low to High)
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSortOption('attackDesc')}
+                className={cn("flex gap-2", sortOption === 'attackDesc' && "bg-muted")}
+              >
+                <Gauge className="h-4 w-4 text-red-500" />
+                Attack (High to Low)
+              </DropdownMenuItem>
+              
+              {/* Initiative */}
+              <DropdownMenuItem 
+                onClick={() => setSortOption('initiativeAsc')}
+                className={cn("flex gap-2", sortOption === 'initiativeAsc' && "bg-muted")}
+              >
+                <Zap className="h-4 w-4 text-yellow-500" />
+                Initiative (Low to High)
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSortOption('initiativeDesc')}
+                className={cn("flex gap-2", sortOption === 'initiativeDesc' && "bg-muted")}
+              >
+                <Zap className="h-4 w-4 text-yellow-500" />
+                Initiative (High to Low)
+              </DropdownMenuItem>
+              
+              {/* Defense */}
+              <DropdownMenuItem 
+                onClick={() => setSortOption('defenseAsc')}
+                className={cn("flex gap-2", sortOption === 'defenseAsc' && "bg-muted")}
+              >
+                <Shield className="h-4 w-4 text-blue-500" />
+                Defense (Low to High)
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSortOption('defenseDesc')}
+                className={cn("flex gap-2", sortOption === 'defenseDesc' && "bg-muted")}
+              >
+                <Shield className="h-4 w-4 text-blue-500" />
+                Defense (High to Low)
+              </DropdownMenuItem>
+              
+              {/* Movement */}
+              <DropdownMenuItem 
+                onClick={() => setSortOption('movementAsc')}
+                className={cn("flex gap-2", sortOption === 'movementAsc' && "bg-muted")}
+              >
+                <MoveHorizontal className="h-4 w-4 text-green-500" />
+                Movement (Low to High)
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSortOption('movementDesc')}
+                className={cn("flex gap-2", sortOption === 'movementDesc' && "bg-muted")}
+              >
+                <MoveHorizontal className="h-4 w-4 text-green-500" />
+                Movement (High to Low)
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

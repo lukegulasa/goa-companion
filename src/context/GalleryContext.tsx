@@ -60,6 +60,63 @@ export const GalleryProvider: React.FC<{ children: React.ReactNode }> = ({ child
           return totalB - totalA;
         });
         break;
+      // New sorting options for individual stats
+      case 'attackAsc':
+        filtered.sort((a, b) => {
+          const statA = a.stats.attack.boosted || a.stats.attack.base;
+          const statB = b.stats.attack.boosted || b.stats.attack.base;
+          return statA - statB;
+        });
+        break;
+      case 'attackDesc':
+        filtered.sort((a, b) => {
+          const statA = a.stats.attack.boosted || a.stats.attack.base;
+          const statB = b.stats.attack.boosted || b.stats.attack.base;
+          return statB - statA;
+        });
+        break;
+      case 'initiativeAsc':
+        filtered.sort((a, b) => {
+          const statA = a.stats.initiative.boosted || a.stats.initiative.base;
+          const statB = b.stats.initiative.boosted || b.stats.initiative.base;
+          return statA - statB;
+        });
+        break;
+      case 'initiativeDesc':
+        filtered.sort((a, b) => {
+          const statA = a.stats.initiative.boosted || a.stats.initiative.base;
+          const statB = b.stats.initiative.boosted || b.stats.initiative.base;
+          return statB - statA;
+        });
+        break;
+      case 'defenseAsc':
+        filtered.sort((a, b) => {
+          const statA = a.stats.defense.boosted || a.stats.defense.base;
+          const statB = b.stats.defense.boosted || b.stats.defense.base;
+          return statA - statB;
+        });
+        break;
+      case 'defenseDesc':
+        filtered.sort((a, b) => {
+          const statA = a.stats.defense.boosted || a.stats.defense.base;
+          const statB = b.stats.defense.boosted || b.stats.defense.base;
+          return statB - statA;
+        });
+        break;
+      case 'movementAsc':
+        filtered.sort((a, b) => {
+          const statA = a.stats.movement.boosted || a.stats.movement.base;
+          const statB = b.stats.movement.boosted || b.stats.movement.base;
+          return statA - statB;
+        });
+        break;
+      case 'movementDesc':
+        filtered.sort((a, b) => {
+          const statA = a.stats.movement.boosted || a.stats.movement.base;
+          const statB = b.stats.movement.boosted || b.stats.movement.base;
+          return statB - statA;
+        });
+        break;
       default:
         break;
     }

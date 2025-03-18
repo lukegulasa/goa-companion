@@ -32,7 +32,15 @@ export type SortOption =
   | 'starsAsc' 
   | 'starsDesc' 
   | 'statTotalAsc' 
-  | 'statTotalDesc';
+  | 'statTotalDesc'
+  | 'attackAsc'
+  | 'attackDesc'
+  | 'initiativeAsc'
+  | 'initiativeDesc'
+  | 'defenseAsc'
+  | 'defenseDesc'
+  | 'movementAsc'
+  | 'movementDesc';
 
 export interface GalleryContextType {
   heroes: Hero[];
