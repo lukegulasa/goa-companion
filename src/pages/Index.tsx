@@ -6,7 +6,8 @@ import HeroGrid from '@/components/HeroGrid';
 import HeroModal from '@/components/HeroModal';
 import TagInfoPanel from '@/components/TagInfoPanel';
 import { Button } from '@/components/ui/button';
-import { InfoIcon } from 'lucide-react';
+import { InfoIcon, BarChartIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Index: React.FC = () => {
   const [tagInfoOpen, setTagInfoOpen] = useState(false);
@@ -24,15 +25,27 @@ const Index: React.FC = () => {
                 Explore the heroes of the board game
               </p>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex items-center gap-1.5"
-              onClick={() => setTagInfoOpen(true)}
-            >
-              <InfoIcon className="w-4 h-4" />
-              <span className="hidden sm:inline">Tag Reference</span>
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Link to="/game-stats">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center gap-1.5"
+                >
+                  <BarChartIcon className="w-4 h-4" />
+                  <span className="hidden sm:inline">Game Stats</span>
+                </Button>
+              </Link>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-1.5"
+                onClick={() => setTagInfoOpen(true)}
+              >
+                <InfoIcon className="w-4 h-4" />
+                <span className="hidden sm:inline">Tag Reference</span>
+              </Button>
+            </div>
           </div>
         </header>
 
