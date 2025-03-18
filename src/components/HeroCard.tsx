@@ -42,9 +42,9 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
           </div>
         </div>
         
-        {/* Primary tags */}
+        {/* All tags instead of just primary tags */}
         <div className="mb-4 flex flex-wrap gap-1.5 tag-container">
-          {hero.primaryTags.map((tag) => (
+          {hero.allTags.map((tag) => (
             <TagBadge key={tag} tag={tag} size="small" />
           ))}
         </div>
