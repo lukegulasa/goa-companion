@@ -7,6 +7,6 @@ export function useHeroes() {
   const { heroes } = useGallery();
   
   return {
-    heroes: heroes || []
+    heroes: heroes || [] as Hero[]
   };
 }
