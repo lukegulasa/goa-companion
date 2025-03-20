@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import Index from "./pages/Index";
 import GameStats from "./pages/GameStats";
+import DraftPage from "./pages/DraftPage";
 import NotFound from "./pages/NotFound";
 import { LazyMotion, domAnimation } from "framer-motion";
 
@@ -21,6 +22,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Layout><Index /></Layout>} />
+            <Route path="/draft" element={<Layout><DraftPage /></Layout>} />
             <Route path="/game-stats" element={<Layout><GameStats /></Layout>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<Layout><NotFound /></Layout>} />

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { HomeIcon, BarChartIcon } from 'lucide-react';
+import { HomeIcon, BarChartIcon, Users2 } from 'lucide-react';
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -42,6 +42,22 @@ const Navigation: React.FC = () => {
                 >
                   <HomeIcon className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                   <span className={isMobile ? "text-xs" : ""}>Gallery</span>
+                </Button>
+              </Link>
+            </NavigationMenuItem>
+            
+            <NavigationMenuItem>
+              <Link to="/draft">
+                <Button 
+                  variant={isActive('/draft') ? 'default' : 'outline'} 
+                  size={isMobile ? "sm" : "default"}
+                  className={cn(
+                    "mr-1 sm:mr-2",
+                    isActive('/draft') && "bg-primary/90 hover:bg-primary"
+                  )}
+                >
+                  <Users2 className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className={isMobile ? "text-xs" : ""}>Draft</span>
                 </Button>
               </Link>
             </NavigationMenuItem>
