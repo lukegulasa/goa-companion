@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useHeroes } from '@/hooks/use-heroes';
@@ -8,7 +7,8 @@ import { motion } from 'framer-motion';
 
 interface AllPickDraftProps {
   playerCount: number;
-  onComplete: () => void;
+  playerNames?: string[];
+  onComplete: (draftData: any[]) => void;
 }
 
 interface DraftSlot {
@@ -18,7 +18,11 @@ interface DraftSlot {
   heroName: string;
 }
 
-const AllPickDraft: React.FC<AllPickDraftProps> = ({ playerCount, onComplete }) => {
+const AllPickDraft: React.FC<AllPickDraftProps> = ({ 
+  playerCount, 
+  playerNames = [], 
+  onComplete 
+}) => {
   const { heroes } = useHeroes();
   const [selectedHeroId, setSelectedHeroId] = useState<number | null>(null);
   const [currentTeam, setCurrentTeam] = useState<'Red' | 'Blue'>('Red');
@@ -80,6 +84,19 @@ const AllPickDraft: React.FC<AllPickDraftProps> = ({ playerCount, onComplete }) 
     }
   };
 
+  const handleComplete = () => {
+    // Prepare draft data
+    const draftData = draftSlots.map((slot, index) => ({
+      id: playerNames[index] ? playerNames[index].toLowerCase().replace(/\s+/g, '-') : `player-${slot.playerNumber}`,
+      name: playerNames[index] || `Player ${slot.playerNumber}`,
+      team: slot.team,
+      heroId: slot.heroId as number,
+      heroName: slot.heroName
+    }));
+
+    onComplete(draftData);
+  };
+
   if (isComplete) {
     return (
       <div className="space-y-6">
@@ -117,7 +134,7 @@ const AllPickDraft: React.FC<AllPickDraftProps> = ({ playerCount, onComplete }) 
           </div>
         </div>
         
-        <Button onClick={onComplete} className="w-full">
+        <Button onClick={handleComplete} className="w-full">
           Continue
         </Button>
       </div>

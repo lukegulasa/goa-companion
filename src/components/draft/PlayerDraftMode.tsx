@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useHeroes } from '@/hooks/use-heroes';
@@ -38,10 +37,15 @@ interface Player {
 
 interface PlayerDraftModeProps {
   playerCount: number;
-  onComplete: () => void;
+  playerNames?: string[];
+  onComplete: (draftData: any[]) => void;
 }
 
-const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ playerCount, onComplete }) => {
+const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ 
+  playerCount, 
+  playerNames = [],
+  onComplete 
+}) => {
   const { heroes } = useHeroes();
   const { toast } = useToast();
   
@@ -53,9 +57,8 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ playerCount, onComple
   const [currentCaptain, setCurrentCaptain] = useState<'A' | 'B'>('A');
   const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [playerNames, setPlayerNames] = useState<string[]>(Array(playerCount).fill(''));
+  const [playerNamesState, setPlayerNames] = useState<string[]>(Array(playerCount).fill(''));
   
-  // Initialize player data
   useEffect(() => {
     if (draftStage === 'hero-selection' && players.length === 0) {
       if (draftMethod === 'all-random') {
@@ -65,7 +68,6 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ playerCount, onComple
   }, [draftStage, draftMethod]);
   
   const setupDraft = () => {
-    // Validate that names are entered
     const emptyNames = playerNames.filter(name => !name.trim()).length;
     if (emptyNames > 0) {
       toast({
@@ -76,7 +78,6 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ playerCount, onComple
       return;
     }
     
-    // Validate that captains are selected
     if (captainA === null || captainB === null) {
       toast({
         title: "Missing captains",
@@ -108,7 +109,6 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ playerCount, onComple
       return;
     }
     
-    // Shuffle heroes and assign to players
     const shuffled = [...heroes].sort(() => 0.5 - Math.random());
     const newPlayers: Player[] = [];
     
@@ -132,7 +132,6 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ playerCount, onComple
   };
   
   const selectPlayer = (playerId: number) => {
-    // Check if player is already on a team or is a captain
     const player = players.find(p => p.id === playerId);
     if (!player || player.team) {
       return;
@@ -145,7 +144,6 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ playerCount, onComple
   const confirmSelection = () => {
     if (selectedPlayer === null) return;
     
-    // Assign player to current captain's team
     setPlayers(prev => 
       prev.map(player => 
         player.id === selectedPlayer 
@@ -154,7 +152,6 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ playerCount, onComple
       )
     );
     
-    // Switch to other captain
     setCurrentCaptain(prev => prev === 'A' ? 'B' : 'A');
     
     const playerName = players.find(p => p.id === selectedPlayer)?.name;
@@ -166,8 +163,7 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ playerCount, onComple
     setSelectedPlayer(null);
     setIsDialogOpen(false);
     
-    // Check if draft is complete
-    const undraftedPlayers = players.filter(p => !p.team).length - 1; // -1 for current selection
+    const undraftedPlayers = players.filter(p => !p.team).length - 1;
     if (undraftedPlayers === 0) {
       setDraftStage('complete');
       toast({
@@ -183,17 +179,15 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ playerCount, onComple
   };
   
   const handlePlayerNameChange = (index: number, name: string) => {
-    const newNames = [...playerNames];
+    const newNames = [...playerNamesState];
     newNames[index] = name;
     setPlayerNames(newNames);
   };
   
-  // Helper to get drafted players for a team
   const getTeamPlayers = (team: 'A' | 'B') => {
     return players.filter(player => player.team === team);
   };
   
-  // Container animation
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -216,6 +210,29 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ playerCount, onComple
       }
     }
   };
+  
+  const handleDraftComplete = () => {
+    const draftData = players.map(player => ({
+      id: player.name.toLowerCase().replace(/\s+/g, '-'),
+      name: player.name,
+      team: player.team === 'A' ? 'Red' : 'Blue',
+      heroId: player.hero.id,
+      heroName: player.hero.name
+    }));
+    
+    onComplete(draftData);
+  };
+  
+  if (draftStage === 'complete') {
+    return (
+      <div className="flex justify-end pt-4">
+        <Button onClick={handleDraftComplete}>
+          Confirm Draft
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+    );
+  }
   
   return (
     <div className="space-y-6">
@@ -267,7 +284,7 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ playerCount, onComple
                   <Label htmlFor={`player-${index}`}>Player {index + 1}</Label>
                   <Input
                     id={`player-${index}`}
-                    value={playerNames[index]}
+                    value={playerNamesState[index]}
                     onChange={(e) => handlePlayerNameChange(index, e.target.value)}
                     placeholder={`Player ${index + 1}`}
                     className="mt-1"
@@ -290,7 +307,7 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ playerCount, onComple
                 <SelectContent>
                   {Array.from({ length: playerCount }).map((_, index) => (
                     <SelectItem key={index} value={index.toString()}>
-                      {playerNames[index] || `Player ${index + 1}`}
+                      {playerNamesState[index] || `Player ${index + 1}`}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -309,7 +326,7 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ playerCount, onComple
                 <SelectContent>
                   {Array.from({ length: playerCount }).map((_, index) => (
                     <SelectItem key={index} value={index.toString()}>
-                      {playerNames[index] || `Player ${index + 1}`}
+                      {playerNamesState[index] || `Player ${index + 1}`}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -419,7 +436,7 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ playerCount, onComple
       
       {draftStage === 'complete' && (
         <div className="flex justify-end pt-4">
-          <Button onClick={onComplete}>
+          <Button onClick={handleDraftComplete}>
             Confirm Draft
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>

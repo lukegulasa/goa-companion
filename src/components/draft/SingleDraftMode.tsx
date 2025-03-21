@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useHeroes } from '@/hooks/use-heroes';
@@ -24,10 +23,15 @@ interface PlayerDraft {
 
 interface SingleDraftModeProps {
   playerCount: number;
-  onComplete: () => void;
+  playerNames?: string[];
+  onComplete: (draftData: any[]) => void;
 }
 
-const SingleDraftMode: React.FC<SingleDraftModeProps> = ({ playerCount, onComplete }) => {
+const SingleDraftMode: React.FC<SingleDraftModeProps> = ({ 
+  playerCount, 
+  playerNames = [],
+  onComplete 
+}) => {
   const { heroes } = useHeroes();
   const { toast } = useToast();
   
@@ -39,12 +43,10 @@ const SingleDraftMode: React.FC<SingleDraftModeProps> = ({ playerCount, onComple
   
   const playersPerTeam = playerCount / 2;
   
-  // Initialize players on component mount
   useEffect(() => {
     initializeDraft();
   }, [heroes, playerCount]);
   
-  // Check if draft is complete
   useEffect(() => {
     const allSelected = players.every(player => player.selected);
     if (players.length > 0 && allSelected) {
@@ -62,14 +64,11 @@ const SingleDraftMode: React.FC<SingleDraftModeProps> = ({ playerCount, onComple
       return;
     }
     
-    // Shuffle all heroes
     const shuffled = [...heroes].sort(() => 0.5 - Math.random());
     
-    // Create player drafts
     const newPlayers: PlayerDraft[] = [];
     
     for (let i = 0; i < playerCount; i++) {
-      // Get 3 unique heroes for this player
       const startIndex = i * 3;
       const playerOptions = shuffled.slice(startIndex, startIndex + 3);
       
@@ -93,7 +92,6 @@ const SingleDraftMode: React.FC<SingleDraftModeProps> = ({ playerCount, onComple
   const confirmSelection = () => {
     if (!selectedHero) return;
     
-    // Update the current player's selection
     setPlayers(prev => 
       prev.map((player, idx) => 
         idx === currentPlayerIndex 
@@ -102,7 +100,6 @@ const SingleDraftMode: React.FC<SingleDraftModeProps> = ({ playerCount, onComple
       )
     );
     
-    // Move to next player or complete
     if (currentPlayerIndex < players.length - 1) {
       setCurrentPlayerIndex(prev => prev + 1);
       
@@ -126,7 +123,18 @@ const SingleDraftMode: React.FC<SingleDraftModeProps> = ({ playerCount, onComple
     setIsDialogOpen(false);
   };
   
-  // Container animation
+  const handleDraftComplete = () => {
+    const draftData = players.map((player, index) => ({
+      id: playerNames[index] ? playerNames[index].toLowerCase().replace(/\s+/g, '-') : `player-${player.id}`,
+      name: playerNames[index] || `Player ${player.id}`,
+      team: player.team === 'A' ? 'Red' : 'Blue',
+      heroId: player.selected ? player.selected.id : 0,
+      heroName: player.selected ? player.selected.name : ''
+    }));
+    
+    onComplete(draftData);
+  };
+  
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -165,6 +173,17 @@ const SingleDraftMode: React.FC<SingleDraftModeProps> = ({ playerCount, onComple
       .filter(player => player.team === 'B' && player.selected)
       .map(player => player.selected!);
   };
+  
+  if (isDraftComplete) {
+    return (
+      <div className="flex justify-end pt-4">
+        <Button onClick={handleDraftComplete}>
+          Confirm Draft
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+    );
+  }
   
   return (
     <div className="space-y-6">
@@ -255,15 +274,6 @@ const SingleDraftMode: React.FC<SingleDraftModeProps> = ({ playerCount, onComple
               </motion.div>
             ))}
           </motion.div>
-        </div>
-      )}
-      
-      {isDraftComplete && (
-        <div className="flex justify-end pt-4">
-          <Button onClick={onComplete}>
-            Confirm Draft
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
         </div>
       )}
       

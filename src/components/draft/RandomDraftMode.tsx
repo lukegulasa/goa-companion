@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useHeroes } from '@/hooks/use-heroes';
@@ -9,7 +8,8 @@ import { motion } from 'framer-motion';
 
 interface RandomDraftModeProps {
   playerCount: number;
-  onComplete: () => void;
+  playerNames?: string[];
+  onComplete: (draftData: any[]) => void;
 }
 
 interface DraftSlot {
@@ -19,7 +19,11 @@ interface DraftSlot {
   heroName: string;
 }
 
-const RandomDraftMode: React.FC<RandomDraftModeProps> = ({ playerCount, onComplete }) => {
+const RandomDraftMode: React.FC<RandomDraftModeProps> = ({ 
+  playerCount, 
+  playerNames = [],
+  onComplete 
+}) => {
   const { heroes } = useHeroes();
   const [selectedHeroId, setSelectedHeroId] = useState<number | null>(null);
   const [currentTeam, setCurrentTeam] = useState<'Red' | 'Blue'>('Red');
@@ -28,9 +32,7 @@ const RandomDraftMode: React.FC<RandomDraftModeProps> = ({ playerCount, onComple
   const [availableHeroes, setAvailableHeroes] = useState<typeof heroes>([]);
   const [isComplete, setIsComplete] = useState(false);
 
-  // Initialize draft slots and random hero pool
   useEffect(() => {
-    // Initialize draft slots
     const slots: DraftSlot[] = [];
     const teamsCount = Math.floor(playerCount / 2);
     
@@ -46,13 +48,11 @@ const RandomDraftMode: React.FC<RandomDraftModeProps> = ({ playerCount, onComple
     
     setDraftSlots(slots);
     
-    // Select random pool of heroes
     const shuffledHeroes = [...heroes].sort(() => 0.5 - Math.random());
     setAvailableHeroes(shuffledHeroes.slice(0, playerCount + 2));
   }, [playerCount, heroes]);
 
   const handleHeroSelect = (heroId: number) => {
-    // Don't allow selecting already picked heroes
     if (draftSlots.some(slot => slot.heroId === heroId)) return;
     
     setSelectedHeroId(heroId);
@@ -61,7 +61,6 @@ const RandomDraftMode: React.FC<RandomDraftModeProps> = ({ playerCount, onComple
   const handleConfirmSelection = () => {
     if (selectedHeroId === null) return;
 
-    // Update current player's hero
     const updatedSlots = draftSlots.map(slot => {
       if (slot.playerNumber === currentPlayer) {
         const hero = heroes.find(h => h.id === selectedHeroId);
@@ -76,7 +75,6 @@ const RandomDraftMode: React.FC<RandomDraftModeProps> = ({ playerCount, onComple
     
     setDraftSlots(updatedSlots);
     
-    // Move to next player
     const nextPlayer = currentPlayer + 1;
     if (nextPlayer > playerCount) {
       setIsComplete(true);
@@ -85,6 +83,18 @@ const RandomDraftMode: React.FC<RandomDraftModeProps> = ({ playerCount, onComple
       setCurrentTeam(currentTeam === 'Red' ? 'Blue' : 'Red');
       setSelectedHeroId(null);
     }
+  };
+
+  const handleComplete = () => {
+    const draftData = draftSlots.map((slot, index) => ({
+      id: playerNames[index] ? playerNames[index].toLowerCase().replace(/\s+/g, '-') : `player-${slot.playerNumber}`,
+      name: playerNames[index] || `Player ${slot.playerNumber}`,
+      team: slot.team,
+      heroId: slot.heroId as number,
+      heroName: slot.heroName
+    }));
+
+    onComplete(draftData);
   };
 
   if (isComplete) {
@@ -124,7 +134,7 @@ const RandomDraftMode: React.FC<RandomDraftModeProps> = ({ playerCount, onComple
           </div>
         </div>
         
-        <Button onClick={onComplete} className="w-full">
+        <Button onClick={handleComplete} className="w-full">
           Continue
         </Button>
       </div>
@@ -144,7 +154,6 @@ const RandomDraftMode: React.FC<RandomDraftModeProps> = ({ playerCount, onComple
         </div>
       </div>
       
-      {/* Current Team's Draft Slots */}
       <Card className={`border-2 ${currentTeam === 'Red' ? 'border-red-500' : 'border-blue-500'}`}>
         <CardContent className="p-4">
           <h3 className="font-medium mb-3">
@@ -172,7 +181,6 @@ const RandomDraftMode: React.FC<RandomDraftModeProps> = ({ playerCount, onComple
         </CardContent>
       </Card>
       
-      {/* Available Heroes */}
       <div>
         <h3 className="font-medium mb-3">Random Hero Pool</h3>
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
@@ -201,3 +209,4 @@ const RandomDraftMode: React.FC<RandomDraftModeProps> = ({ playerCount, onComple
 };
 
 export default RandomDraftMode;
+

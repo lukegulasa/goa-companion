@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useHeroes } from '@/hooks/use-heroes';
@@ -22,10 +21,15 @@ interface DraftAction {
 
 interface PickBanDraftModeProps {
   playerCount: number;
-  onComplete: () => void;
+  playerNames?: string[];
+  onComplete: (draftData: any[]) => void;
 }
 
-const PickBanDraftMode: React.FC<PickBanDraftModeProps> = ({ playerCount, onComplete }) => {
+const PickBanDraftMode: React.FC<PickBanDraftModeProps> = ({ 
+  playerCount, 
+  playerNames = [],
+  onComplete 
+}) => {
   const { heroes } = useHeroes();
   const { toast } = useToast();
   
@@ -39,12 +43,10 @@ const PickBanDraftMode: React.FC<PickBanDraftModeProps> = ({ playerCount, onComp
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDraftComplete, setIsDraftComplete] = useState(false);
   
-  // Initialize the draft on component mount
   useEffect(() => {
     initializeDraft();
   }, [heroes, playerCount]);
   
-  // Check if draft is complete
   useEffect(() => {
     if (draftSequence.length > 0 && currentStep >= draftSequence.length) {
       setIsDraftComplete(true);
@@ -52,7 +54,6 @@ const PickBanDraftMode: React.FC<PickBanDraftModeProps> = ({ playerCount, onComp
   }, [currentStep, draftSequence]);
   
   const initializeDraft = () => {
-    // Set available heroes
     setAvailableHeroes([...heroes]);
     setBannedHeroes([]);
     setTeamA([]);
@@ -60,11 +61,9 @@ const PickBanDraftMode: React.FC<PickBanDraftModeProps> = ({ playerCount, onComp
     setCurrentStep(0);
     setIsDraftComplete(false);
     
-    // Create draft sequence based on player count
     const sequence: DraftAction[] = [];
     
     if (playerCount === 4) {
-      // 4 players sequence
       sequence.push({ team: 'A', action: 'ban' });
       sequence.push({ team: 'B', action: 'ban' });
       sequence.push({ team: 'A', action: 'pick' });
@@ -74,7 +73,6 @@ const PickBanDraftMode: React.FC<PickBanDraftModeProps> = ({ playerCount, onComp
       sequence.push({ team: 'B', action: 'pick' });
       sequence.push({ team: 'A', action: 'pick' });
     } else if (playerCount === 6) {
-      // 6 players sequence (same as 4 players plus additional steps)
       sequence.push({ team: 'A', action: 'ban' });
       sequence.push({ team: 'B', action: 'ban' });
       sequence.push({ team: 'A', action: 'pick' });
@@ -111,7 +109,6 @@ const PickBanDraftMode: React.FC<PickBanDraftModeProps> = ({ playerCount, onComp
     if (!currentAction) return;
     
     if (currentAction.action === 'ban') {
-      // Add hero to banned list
       setBannedHeroes(prev => [...prev, selectedHero]);
       
       toast({
@@ -119,7 +116,6 @@ const PickBanDraftMode: React.FC<PickBanDraftModeProps> = ({ playerCount, onComp
         description: `${selectedHero.name} has been removed from the draft pool.`,
       });
     } else {
-      // Add hero to team
       if (currentAction.team === 'A') {
         setTeamA(prev => [...prev, selectedHero]);
       } else {
@@ -132,10 +128,8 @@ const PickBanDraftMode: React.FC<PickBanDraftModeProps> = ({ playerCount, onComp
       });
     }
     
-    // Remove hero from available heroes
     setAvailableHeroes(prev => prev.filter(h => h.id !== selectedHero.id));
     
-    // Move to next step
     setCurrentStep(prev => prev + 1);
     
     setSelectedHero(null);
@@ -147,7 +141,27 @@ const PickBanDraftMode: React.FC<PickBanDraftModeProps> = ({ playerCount, onComp
     setIsDialogOpen(false);
   };
   
-  // Container animation
+  const handleDraftComplete = () => {
+    const draftData = [
+      ...teamA.map((hero, index) => ({
+        id: playerNames[index] ? playerNames[index].toLowerCase().replace(/\s+/g, '-') : `teamA-player-${index}`,
+        name: playerNames[index] || `Team A Player ${index + 1}`,
+        team: 'Red',
+        heroId: hero.id,
+        heroName: hero.name
+      })),
+      ...teamB.map((hero, index) => ({
+        id: playerNames[teamA.length + index] ? playerNames[teamA.length + index].toLowerCase().replace(/\s+/g, '-') : `teamB-player-${index}`,
+        name: playerNames[teamA.length + index] || `Team B Player ${index + 1}`,
+        team: 'Blue',
+        heroId: hero.id,
+        heroName: hero.name
+      }))
+    ];
+    
+    onComplete(draftData);
+  };
+  
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -298,7 +312,7 @@ const PickBanDraftMode: React.FC<PickBanDraftModeProps> = ({ playerCount, onComp
       
       {isDraftComplete && (
         <div className="flex justify-end pt-4">
-          <Button onClick={onComplete}>
+          <Button onClick={handleDraftComplete}>
             Confirm Draft
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
