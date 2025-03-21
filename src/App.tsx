@@ -1,9 +1,10 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from "@/components/ui/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import Layout from '@/components/layout/Layout';
-import Index from './pages';
+import Index from './pages/Index'; // Changed from './pages' to './pages/Index'
 import DraftPage from './pages/DraftPage';
 import NotFound from './pages/NotFound';
 import HeroModal from '@/components/HeroModal';
