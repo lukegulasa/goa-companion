@@ -182,3 +182,11 @@ export function getHeroMatchups(heroId: number, matchups: HeroMatchupStats[]): H
 export function getHeroSynergies(heroId: number, synergies: HeroSynergyStats[]): HeroSynergyStats[] {
   return synergies.filter(synergy => synergy.heroId === heroId);
 }
+
+/**
+ * Get win rate for a specific hero
+ */
+export function getHeroWinRate(heroId: number, heroStats: HeroStats[]): number | null {
+  const stats = getHeroStats(heroId, heroStats);
+  return stats ? stats.winRate : null;
+}

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,7 +51,6 @@ const DraftPage = () => {
   };
 
   const startDraft = () => {
-    // Validate that we have player names for all slots
     const filledNames = playerNames.slice(0, playerCount).filter(name => name.trim() !== '');
     if (filledNames.length < playerCount) {
       toast({
@@ -99,7 +97,6 @@ const DraftPage = () => {
       );
     }
 
-    // Prepare player data for the draft components
     const draftProps = {
       playerCount,
       playerNames: playerNames.slice(0, playerCount),
@@ -112,37 +109,37 @@ const DraftPage = () => {
         return <AllRandomDraft 
           playerCount={playerCount} 
           playerNames={playerNames.slice(0, playerCount)}
-          onComplete={(data) => onDraftComplete(data || [])} 
+          onComplete={onDraftComplete} 
         />;
       case 'all-pick':
         return <AllPickDraft 
           playerCount={playerCount} 
           playerNames={playerNames.slice(0, playerCount)}
-          onComplete={(data) => onDraftComplete(data || [])} 
+          onComplete={onDraftComplete} 
         />;
       case 'single-draft':
         return <SingleDraftMode 
           playerCount={playerCount} 
           playerNames={playerNames.slice(0, playerCount)}
-          onComplete={(data) => onDraftComplete(data || [])} 
+          onComplete={onDraftComplete} 
         />;
       case 'random-draft':
         return <RandomDraftMode 
           playerCount={playerCount} 
           playerNames={playerNames.slice(0, playerCount)}
-          onComplete={(data) => onDraftComplete(data || [])} 
+          onComplete={onDraftComplete} 
         />;
       case 'player-draft':
         return <PlayerDraftMode 
           playerCount={playerCount} 
           playerNames={playerNames.slice(0, playerCount)}
-          onComplete={(data) => onDraftComplete(data || [])} 
+          onComplete={onDraftComplete} 
         />;
       case 'pick-ban':
         return <PickBanDraftMode 
           playerCount={playerCount} 
           playerNames={playerNames.slice(0, playerCount)}
-          onComplete={(data) => onDraftComplete(data || [])} 
+          onComplete={onDraftComplete} 
         />;
       default:
         return null;
