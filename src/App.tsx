@@ -9,13 +9,16 @@ import DraftPage from './pages/DraftPage';
 import NotFound from './pages/NotFound';
 import HeroModal from '@/components/HeroModal';
 import GameStats from './pages/GameStats';
+import { GalleryProvider } from '@/context/GalleryContext';
 
 function App() {
   return (
     <div className="min-h-screen bg-background font-sans antialiased">
       <ThemeProvider defaultTheme="system" storageKey="goa-theme">
         <Toaster />
-        <HeroModal />
+        <GalleryProvider>
+          <HeroModal />
+        </GalleryProvider>
         <BrowserRouter>
           <Layout>
             <Routes>
