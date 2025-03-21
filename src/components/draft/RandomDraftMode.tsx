@@ -5,8 +5,9 @@ import { useHeroes } from '@/hooks/use-heroes';
 import { Hero } from '@/lib/types';
 import { motion } from 'framer-motion';
 import HeroCard from '@/components/HeroCard';
-import { Shuffle, ArrowRight } from 'lucide-react';
+import { Shuffle, ArrowRight, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Toggle } from '@/components/ui/toggle';
 import {
   Dialog,
   DialogContent,
@@ -31,14 +32,21 @@ const RandomDraftMode: React.FC<RandomDraftModeProps> = ({ playerCount, onComple
   const [currentHero, setCurrentHero] = useState<Hero | null>(null);
   const [isDraftComplete, setIsDraftComplete] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [starFilters, setStarFilters] = useState<number[]>([]);
   
   // Calculate how many heroes each team needs to pick
   const heroesPerTeam = playerCount / 2;
   
-  // Generate the hero pool on initial render
+  // Apply star filters to the heroes
+  const filteredHeroes = React.useMemo(() => {
+    if (starFilters.length === 0) return heroes;
+    return heroes.filter(hero => starFilters.includes(hero.stars));
+  }, [heroes, starFilters]);
+  
+  // Generate the hero pool on initial render or when filters change
   useEffect(() => {
     generateHeroPool();
-  }, [heroes, playerCount]);
+  }, [filteredHeroes, playerCount]);
   
   // Reset state when draft completes
   useEffect(() => {
@@ -48,17 +56,17 @@ const RandomDraftMode: React.FC<RandomDraftModeProps> = ({ playerCount, onComple
   }, [teamA.length, teamB.length, heroesPerTeam]);
   
   const generateHeroPool = () => {
-    if (heroes.length < playerCount + 2) {
+    if (filteredHeroes.length < playerCount + 2) {
       toast({
         title: "Not enough heroes",
-        description: "There aren't enough heroes available for this draft mode.",
+        description: "There aren't enough heroes available for this draft mode with the current filters.",
         variant: "destructive",
       });
       return;
     }
     
-    // Shuffle all heroes and select pool size of playerCount + 2
-    const shuffled = [...heroes].sort(() => 0.5 - Math.random());
+    // Shuffle filtered heroes and select pool size of playerCount + 2
+    const shuffled = [...filteredHeroes].sort(() => 0.5 - Math.random());
     const pool = shuffled.slice(0, playerCount + 2);
     setHeroPool(pool);
     
@@ -67,6 +75,14 @@ const RandomDraftMode: React.FC<RandomDraftModeProps> = ({ playerCount, onComple
     setTeamB([]);
     setTeamATurn(true);
     setIsDraftComplete(false);
+  };
+  
+  const toggleStarFilter = (star: number) => {
+    setStarFilters(prev => 
+      prev.includes(star) 
+        ? prev.filter(s => s !== star) 
+        : [...prev, star]
+    );
   };
   
   const selectHero = (hero: Hero) => {
@@ -140,6 +156,34 @@ const RandomDraftMode: React.FC<RandomDraftModeProps> = ({ playerCount, onComple
           <Shuffle className="mr-2 h-4 w-4" />
           New Hero Pool
         </Button>
+      </div>
+      
+      {/* Star filters */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        <span className="text-sm font-medium flex items-center mr-1">Filter by stars:</span>
+        {[1, 2, 3, 4].map((star) => (
+          <Toggle
+            key={star}
+            pressed={starFilters.includes(star)}
+            onPressedChange={() => toggleStarFilter(star)}
+            variant="outline"
+            size="sm"
+            className="h-8 px-3 flex items-center gap-1"
+          >
+            {star}
+            <Star className={`h-3.5 w-3.5 ${starFilters.includes(star) ? "fill-yellow-400" : ""}`} />
+          </Toggle>
+        ))}
+        {starFilters.length > 0 && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setStarFilters([])}
+            className="h-8 px-3"
+          >
+            Clear
+          </Button>
+        )}
       </div>
       
       {!isDraftComplete && (

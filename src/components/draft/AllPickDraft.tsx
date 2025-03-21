@@ -6,8 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { motion } from 'framer-motion';
-import { Search, Users } from 'lucide-react';
+import { Search, Users, Star } from 'lucide-react';
 import HeroCard from '@/components/HeroCard';
+import { Toggle } from '@/components/ui/toggle';
 
 interface AllPickDraftProps {
   playerCount: number;
@@ -21,6 +22,7 @@ const AllPickDraft: React.FC<AllPickDraftProps> = ({ playerCount, onComplete }) 
   const [teamBHeroes, setTeamBHeroes] = useState<Hero[]>([]);
   const [currentTeam, setCurrentTeam] = useState<'A' | 'B'>('A');
   const [selectedHeroes, setSelectedHeroes] = useState<Hero[]>([]);
+  const [starFilters, setStarFilters] = useState<number[]>([]);
   
   const playersPerTeam = playerCount / 2;
   const isTeamAComplete = teamAHeroes.length === playersPerTeam;
@@ -30,6 +32,11 @@ const AllPickDraft: React.FC<AllPickDraftProps> = ({ playerCount, onComplete }) 
   const filteredHeroes = heroes.filter(hero => {
     const isAlreadySelected = selectedHeroes.some(selected => selected.id === hero.id);
     if (isAlreadySelected) return false;
+    
+    // Star filter
+    if (starFilters.length > 0 && !starFilters.includes(hero.stars)) {
+      return false;
+    }
     
     if (!searchQuery) return true;
     return hero.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -42,19 +49,35 @@ const AllPickDraft: React.FC<AllPickDraftProps> = ({ playerCount, onComplete }) 
     
     if (currentTeam === 'A') {
       if (teamAHeroes.length < playersPerTeam) {
-        setTeamAHeroes([...teamAHeroes, hero]);
-        if (teamAHeroes.length + 1 < playersPerTeam || teamBHeroes.length >= playersPerTeam) {
+        const newTeamA = [...teamAHeroes, hero];
+        setTeamAHeroes(newTeamA);
+        // If team A is now full or team B still needs heroes, switch to team B
+        if (newTeamA.length >= playersPerTeam) {
+          setCurrentTeam('B');
+        } else if (teamBHeroes.length < playersPerTeam) {
           setCurrentTeam('B');
         }
       }
     } else {
       if (teamBHeroes.length < playersPerTeam) {
-        setTeamBHeroes([...teamBHeroes, hero]);
-        if (teamBHeroes.length + 1 < playersPerTeam || teamAHeroes.length >= playersPerTeam) {
+        const newTeamB = [...teamBHeroes, hero];
+        setTeamBHeroes(newTeamB);
+        // If team B is now full or team A still needs heroes, switch to team A
+        if (newTeamB.length >= playersPerTeam) {
+          setCurrentTeam('A');
+        } else if (teamAHeroes.length < playersPerTeam) {
           setCurrentTeam('A');
         }
       }
     }
+  };
+
+  const toggleStarFilter = (star: number) => {
+    setStarFilters(prev => 
+      prev.includes(star) 
+        ? prev.filter(s => s !== star) 
+        : [...prev, star]
+    );
   };
 
   const resetDraft = () => {
@@ -62,6 +85,7 @@ const AllPickDraft: React.FC<AllPickDraftProps> = ({ playerCount, onComplete }) 
     setTeamBHeroes([]);
     setSelectedHeroes([]);
     setCurrentTeam('A');
+    setStarFilters([]);
   };
 
   // Container animation
@@ -121,16 +145,46 @@ const AllPickDraft: React.FC<AllPickDraftProps> = ({ playerCount, onComplete }) 
       </div>
 
       {!isDraftComplete && (
-        <div className="relative mb-6">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search heroes by name or tag..."
-            className="pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+        <>
+          <div className="relative mb-4">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search heroes by name or tag..."
+              className="pl-8"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          
+          {/* Star filters */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            <span className="text-sm font-medium flex items-center mr-1">Filter by stars:</span>
+            {[1, 2, 3, 4].map((star) => (
+              <Toggle
+                key={star}
+                pressed={starFilters.includes(star)}
+                onPressedChange={() => toggleStarFilter(star)}
+                variant="outline"
+                size="sm"
+                className="h-8 px-3 flex items-center gap-1"
+              >
+                {star}
+                <Star className={`h-3.5 w-3.5 ${starFilters.includes(star) ? "fill-yellow-400" : ""}`} />
+              </Toggle>
+            ))}
+            {starFilters.length > 0 && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setStarFilters([])}
+                className="h-8 px-3"
+              >
+                Clear
+              </Button>
+            )}
+          </div>
+        </>
       )}
 
       {/* Team previews */}
