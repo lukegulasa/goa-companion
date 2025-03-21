@@ -18,7 +18,7 @@ interface DraftPlayerSelectProps {
   selectedPlayers: string[];
   onSelectPlayer: (index: number, playerId: string) => void;
   playerNames: string[];
-  setPlayerNames: (names: string[]) => void;
+  setPlayerNames: (index: number, name: string) => void; // Update the type signature here
 }
 
 const DraftPlayerSelect: React.FC<DraftPlayerSelectProps> = ({
@@ -37,9 +37,7 @@ const DraftPlayerSelect: React.FC<DraftPlayerSelectProps> = ({
     if (playerId) {
       const player = savedPlayers.find(p => p.id === playerId);
       if (player) {
-        const newNames = [...playerNames];
-        newNames[index] = player.name;
-        setPlayerNames(newNames);
+        setPlayerNames(index, player.name); // Use the updated function signature
       }
     }
   };
@@ -63,7 +61,7 @@ const DraftPlayerSelect: React.FC<DraftPlayerSelectProps> = ({
                 <SelectValue placeholder="Select a player" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Custom Name</SelectItem>
+                <SelectItem value="custom">Custom Name</SelectItem>
                 {savedPlayers.map((player) => (
                   <SelectItem key={player.id} value={player.id}>
                     {player.name}
