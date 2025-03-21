@@ -18,17 +18,17 @@ function App() {
         <Toaster />
         <GalleryProvider>
           <HeroModal />
+          <BrowserRouter>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/draft" element={<DraftPage />} />
+                <Route path="/game-stats" element={<GameStats />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Layout>
+          </BrowserRouter>
         </GalleryProvider>
-        <BrowserRouter>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/draft" element={<DraftPage />} />
-              <Route path="/game-stats" element={<GameStats />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Layout>
-        </BrowserRouter>
       </ThemeProvider>
     </div>
   );
