@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +22,9 @@ import SingleDraftMode from '@/components/draft/SingleDraftMode';
 import RandomDraftMode from '@/components/draft/RandomDraftMode';
 import PlayerDraftMode from '@/components/draft/PlayerDraftMode';
 import PickBanDraftMode from '@/components/draft/PickBanDraftMode';
+import DraftPlayerSelect from '@/components/draft/DraftPlayerSelect';
+import LogDraftGame from '@/components/draft/LogDraftGame';
+import { useToast } from '@/hooks/use-toast';
 
 export type DraftMode = 'all-random' | 'all-pick' | 'single-draft' | 'random-draft' | 'player-draft' | 'pick-ban';
 export type DraftState = 'setup' | 'in-progress' | 'completed';
@@ -29,9 +33,36 @@ const DraftPage = () => {
   const [selectedMode, setSelectedMode] = useState<DraftMode>('all-random');
   const [draftState, setDraftState] = useState<DraftState>('setup');
   const [playerCount, setPlayerCount] = useState<number>(4);
+  const [playerNames, setPlayerNames] = useState<string[]>(Array(8).fill(''));
+  const [selectedPlayers, setSelectedPlayers] = useState<string[]>(Array(8).fill(''));
+  const [completedDraftData, setCompletedDraftData] = useState<any[]>([]);
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSelectPlayer = (index: number, playerId: string) => {
+    const newSelectedPlayers = [...selectedPlayers];
+    newSelectedPlayers[index] = playerId;
+    setSelectedPlayers(newSelectedPlayers);
+  };
+
+  const handlePlayerNameChange = (index: number, name: string) => {
+    const newNames = [...playerNames];
+    newNames[index] = name;
+    setPlayerNames(newNames);
+  };
 
   const startDraft = () => {
+    // Validate that we have player names for all slots
+    const filledNames = playerNames.slice(0, playerCount).filter(name => name.trim() !== '');
+    if (filledNames.length < playerCount) {
+      toast({
+        title: "Missing Player Names",
+        description: `Please provide names for all ${playerCount} players.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (selectedMode) {
       setDraftState('in-progress');
     }
@@ -40,26 +71,79 @@ const DraftPage = () => {
   const resetDraft = () => {
     setDraftState('setup');
     setSelectedMode('all-random');
+    setCompletedDraftData([]);
+  };
+
+  const onDraftComplete = (draftData: any[]) => {
+    setCompletedDraftData(draftData);
+    setDraftState('completed');
   };
 
   const renderDraftComponent = () => {
     if (draftState === 'setup') {
-      return <DraftSetup playerCount={playerCount} setPlayerCount={setPlayerCount} />;
+      return (
+        <>
+          <DraftSetup 
+            playerCount={playerCount} 
+            setPlayerCount={setPlayerCount} 
+          />
+          
+          <DraftPlayerSelect
+            playerCount={playerCount}
+            selectedPlayers={selectedPlayers}
+            onSelectPlayer={handleSelectPlayer}
+            playerNames={playerNames}
+            setPlayerNames={setPlayerNames}
+          />
+        </>
+      );
     }
+
+    // Prepare player data for the draft components
+    const draftProps = {
+      playerCount,
+      playerNames: playerNames.slice(0, playerCount),
+      playerIds: selectedPlayers.slice(0, playerCount),
+      onComplete: onDraftComplete
+    };
 
     switch (selectedMode) {
       case 'all-random':
-        return <AllRandomDraft playerCount={playerCount} onComplete={() => setDraftState('completed')} />;
+        return <AllRandomDraft 
+          playerCount={playerCount} 
+          playerNames={playerNames.slice(0, playerCount)}
+          onComplete={(data) => onDraftComplete(data || [])} 
+        />;
       case 'all-pick':
-        return <AllPickDraft playerCount={playerCount} onComplete={() => setDraftState('completed')} />;
+        return <AllPickDraft 
+          playerCount={playerCount} 
+          playerNames={playerNames.slice(0, playerCount)}
+          onComplete={(data) => onDraftComplete(data || [])} 
+        />;
       case 'single-draft':
-        return <SingleDraftMode playerCount={playerCount} onComplete={() => setDraftState('completed')} />;
+        return <SingleDraftMode 
+          playerCount={playerCount} 
+          playerNames={playerNames.slice(0, playerCount)}
+          onComplete={(data) => onDraftComplete(data || [])} 
+        />;
       case 'random-draft':
-        return <RandomDraftMode playerCount={playerCount} onComplete={() => setDraftState('completed')} />;
+        return <RandomDraftMode 
+          playerCount={playerCount} 
+          playerNames={playerNames.slice(0, playerCount)}
+          onComplete={(data) => onDraftComplete(data || [])} 
+        />;
       case 'player-draft':
-        return <PlayerDraftMode playerCount={playerCount} onComplete={() => setDraftState('completed')} />;
+        return <PlayerDraftMode 
+          playerCount={playerCount} 
+          playerNames={playerNames.slice(0, playerCount)}
+          onComplete={(data) => onDraftComplete(data || [])} 
+        />;
       case 'pick-ban':
-        return <PickBanDraftMode playerCount={playerCount} onComplete={() => setDraftState('completed')} />;
+        return <PickBanDraftMode 
+          playerCount={playerCount} 
+          playerNames={playerNames.slice(0, playerCount)}
+          onComplete={(data) => onDraftComplete(data || [])} 
+        />;
       default:
         return null;
     }
@@ -154,15 +238,58 @@ const DraftPage = () => {
               </CardContent>
             </Card>
 
-            {draftState === 'completed' && (
-              <div className="flex justify-between">
-                <Button variant="outline" onClick={resetDraft}>
-                  Start New Draft
-                </Button>
-                <Button onClick={() => navigate('/game-stats')}>
-                  Log Game Results
-                </Button>
-              </div>
+            {draftState === 'completed' && completedDraftData.length > 0 && (
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle>Draft Results</CardTitle>
+                  <CardDescription>
+                    Log this draft as a completed game to update hero statistics
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <h3 className="font-medium mb-3 text-red-600">Red Team</h3>
+                      <div className="space-y-2">
+                        {completedDraftData
+                          .filter(player => player.team === 'Red')
+                          .map((player, index) => (
+                            <div key={index} className="flex items-center justify-between border-b pb-2">
+                              <span>{player.name}</span>
+                              <span className="font-medium">{player.heroName}</span>
+                            </div>
+                          ))
+                        }
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="font-medium mb-3 text-blue-600">Blue Team</h3>
+                      <div className="space-y-2">
+                        {completedDraftData
+                          .filter(player => player.team === 'Blue')
+                          .map((player, index) => (
+                            <div key={index} className="flex items-center justify-between border-b pb-2">
+                              <span>{player.name}</span>
+                              <span className="font-medium">{player.heroName}</span>
+                            </div>
+                          ))
+                        }
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <Button variant="outline" onClick={resetDraft}>
+                      Start New Draft
+                    </Button>
+                    
+                    <LogDraftGame 
+                      playerData={completedDraftData}
+                      onComplete={() => navigate('/game-stats')}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
             )}
           </motion.div>
         )}

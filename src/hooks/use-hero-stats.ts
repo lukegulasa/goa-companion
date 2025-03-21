@@ -4,7 +4,11 @@ import { Game } from '@/lib/game-stats-types';
 import { 
   calculateHeroStats, 
   calculateHeroMatchups, 
-  calculateHeroSynergies 
+  calculateHeroSynergies,
+  getHeroStats,
+  getHeroMatchups,
+  getHeroSynergies,
+  getHeroWinRate
 } from '@/lib/hero-stats-utils';
 import { useMemo } from 'react';
 
@@ -27,3 +31,11 @@ export function useHeroStats() {
     gamesLogged: gameLogs.length
   };
 }
+
+// Export additional utility functions for easy access
+export {
+  getHeroStats,
+  getHeroMatchups,
+  getHeroSynergies,
+  getHeroWinRate
+};

@@ -1,71 +1,95 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Shuffle } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { useHeroes } from '@/hooks/use-heroes';
-import { Hero } from '@/lib/types';
-import { useToast } from '@/hooks/use-toast';
-import { motion } from 'framer-motion';
+import { Badge } from '@/components/ui/badge';
 import HeroCard from '@/components/HeroCard';
-import { Shuffle, Star } from 'lucide-react';
-import { Toggle } from '@/components/ui/toggle';
+import { motion } from 'framer-motion';
+import { useHeroStats } from '@/hooks/use-hero-stats';
+import { getHeroWinRate } from '@/lib/hero-stats-utils';
 
 interface AllRandomDraftProps {
   playerCount: number;
-  onComplete: () => void;
+  playerNames?: string[];
+  onComplete: (draftData?: any[]) => void;
 }
 
-const AllRandomDraft: React.FC<AllRandomDraftProps> = ({ playerCount, onComplete }) => {
+const AllRandomDraft: React.FC<AllRandomDraftProps> = ({ 
+  playerCount, 
+  playerNames = [], 
+  onComplete 
+}) => {
   const { heroes } = useHeroes();
-  const [selectedHeroes, setSelectedHeroes] = useState<Hero[]>([]);
-  const [teamA, setTeamA] = useState<Hero[]>([]);
-  const [teamB, setTeamB] = useState<Hero[]>([]);
-  const [isReady, setIsReady] = useState(false);
-  const [starFilters, setStarFilters] = useState<number[]>([]);
-  const { toast } = useToast();
+  const { heroStats } = useHeroStats();
+  const [isComplete, setIsComplete] = useState(false);
+  const [selectedHeroes, setSelectedHeroes] = useState<{
+    id: number;
+    team: 'Red' | 'Blue';
+    name: string;
+    hero: any;
+    playerName: string;
+  }[]>([]);
 
-  // Apply star filters to the heroes
-  const filteredHeroes = React.useMemo(() => {
-    if (starFilters.length === 0) return heroes;
-    return heroes.filter(hero => starFilters.includes(hero.stars));
-  }, [heroes, starFilters]);
-
-  const toggleStarFilter = (star: number) => {
-    setStarFilters(prev => 
-      prev.includes(star) 
-        ? prev.filter(s => s !== star) 
-        : [...prev, star]
-    );
+  // Complete hero selection process
+  const handleDraftComplete = () => {
+    setIsComplete(true);
+    
+    // Prepare draft data for the parent component
+    const draftData = selectedHeroes.map(selection => ({
+      id: selection.playerName ? selection.playerName.toLowerCase().replace(/\s+/g, '-') : `player-${selection.id}`,
+      name: selection.playerName || `Player ${selection.id}`,
+      team: selection.team,
+      heroId: selection.hero.id,
+      heroName: selection.hero.name
+    }));
+    
+    // Notify parent component
+    onComplete(draftData);
   };
 
-  const shuffleAndDraft = () => {
-    if (filteredHeroes.length < playerCount) {
-      toast({
-        title: "Not enough heroes",
-        description: "There aren't enough heroes available for the draft with the current filters.",
-        variant: "destructive",
-      });
+  const getWinRateText = (heroId: number) => {
+    const winRate = getHeroWinRate(heroId, heroStats);
+    if (winRate === null) return 'No data';
+    return `${winRate}% win rate`;
+  };
+
+  // Randomize hero selection
+  const randomizeHeroes = () => {
+    // Reset draft state
+    setIsComplete(false);
+    
+    // Ensure we have enough heroes
+    if (heroes.length < playerCount) {
+      console.error("Not enough heroes for all players");
       return;
     }
-
-    // Shuffle all heroes
-    const shuffled = [...filteredHeroes].sort(() => 0.5 - Math.random());
-    const selected = shuffled.slice(0, playerCount);
-    setSelectedHeroes(selected);
-
-    // Split into teams
-    const playersPerTeam = playerCount / 2;
-    setTeamA(selected.slice(0, playersPerTeam));
-    setTeamB(selected.slice(playersPerTeam, playerCount));
     
-    setIsReady(true);
+    // Randomly select heroes for each player
+    const shuffled = [...heroes].sort(() => 0.5 - Math.random());
+    const newSelections = [];
+    
+    for (let i = 0; i < playerCount; i++) {
+      const team = i < Math.ceil(playerCount / 2) ? 'Red' : 'Blue';
+      newSelections.push({
+        id: i + 1,
+        team,
+        name: `Player ${i + 1}`,
+        hero: shuffled[i],
+        playerName: playerNames[i] || `Player ${i + 1}`
+      });
+    }
+    
+    setSelectedHeroes(newSelections);
   };
 
+  // Auto-randomize on first load
   useEffect(() => {
-    shuffleAndDraft();
-  }, [filteredHeroes, playerCount]);
+    randomizeHeroes();
+  }, [playerCount, playerNames]);
 
-  // Container animation
-  const container = {
+  const containerAnimation = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
@@ -75,108 +99,97 @@ const AllRandomDraft: React.FC<AllRandomDraftProps> = ({ playerCount, onComplete
     }
   };
 
-  const item = {
+  const itemAnimation = {
     hidden: { opacity: 0, y: 20 },
-    show: { 
-      opacity: 1, 
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 260,
-        damping: 20
-      }
-    }
+    show: { opacity: 1, y: 0 }
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">All Random Draft</h3>
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">All Random Draft</h2>
         <Button 
-          onClick={shuffleAndDraft} 
           variant="outline" 
-          size="sm"
           className="flex items-center"
+          onClick={randomizeHeroes}
         >
           <Shuffle className="mr-2 h-4 w-4" />
-          Shuffle Again
+          Randomize Again
         </Button>
       </div>
-
-      {/* Star filters */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        <span className="text-sm font-medium flex items-center mr-1">Filter by stars:</span>
-        {[1, 2, 3, 4].map((star) => (
-          <Toggle
-            key={star}
-            pressed={starFilters.includes(star)}
-            onPressedChange={() => toggleStarFilter(star)}
-            variant="outline"
-            size="sm"
-            className="h-8 px-3 flex items-center gap-1"
-          >
-            {star}
-            <Star className={`h-3.5 w-3.5 ${starFilters.includes(star) ? "fill-yellow-400" : ""}`} />
-          </Toggle>
-        ))}
-        {starFilters.length > 0 && (
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setStarFilters([])}
-            className="h-8 px-3"
-          >
-            Clear
-          </Button>
-        )}
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardContent className="p-4">
+            <h3 className="font-semibold mb-4 text-red-600">Red Team</h3>
+            <motion.div 
+              className="space-y-4"
+              variants={containerAnimation}
+              initial="hidden"
+              animate="show"
+            >
+              {selectedHeroes
+                .filter(item => item.team === 'Red')
+                .map(item => (
+                  <motion.div 
+                    key={item.id} 
+                    className="flex items-center justify-between"
+                    variants={itemAnimation}
+                  >
+                    <div className="flex-1">
+                      <div className="mb-1">{item.playerName}</div>
+                      <Badge variant="outline">{getWinRateText(item.hero.id)}</Badge>
+                    </div>
+                    <div className="w-40">
+                      <HeroCard hero={item.hero} onClick={() => {}} />
+                    </div>
+                  </motion.div>
+                ))
+              }
+            </motion.div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <h3 className="font-semibold mb-4 text-blue-600">Blue Team</h3>
+            <motion.div 
+              className="space-y-4"
+              variants={containerAnimation}
+              initial="hidden"
+              animate="show"
+            >
+              {selectedHeroes
+                .filter(item => item.team === 'Blue')
+                .map(item => (
+                  <motion.div 
+                    key={item.id} 
+                    className="flex items-center justify-between"
+                    variants={itemAnimation}
+                  >
+                    <div className="flex-1">
+                      <div className="mb-1">{item.playerName}</div>
+                      <Badge variant="outline">{getWinRateText(item.hero.id)}</Badge>
+                    </div>
+                    <div className="w-40">
+                      <HeroCard hero={item.hero} onClick={() => {}} />
+                    </div>
+                  </motion.div>
+                ))
+              }
+            </motion.div>
+          </CardContent>
+        </Card>
       </div>
-
-      {isReady && (
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-md font-medium mb-3 flex items-center">
-              <span className="inline-block w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
-              Team A
-            </h3>
-            <motion.div 
-              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
-              variants={container}
-              initial="hidden"
-              animate="show"
-            >
-              {teamA.map(hero => (
-                <motion.div key={hero.id} variants={item}>
-                  <HeroCard hero={hero} onClick={() => {}} />
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-
-          <div>
-            <h3 className="text-md font-medium mb-3 flex items-center">
-              <span className="inline-block w-3 h-3 bg-red-500 rounded-full mr-2"></span>
-              Team B
-            </h3>
-            <motion.div 
-              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
-              variants={container}
-              initial="hidden"
-              animate="show"
-            >
-              {teamB.map(hero => (
-                <motion.div key={hero.id} variants={item}>
-                  <HeroCard hero={hero} onClick={() => {}} />
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-
-          <div className="flex justify-end pt-4">
-            <Button onClick={onComplete}>
-              Confirm Draft
-            </Button>
-          </div>
-        </div>
+      
+      {!isComplete && (
+        <Button 
+          onClick={handleDraftComplete} 
+          className="w-full"
+          disabled={selectedHeroes.length !== playerCount}
+        >
+          Confirm Draft
+        </Button>
       )}
     </div>
   );
