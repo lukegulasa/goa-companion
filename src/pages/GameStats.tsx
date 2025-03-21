@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useHeroes } from '@/hooks/use-heroes';
-import { GalleryProvider } from '@/context/GalleryContext';
 import {
   Tabs,
   TabsContent,
@@ -13,9 +12,10 @@ import { PlayerForm } from '@/components/game-stats/PlayerForm';
 import { GameLogger } from '@/components/game-stats/GameLogger';
 import { GameHistory } from '@/components/game-stats/GameHistory';
 import { PlayerStats } from '@/components/game-stats/PlayerStats';
+import { DataPersistence } from '@/components/game-stats/DataPersistence';
 import { Game, GameLogFormValues, GamePlayer, NewPlayerFormValues, Player } from '@/lib/game-stats-types';
 
-const GameStatsContent: React.FC = () => {
+const GameStats: React.FC = () => {
   const [players, setPlayers] = useLocalStorage<Player[]>('game-players', []);
   const [gameLogs, setGameLogs] = useLocalStorage<Game[]>('game-logs', []);
   const [gameParticipants, setGameParticipants] = useState<GamePlayer[]>([]);
@@ -57,12 +57,40 @@ const GameStatsContent: React.FC = () => {
     setActiveTab('game-history');
   };
 
+  // Handle importing data
+  const handleDataImport = (data: { games: Game[], players: Player[] }) => {
+    // Merge players (avoid duplicates based on id)
+    const existingPlayerIds = new Set(players.map(p => p.id));
+    const newPlayers = [
+      ...players,
+      ...data.players.filter(p => !existingPlayerIds.has(p.id))
+    ];
+    
+    // Merge games (avoid duplicates based on id)
+    const existingGameIds = new Set(gameLogs.map(g => g.id));
+    const newGames = [
+      ...gameLogs,
+      ...data.games.filter(g => !existingGameIds.has(g.id))
+    ];
+    
+    setPlayers(newPlayers);
+    setGameLogs(newGames);
+  };
+
   return (
     <div className="container max-w-6xl mx-auto py-8 px-4 sm:px-6">
       <header className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Game Statistics</h1>
         <p className="text-muted-foreground mt-1">Track your games and player statistics</p>
       </header>
+      
+      <div className="mb-8">
+        <DataPersistence 
+          games={gameLogs} 
+          players={players} 
+          onImport={handleDataImport} 
+        />
+      </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList>
@@ -94,14 +122,6 @@ const GameStatsContent: React.FC = () => {
         </TabsContent>
       </Tabs>
     </div>
-  );
-};
-
-const GameStats: React.FC = () => {
-  return (
-    <GalleryProvider>
-      <GameStatsContent />
-    </GalleryProvider>
   );
 };
 
