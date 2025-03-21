@@ -26,7 +26,7 @@ const TeamDisplay: React.FC<TeamDisplayProps> = ({ team, players, teamStrength }
       </div>
       
       <div className="space-y-3">
-        {players.map(player => (
+        {players && players.map(player => (
           <div key={player.id} className="flex items-center justify-between border-b pb-2">
             <div>
               <div className="font-medium">{player.name}</div>

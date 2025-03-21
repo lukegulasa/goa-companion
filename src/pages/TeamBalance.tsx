@@ -13,6 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import PlayerStrengthTable from '@/components/team-balance/PlayerStrengthTable';
 import TeamDisplay from '@/components/team-balance/TeamDisplay';
+import { useToast } from '@/hooks/use-toast';
 
 const TeamBalance: React.FC = () => {
   const [players] = useLocalStorage<Player[]>('game-players', []);
@@ -21,6 +22,8 @@ const TeamBalance: React.FC = () => {
   const [selectedPlayerIds, setSelectedPlayerIds] = useState<string[]>([]);
   const [teamSize, setTeamSize] = useState<'2v2' | '3v3'>('2v2');
   const [balancedTeams, setBalancedTeams] = useState<TeamConfig | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('setup');
+  const { toast } = useToast();
 
   useEffect(() => {
     if (players.length > 0 && games.length > 0) {
@@ -57,6 +60,11 @@ const TeamBalance: React.FC = () => {
     const requiredPlayers = teamSize === '2v2' ? 4 : 6;
     
     if (selectedPlayerIds.length !== requiredPlayers) {
+      toast({
+        title: "Incorrect number of players",
+        description: `Please select exactly ${requiredPlayers} players for ${teamSize} format.`,
+        variant: "destructive"
+      });
       return;
     }
     
@@ -64,8 +72,18 @@ const TeamBalance: React.FC = () => {
       selectedPlayerIds.includes(player.id)
     );
     
-    const balancedConfig = findBalancedTeams(selectedPlayers);
-    setBalancedTeams(balancedConfig);
+    try {
+      const balancedConfig = findBalancedTeams(selectedPlayers);
+      setBalancedTeams(balancedConfig);
+      setActiveTab('results');
+    } catch (error) {
+      console.error("Error balancing teams:", error);
+      toast({
+        title: "Error creating teams",
+        description: "There was a problem balancing the teams. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -75,7 +93,7 @@ const TeamBalance: React.FC = () => {
         <p className="text-muted-foreground mt-1">Create balanced teams based on player stats</p>
       </header>
       
-      <Tabs defaultValue="setup" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList>
           <TabsTrigger value="setup">Team Setup</TabsTrigger>
           <TabsTrigger value="results" disabled={!balancedTeams}>Team Results</TabsTrigger>
@@ -188,7 +206,7 @@ const TeamBalance: React.FC = () => {
               </Card>
               
               <div className="flex justify-center">
-                <Button onClick={() => setBalancedTeams(null)} variant="outline">
+                <Button onClick={() => setActiveTab('setup')} variant="outline">
                   Reconfigure Teams
                 </Button>
               </div>
