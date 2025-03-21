@@ -2,47 +2,60 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PlusIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { newPlayerSchema, NewPlayerFormValues } from '@/lib/game-stats-types';
+import { UserPlus } from 'lucide-react';
 
 interface PlayerFormProps {
   onAddPlayer: (data: NewPlayerFormValues) => void;
 }
 
 export const PlayerForm: React.FC<PlayerFormProps> = ({ onAddPlayer }) => {
-  const newPlayerForm = useForm<NewPlayerFormValues>({
+  const form = useForm<NewPlayerFormValues>({
     resolver: zodResolver(newPlayerSchema),
     defaultValues: {
       playerName: '',
     },
   });
 
-  const handleSubmit = (data: NewPlayerFormValues) => {
+  const onSubmit = (data: NewPlayerFormValues) => {
     onAddPlayer(data);
-    newPlayerForm.reset();
+    form.reset();
   };
 
   return (
     <div className="bg-card rounded-lg border shadow-sm p-6">
-      <h2 className="text-xl font-semibold mb-4">Add New Player</h2>
-      <form onSubmit={newPlayerForm.handleSubmit(handleSubmit)} className="flex gap-4">
-        <Input
-          placeholder="Player Name"
-          {...newPlayerForm.register('playerName')}
-          className="max-w-xs"
-        />
-        <Button type="submit">
-          <PlusIcon className="mr-2 h-4 w-4" />
-          Add Player
-        </Button>
-      </form>
-      {newPlayerForm.formState.errors.playerName && (
-        <p className="text-destructive text-sm mt-2">
-          {newPlayerForm.formState.errors.playerName.message}
-        </p>
-      )}
+      <h2 className="text-xl font-semibold mb-4">Add a New Player</h2>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="playerName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Player Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter player name" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" className="w-full sm:w-auto">
+            <UserPlus className="mr-2 h-4 w-4" />
+            Add Player
+          </Button>
+        </form>
+      </Form>
     </div>
   );
 };

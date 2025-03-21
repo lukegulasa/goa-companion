@@ -36,3 +36,34 @@ export const gameLogSchema = z.object({
 
 export type GameLogFormValues = z.infer<typeof gameLogSchema>;
 export type NewPlayerFormValues = z.infer<typeof newPlayerSchema>;
+
+// Stats calculation interfaces
+export interface HeroStats {
+  heroId: number;
+  heroName: string;
+  gamesPlayed: number;
+  wins: number;
+  winRate: number;
+}
+
+export interface HeroMatchupStats {
+  heroId: number;
+  opponentId: number;
+  gamesPlayed: number;
+  wins: number;
+  winRate: number;
+}
+
+export interface HeroSynergyStats {
+  heroId: number;
+  allyId: number;
+  gamesPlayed: number;
+  wins: number;
+  winRate: number;
+}
+
+export interface VictoryMethodStats {
+  method: 'Wave Counter' | 'Base Push' | 'Hero Kills';
+  count: number;
+  percentage: number;
+}
