@@ -91,7 +91,7 @@ const DraftPage = () => {
             selectedPlayers={selectedPlayers}
             onSelectPlayer={handleSelectPlayer}
             playerNames={playerNames}
-            setPlayerNames={setPlayerNames}
+            setPlayerNames={handlePlayerNameChange}
           />
         </>
       );
@@ -100,47 +100,22 @@ const DraftPage = () => {
     const draftProps = {
       playerCount,
       playerNames: playerNames.slice(0, playerCount),
-      playerIds: selectedPlayers.slice(0, playerCount),
       onComplete: onDraftComplete
     };
 
     switch (selectedMode) {
       case 'all-random':
-        return <AllRandomDraft 
-          playerCount={playerCount} 
-          playerNames={playerNames.slice(0, playerCount)}
-          onComplete={onDraftComplete} 
-        />;
+        return <AllRandomDraft {...draftProps} />;
       case 'all-pick':
-        return <AllPickDraft 
-          playerCount={playerCount} 
-          playerNames={playerNames.slice(0, playerCount)}
-          onComplete={onDraftComplete} 
-        />;
+        return <AllPickDraft {...draftProps} />;
       case 'single-draft':
-        return <SingleDraftMode 
-          playerCount={playerCount} 
-          playerNames={playerNames.slice(0, playerCount)}
-          onComplete={onDraftComplete} 
-        />;
+        return <SingleDraftMode {...draftProps} />;
       case 'random-draft':
-        return <RandomDraftMode 
-          playerCount={playerCount} 
-          playerNames={playerNames.slice(0, playerCount)}
-          onComplete={onDraftComplete} 
-        />;
+        return <RandomDraftMode {...draftProps} />;
       case 'player-draft':
-        return <PlayerDraftMode 
-          playerCount={playerCount} 
-          playerNames={playerNames.slice(0, playerCount)}
-          onComplete={onDraftComplete} 
-        />;
+        return <PlayerDraftMode {...draftProps} />;
       case 'pick-ban':
-        return <PickBanDraftMode 
-          playerCount={playerCount} 
-          playerNames={playerNames.slice(0, playerCount)}
-          onComplete={onDraftComplete} 
-        />;
+        return <PickBanDraftMode {...draftProps} />;
       default:
         return null;
     }

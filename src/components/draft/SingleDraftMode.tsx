@@ -27,6 +27,8 @@ interface SingleDraftModeProps {
   onComplete: (draftData: any[]) => void;
 }
 
+type DraftStage = 'drafting' | 'complete';
+
 const SingleDraftMode: React.FC<SingleDraftModeProps> = ({ 
   playerCount, 
   playerNames = [],
@@ -39,9 +41,9 @@ const SingleDraftMode: React.FC<SingleDraftModeProps> = ({
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [selectedHero, setSelectedHero] = useState<Hero | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isDraftComplete, setIsDraftComplete] = useState(false);
+  const [draftStage, setDraftStage] = useState<DraftStage>('drafting');
   
-  const playersPerTeam = playerCount / 2;
+  const playersPerTeam = Math.floor(playerCount / 2);
   
   useEffect(() => {
     initializeDraft();
@@ -50,7 +52,7 @@ const SingleDraftMode: React.FC<SingleDraftModeProps> = ({
   useEffect(() => {
     const allSelected = players.every(player => player.selected);
     if (players.length > 0 && allSelected) {
-      setIsDraftComplete(true);
+      setDraftStage('complete');
     }
   }, [players]);
   
@@ -81,7 +83,7 @@ const SingleDraftMode: React.FC<SingleDraftModeProps> = ({
     
     setPlayers(newPlayers);
     setCurrentPlayerIndex(0);
-    setIsDraftComplete(false);
+    setDraftStage('drafting');
   };
   
   const selectHero = (hero: Hero) => {
@@ -174,7 +176,7 @@ const SingleDraftMode: React.FC<SingleDraftModeProps> = ({
       .map(player => player.selected!);
   };
   
-  if (isDraftComplete) {
+  if (draftStage === 'complete') {
     return (
       <div className="flex justify-end pt-4">
         <Button onClick={handleDraftComplete}>
@@ -194,14 +196,13 @@ const SingleDraftMode: React.FC<SingleDraftModeProps> = ({
           variant="outline" 
           size="sm"
           className="flex items-center"
-          disabled={!isDraftComplete && players.length > 0}
         >
           <Shuffle className="mr-2 h-4 w-4" />
           Reset Draft
         </Button>
       </div>
       
-      {players.length > 0 && !isDraftComplete && (
+      {players.length > 0 && getCurrentPlayer() && (
         <div className="bg-muted/50 p-4 rounded-md mb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <div className="flex items-center">
@@ -217,7 +218,7 @@ const SingleDraftMode: React.FC<SingleDraftModeProps> = ({
         </div>
       )}
       
-      {players.length > 0 && !isDraftComplete && getCurrentPlayer() && (
+      {players.length > 0 && getCurrentPlayer() && (
         <div>
           <h3 className="text-md font-medium mb-3">Your Hero Options</h3>
           <motion.div 

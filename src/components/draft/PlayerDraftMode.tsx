@@ -60,7 +60,10 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({
   const [currentCaptain, setCurrentCaptain] = useState<'A' | 'B'>('A');
   const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [playerNamesState, setPlayerNames] = useState<string[]>(Array(playerCount).fill(''));
+  const [playerNamesState, setPlayerNames] = useState<string[]>(() => {
+    // Initialize with provided player names or empty strings
+    return playerNames.length > 0 ? [...playerNames] : Array(playerCount).fill('');
+  });
   
   useEffect(() => {
     if (draftStage === 'hero-selection' && players.length === 0) {
@@ -71,7 +74,7 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({
   }, [draftStage, draftMethod]);
   
   const setupDraft = () => {
-    const emptyNames = playerNames.filter(name => !name.trim()).length;
+    const emptyNames = playerNamesState.filter(name => !name.trim()).length;
     if (emptyNames > 0) {
       toast({
         title: "Missing player names",
@@ -118,7 +121,7 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({
     for (let i = 0; i < playerCount; i++) {
       newPlayers.push({
         id: i,
-        name: playerNames[i] || `Player ${i + 1}`,
+        name: playerNamesState[i] || `Player ${i + 1}`,
         hero: shuffled[i],
         team: i === captainA ? 'A' : i === captainB ? 'B' : undefined
       });
@@ -300,7 +303,7 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({
             <div>
               <Label htmlFor="captain-a">Team A Captain</Label>
               <Select 
-                value={captainA !== null ? captainA.toString() : ''} 
+                value={captainA !== null ? captainA.toString() : undefined} 
                 onValueChange={(value) => setCaptainA(parseInt(value))}
               >
                 <SelectTrigger id="captain-a" className="w-full mt-1">
@@ -319,7 +322,7 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({
             <div>
               <Label htmlFor="captain-b">Team B Captain</Label>
               <Select 
-                value={captainB !== null ? captainB.toString() : ''}
+                value={captainB !== null ? captainB.toString() : undefined}
                 onValueChange={(value) => setCaptainB(parseInt(value))}
               >
                 <SelectTrigger id="captain-b" className="w-full mt-1">
@@ -455,4 +458,3 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({
 };
 
 export default PlayerDraftMode;
-
