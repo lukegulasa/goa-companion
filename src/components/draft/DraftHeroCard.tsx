@@ -2,18 +2,24 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star } from 'lucide-react';
-import { useGallery } from '@/context/GalleryContext';
 import { Hero } from '@/lib/types';
 import { HeroWinRate } from '@/components/HeroWinRate';
 import { useHeroStats } from '@/hooks/use-hero-stats';
 import { getHeroStats } from '@/lib/hero-stats-utils';
 
-interface HeroCardProps {
+interface DraftHeroCardProps {
   hero: Hero;
+  onClick?: () => void;
+  isSelected?: boolean;
+  isBanned?: boolean;
 }
 
-const HeroCard: React.FC<HeroCardProps> = ({ hero }) => {
-  const { selectHero } = useGallery();
+export const DraftHeroCard: React.FC<DraftHeroCardProps> = ({ 
+  hero, 
+  onClick, 
+  isSelected = false,
+  isBanned = false
+}) => {
   const { heroStats } = useHeroStats();
   
   // Get win rate stats for this hero
@@ -21,17 +27,22 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero }) => {
   
   return (
     <Card 
-      className="overflow-hidden cursor-pointer transition-all hover:scale-[1.02] hover:shadow-md glass-panel"
-      onClick={() => selectHero(hero)}
+      className={`
+        overflow-hidden cursor-pointer transition-all 
+        ${isSelected ? 'ring-2 ring-primary' : ''} 
+        ${isBanned ? 'opacity-40 grayscale' : 'hover:scale-[1.02] hover:shadow-md'} 
+        glass-panel
+      `}
+      onClick={isBanned ? undefined : onClick}
     >
-      <CardContent className="p-4">
+      <CardContent className="p-3">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="font-semibold truncate">{hero.name}</h3>
+          <h3 className="font-semibold truncate text-sm">{hero.name}</h3>
           <div className="flex items-center">
             {Array.from({ length: hero.stars }).map((_, i) => (
               <Star
                 key={i}
-                className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400"
+                className="w-3 h-3 fill-yellow-400 text-yellow-400"
                 strokeWidth={1}
               />
             ))}
@@ -58,5 +69,3 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero }) => {
     </Card>
   );
 };
-
-export default HeroCard;

@@ -6,11 +6,26 @@ import { Star, Shield, Zap, ArrowRight, Activity } from 'lucide-react';
 import TagBadge from './TagBadge';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
+import { useHeroStats } from '@/hooks/use-hero-stats';
+import { getHeroMatchups, getHeroStats, getHeroSynergies } from '@/lib/hero-stats-utils';
+import { HeroWinRate } from './HeroWinRate';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const HeroModal: React.FC = () => {
-  const { selectedHero, isModalOpen, closeModal } = useGallery();
+  const { selectedHero, isModalOpen, closeModal, heroes } = useGallery();
+  const { heroStats, heroMatchups, heroSynergies, gamesLogged } = useHeroStats();
 
   if (!selectedHero) return null;
+
+  // Get stats for the selected hero
+  const heroStat = getHeroStats(selectedHero.id, heroStats);
+  const matchups = getHeroMatchups(selectedHero.id, heroMatchups)
+    .filter(m => m.gamesPlayed >= 1)
+    .sort((a, b) => b.winRate - a.winRate);
+  const synergies = getHeroSynergies(selectedHero.id, heroSynergies)
+    .filter(s => s.gamesPlayed >= 1)
+    .sort((a, b) => b.winRate - a.winRate);
 
   // Format stat display with boosted values
   const formatStat = (base: number, boosted?: number) => {
@@ -30,9 +45,14 @@ const HeroModal: React.FC = () => {
     return (value / 8) * 100;
   };
 
+  // Get hero name by ID
+  const getHeroName = (id: number) => {
+    return heroes.find(h => h.id === id)?.name || "Unknown Hero";
+  };
+
   return (
     <Dialog open={isModalOpen} onOpenChange={closeModal}>
-      <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden glass-panel">
+      <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden glass-panel max-h-[90vh] overflow-y-auto">
         <DialogHeader className="p-6 pb-2">
           <DialogTitle className="text-2xl flex items-center justify-between">
             <span>{selectedHero.fullName}</span>
@@ -49,6 +69,20 @@ const HeroModal: React.FC = () => {
         </DialogHeader>
         
         <div className="p-6 pt-2">
+          {/* Win Rate Section */}
+          {gamesLogged > 0 && (
+            <div className="mb-6 flex items-center justify-between">
+              <h3 className="text-sm font-medium">Win Rate</h3>
+              <div className="flex items-center gap-2">
+                <HeroWinRate 
+                  winRate={heroStat?.winRate || 0} 
+                  gamesPlayed={heroStat?.gamesPlayed || 0}
+                  showDetails={true}
+                />
+              </div>
+            </div>
+          )}
+          
           {/* Tags section */}
           <div className="mb-6">
             <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
@@ -148,6 +182,86 @@ const HeroModal: React.FC = () => {
                 <span className="text-xl font-bold">{statTotal}</span>
               </div>
             </div>
+            
+            {/* Performance Data Section */}
+            {gamesLogged > 0 && (
+              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <Tabs defaultValue="matchups" className="w-full mt-4">
+                  <TabsList className="grid grid-cols-2 w-full">
+                    <TabsTrigger value="matchups">Matchups</TabsTrigger>
+                    <TabsTrigger value="synergies">Synergies</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="matchups" className="mt-4">
+                    <h4 className="text-sm font-medium mb-2">Hero Matchups</h4>
+                    {matchups.length > 0 ? (
+                      <div className="rounded-md border overflow-hidden">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Against</TableHead>
+                              <TableHead className="text-right">Win Rate</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {matchups.slice(0, 5).map((matchup) => (
+                              <TableRow key={`${matchup.heroId}-${matchup.opponentId}`}>
+                                <TableCell>{getHeroName(matchup.opponentId)}</TableCell>
+                                <TableCell className="text-right">
+                                  <HeroWinRate 
+                                    winRate={matchup.winRate} 
+                                    gamesPlayed={matchup.gamesPlayed}
+                                    showDetails={true}
+                                  />
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        No matchup data available yet.
+                      </p>
+                    )}
+                  </TabsContent>
+                  
+                  <TabsContent value="synergies" className="mt-4">
+                    <h4 className="text-sm font-medium mb-2">Hero Synergies</h4>
+                    {synergies.length > 0 ? (
+                      <div className="rounded-md border overflow-hidden">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>With</TableHead>
+                              <TableHead className="text-right">Win Rate</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {synergies.slice(0, 5).map((synergy) => (
+                              <TableRow key={`${synergy.heroId}-${synergy.allyId}`}>
+                                <TableCell>{getHeroName(synergy.allyId)}</TableCell>
+                                <TableCell className="text-right">
+                                  <HeroWinRate 
+                                    winRate={synergy.winRate} 
+                                    gamesPlayed={synergy.gamesPlayed}
+                                    showDetails={true}
+                                  />
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        No synergy data available yet.
+                      </p>
+                    )}
+                  </TabsContent>
+                </Tabs>
+              </div>
+            )}
             
             {/* Additional information - Abilities, Playstyle, Synergies */}
             {(selectedHero.abilities || selectedHero.playstyle || selectedHero.synergies) && (
