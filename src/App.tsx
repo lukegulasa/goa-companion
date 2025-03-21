@@ -9,6 +9,7 @@ import DraftPage from './pages/DraftPage';
 import NotFound from './pages/NotFound';
 import HeroModal from '@/components/HeroModal';
 import GameStats from './pages/GameStats';
+import TeamBalance from './pages/TeamBalance';
 import { GalleryProvider } from '@/context/GalleryContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -36,6 +37,7 @@ function App() {
                   <Route path="/" element={<Index />} />
                   <Route path="/draft" element={<DraftPage />} />
                   <Route path="/game-stats" element={<GameStats />} />
+                  <Route path="/team-balance" element={<TeamBalance />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Layout>
