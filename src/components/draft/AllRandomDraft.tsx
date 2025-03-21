@@ -6,7 +6,8 @@ import { Hero } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 import HeroCard from '@/components/HeroCard';
-import { Shuffle } from 'lucide-react';
+import { Shuffle, Star } from 'lucide-react';
+import { Toggle } from '@/components/ui/toggle';
 
 interface AllRandomDraftProps {
   playerCount: number;
@@ -19,20 +20,35 @@ const AllRandomDraft: React.FC<AllRandomDraftProps> = ({ playerCount, onComplete
   const [teamA, setTeamA] = useState<Hero[]>([]);
   const [teamB, setTeamB] = useState<Hero[]>([]);
   const [isReady, setIsReady] = useState(false);
+  const [starFilters, setStarFilters] = useState<number[]>([]);
   const { toast } = useToast();
 
+  // Apply star filters to the heroes
+  const filteredHeroes = React.useMemo(() => {
+    if (starFilters.length === 0) return heroes;
+    return heroes.filter(hero => starFilters.includes(hero.stars));
+  }, [heroes, starFilters]);
+
+  const toggleStarFilter = (star: number) => {
+    setStarFilters(prev => 
+      prev.includes(star) 
+        ? prev.filter(s => s !== star) 
+        : [...prev, star]
+    );
+  };
+
   const shuffleAndDraft = () => {
-    if (heroes.length < playerCount) {
+    if (filteredHeroes.length < playerCount) {
       toast({
         title: "Not enough heroes",
-        description: "There aren't enough heroes available for the draft.",
+        description: "There aren't enough heroes available for the draft with the current filters.",
         variant: "destructive",
       });
       return;
     }
 
     // Shuffle all heroes
-    const shuffled = [...heroes].sort(() => 0.5 - Math.random());
+    const shuffled = [...filteredHeroes].sort(() => 0.5 - Math.random());
     const selected = shuffled.slice(0, playerCount);
     setSelectedHeroes(selected);
 
@@ -46,7 +62,7 @@ const AllRandomDraft: React.FC<AllRandomDraftProps> = ({ playerCount, onComplete
 
   useEffect(() => {
     shuffleAndDraft();
-  }, [heroes, playerCount]);
+  }, [filteredHeroes, playerCount]);
 
   // Container animation
   const container = {
@@ -85,6 +101,34 @@ const AllRandomDraft: React.FC<AllRandomDraftProps> = ({ playerCount, onComplete
           <Shuffle className="mr-2 h-4 w-4" />
           Shuffle Again
         </Button>
+      </div>
+
+      {/* Star filters */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        <span className="text-sm font-medium flex items-center mr-1">Filter by stars:</span>
+        {[1, 2, 3, 4].map((star) => (
+          <Toggle
+            key={star}
+            pressed={starFilters.includes(star)}
+            onPressedChange={() => toggleStarFilter(star)}
+            variant="outline"
+            size="sm"
+            className="h-8 px-3 flex items-center gap-1"
+          >
+            {star}
+            <Star className={`h-3.5 w-3.5 ${starFilters.includes(star) ? "fill-yellow-400" : ""}`} />
+          </Toggle>
+        ))}
+        {starFilters.length > 0 && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setStarFilters([])}
+            className="h-8 px-3"
+          >
+            Clear
+          </Button>
+        )}
       </div>
 
       {isReady && (

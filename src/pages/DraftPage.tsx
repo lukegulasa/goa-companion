@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,7 +26,7 @@ export type DraftMode = 'all-random' | 'all-pick' | 'single-draft' | 'random-dra
 export type DraftState = 'setup' | 'in-progress' | 'completed';
 
 const DraftPage = () => {
-  const [selectedMode, setSelectedMode] = useState<DraftMode | null>(null);
+  const [selectedMode, setSelectedMode] = useState<DraftMode>('all-random');
   const [draftState, setDraftState] = useState<DraftState>('setup');
   const [playerCount, setPlayerCount] = useState<number>(4);
   const navigate = useNavigate();
@@ -40,7 +39,7 @@ const DraftPage = () => {
 
   const resetDraft = () => {
     setDraftState('setup');
-    setSelectedMode(null);
+    setSelectedMode('all-random');
   };
 
   const renderDraftComponent = () => {
@@ -119,7 +118,6 @@ const DraftPage = () => {
               <div className="mt-8 flex justify-end">
                 <Button 
                   onClick={startDraft}
-                  disabled={!selectedMode}
                   className="flex items-center"
                 >
                   Start Draft
