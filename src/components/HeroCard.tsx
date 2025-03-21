@@ -10,19 +10,29 @@ import { getHeroStats } from '@/lib/hero-stats-utils';
 
 interface HeroCardProps {
   hero: Hero;
+  onClick?: () => void; // Added onClick as an optional prop
 }
 
-const HeroCard: React.FC<HeroCardProps> = ({ hero }) => {
+const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
   const { selectHero } = useGallery();
   const { heroStats } = useHeroStats();
   
   // Get win rate stats for this hero
   const stats = getHeroStats(hero.id, heroStats);
   
+  // Use the provided onClick if available, otherwise use selectHero
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      selectHero(hero);
+    }
+  };
+  
   return (
     <Card 
       className="overflow-hidden cursor-pointer transition-all hover:scale-[1.02] hover:shadow-md glass-panel"
-      onClick={() => selectHero(hero)}
+      onClick={handleClick}
     >
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-1">
