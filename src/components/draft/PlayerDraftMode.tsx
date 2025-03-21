@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useHeroes } from '@/hooks/use-heroes';
@@ -41,6 +42,8 @@ interface PlayerDraftModeProps {
   onComplete: (draftData: any[]) => void;
 }
 
+type DraftStage = 'setup' | 'hero-selection' | 'team-draft' | 'complete';
+
 const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({ 
   playerCount, 
   playerNames = [],
@@ -53,7 +56,7 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({
   const [players, setPlayers] = useState<Player[]>([]);
   const [captainA, setCaptainA] = useState<number | null>(null);
   const [captainB, setCaptainB] = useState<number | null>(null);
-  const [draftStage, setDraftStage] = useState<'setup' | 'hero-selection' | 'team-draft' | 'complete'>('setup');
+  const [draftStage, setDraftStage] = useState<DraftStage>('setup');
   const [currentCaptain, setCurrentCaptain] = useState<'A' | 'B'>('A');
   const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -244,7 +247,6 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({
             variant="outline" 
             size="sm"
             className="flex items-center"
-            disabled={draftStage === 'complete'}
           >
             <Shuffle className="mr-2 h-4 w-4" />
             Reset Draft
@@ -434,15 +436,6 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({
         </>
       )}
       
-      {draftStage === 'complete' && (
-        <div className="flex justify-end pt-4">
-          <Button onClick={handleDraftComplete}>
-            Confirm Draft
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-      )}
-      
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -462,3 +455,4 @@ const PlayerDraftMode: React.FC<PlayerDraftModeProps> = ({
 };
 
 export default PlayerDraftMode;
+
