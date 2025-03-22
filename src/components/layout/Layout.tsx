@@ -31,7 +31,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div className="w-2 h-0.5 bg-amber-700/50"></div>
             <div className="w-4 h-0.5 bg-amber-700/50"></div>
           </div>
-          <p>Fantasy Tactics Drafter</p>
+          <p>GoA Companion</p>
         </div>
       </footer>
     </div>

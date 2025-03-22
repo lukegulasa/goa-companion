@@ -23,7 +23,7 @@ const Navigation: React.FC = () => {
   return (
     <nav className="flex items-center justify-between">
       <div className="font-serif text-xl text-amber-900 dark:text-amber-500 font-semibold">
-        Fantasy Tactics
+        GoA Companion
       </div>
       <div className="flex items-center space-x-1 sm:space-x-2">
         {NavItems.map((item) => (
