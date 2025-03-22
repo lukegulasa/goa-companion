@@ -29,20 +29,20 @@ export const DraftHeroCard: React.FC<DraftHeroCardProps> = ({
     <Card 
       className={`
         overflow-hidden cursor-pointer transition-all 
-        ${isSelected ? 'ring-2 ring-primary' : ''} 
+        ${isSelected ? 'ring-2 ring-primary shadow-glow' : ''} 
         ${isBanned ? 'opacity-40 grayscale' : 'hover:scale-[1.02] hover:shadow-md'} 
-        glass-panel
+        arcane-card
       `}
       onClick={isBanned ? undefined : onClick}
     >
-      <CardContent className="p-3">
+      <CardContent className="p-3 relative">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="font-semibold truncate text-sm">{hero.name}</h3>
+          <h3 className="font-serif font-semibold truncate text-sm">{hero.name}</h3>
           <div className="flex items-center">
             {Array.from({ length: hero.stars }).map((_, i) => (
               <Star
                 key={i}
-                className="w-3 h-3 fill-yellow-400 text-yellow-400"
+                className="w-3 h-3 fill-amber-400 text-amber-400"
                 strokeWidth={1}
               />
             ))}
@@ -52,10 +52,10 @@ export const DraftHeroCard: React.FC<DraftHeroCardProps> = ({
         <div className="flex items-center justify-between mt-2">
           <div>
             <div className="flex text-xs text-muted-foreground">
-              <span className="mr-1">A:{hero.stats.attack.base}</span>
-              <span className="mr-1">I:{hero.stats.initiative.base}</span>
-              <span className="mr-1">D:{hero.stats.defense.base}</span>
-              <span>M:{hero.stats.movement.base}</span>
+              <span className="mr-1 font-rune">A:{hero.stats.attack.base}</span>
+              <span className="mr-1 font-rune">I:{hero.stats.initiative.base}</span>
+              <span className="mr-1 font-rune">D:{hero.stats.defense.base}</span>
+              <span className="font-rune">M:{hero.stats.movement.base}</span>
             </div>
           </div>
           
