@@ -1,9 +1,22 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Upload, AlertCircle } from 'lucide-react';
+import { Download, Upload, AlertCircle, Copy, Share2, QrCode } from 'lucide-react';
 import { Game, Player } from '@/lib/game-stats-types';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 
 interface DataPersistenceProps {
   games: Game[];
@@ -17,6 +30,8 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
   onImport
 }) => {
   const { toast } = useToast();
+  const [jsonData, setJsonData] = useState<string>('');
+  const [dialogOpen, setDialogOpen] = useState(false);
   
   // Export data as JSON file
   const handleExport = () => {
@@ -55,6 +70,79 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
     }
   };
   
+  // Generate shareable JSON string
+  const handleGenerateShareableData = () => {
+    try {
+      const dataToExport = {
+        games,
+        players,
+        exportDate: new Date().toISOString()
+      };
+      
+      const data = JSON.stringify(dataToExport);
+      setJsonData(data);
+      setDialogOpen(true);
+    } catch (error) {
+      console.error('Generate shareable data error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "There was an error generating shareable data."
+      });
+    }
+  };
+  
+  // Copy JSON to clipboard
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(jsonData).then(
+      () => {
+        toast({
+          title: "Copied!",
+          description: "Data copied to clipboard. Paste it in another browser to import."
+        });
+      },
+      (err) => {
+        console.error('Copy error:', err);
+        toast({
+          variant: "destructive",
+          title: "Copy Failed",
+          description: "Failed to copy data to clipboard."
+        });
+      }
+    );
+  };
+  
+  // Import data from pasted JSON
+  const handleImportFromText = (text: string) => {
+    try {
+      const importedData = JSON.parse(text);
+      
+      // Basic validation
+      if (!importedData.games || !importedData.players || !Array.isArray(importedData.games) || !Array.isArray(importedData.players)) {
+        throw new Error('Invalid import format');
+      }
+      
+      onImport({
+        games: importedData.games,
+        players: importedData.players
+      });
+      
+      toast({
+        title: "Import Successful",
+        description: `Imported ${importedData.games.length} games and ${importedData.players.length} players.`
+      });
+      
+      setDialogOpen(false);
+    } catch (error) {
+      console.error('JSON parsing error:', error);
+      toast({
+        variant: "destructive",
+        title: "Import Failed",
+        description: "The data appears to be invalid or corrupt."
+      });
+    }
+  };
+  
   // Import data from JSON file
   const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -65,22 +153,7 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
       reader.onload = (e) => {
         try {
           const content = e.target?.result as string;
-          const importedData = JSON.parse(content);
-          
-          // Basic validation
-          if (!importedData.games || !importedData.players || !Array.isArray(importedData.games) || !Array.isArray(importedData.players)) {
-            throw new Error('Invalid import format');
-          }
-          
-          onImport({
-            games: importedData.games,
-            players: importedData.players
-          });
-          
-          toast({
-            title: "Import Successful",
-            description: `Imported ${importedData.games.length} games and ${importedData.players.length} players.`
-          });
+          handleImportFromText(content);
         } catch (error) {
           console.error('JSON parsing error:', error);
           toast({
@@ -110,7 +183,7 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
       <div className="flex flex-col space-y-2">
         <h2 className="text-xl font-semibold">Data Management</h2>
         <p className="text-sm text-muted-foreground">
-          Export your data to keep a backup or to transfer it to another device.
+          Export your data to keep a backup or to transfer it to another device or browser.
         </p>
       </div>
       
@@ -122,8 +195,87 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
           disabled={games.length === 0 && players.length === 0}
         >
           <Download className="h-4 w-4" />
-          Export Data
+          Download Backup
         </Button>
+        
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2"
+              onClick={handleGenerateShareableData}
+              disabled={games.length === 0 && players.length === 0}
+            >
+              <Share2 className="h-4 w-4" />
+              Share Data
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[550px]">
+            <DialogHeader>
+              <DialogTitle>Transfer Your Game Data</DialogTitle>
+              <DialogDescription>
+                Copy this data and paste it on another device or browser to transfer your game statistics.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <Tabs defaultValue="export" className="mt-4">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="export">Export</TabsTrigger>
+                <TabsTrigger value="import">Import</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="export" className="space-y-4">
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Copy this text and save it somewhere safe. You can paste it on another device.
+                  </p>
+                  <Textarea 
+                    value={jsonData} 
+                    readOnly 
+                    className="h-[200px] font-mono text-xs"
+                  />
+                  <Button 
+                    variant="secondary" 
+                    className="w-full" 
+                    onClick={handleCopyToClipboard}
+                  >
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy to Clipboard
+                  </Button>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="import" className="space-y-4">
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Paste the exported data here to import your game statistics.
+                  </p>
+                  <Textarea 
+                    placeholder="Paste your data here..." 
+                    className="h-[200px] font-mono text-xs"
+                    onChange={(e) => setJsonData(e.target.value)}
+                    value={jsonData}
+                  />
+                  <Button 
+                    variant="secondary" 
+                    className="w-full" 
+                    onClick={() => handleImportFromText(jsonData)}
+                    disabled={!jsonData}
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Import Data
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
+            
+            <DialogFooter className="mt-4">
+              <Button variant="outline" onClick={() => setDialogOpen(false)}>
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         
         <div className="relative">
           <Button 
@@ -132,7 +284,7 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
             onClick={() => document.getElementById('import-file')?.click()}
           >
             <Upload className="h-4 w-4" />
-            Import Data
+            Import File
           </Button>
           <input 
             type="file" 
@@ -145,13 +297,23 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
       </div>
       
       {games.length > 0 && (
-        <div className="flex items-start gap-2 p-3 text-sm bg-muted rounded text-muted-foreground">
-          <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
-          <p>
-            You currently have {games.length} game{games.length !== 1 ? 's' : ''} and {players.length} player{players.length !== 1 ? 's' : ''} stored locally.
-            Importing new data will merge with your existing data.
-          </p>
-        </div>
+        <Card className="p-4 border border-amber-200 bg-amber-50 dark:bg-amber-950 dark:border-amber-800">
+          <div className="flex items-start gap-2 text-sm text-amber-800 dark:text-amber-300">
+            <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+            <div>
+              <p className="font-medium mb-1">Browser Storage Notice</p>
+              <p>
+                You currently have {games.length} game{games.length !== 1 ? 's' : ''} and {players.length} player{players.length !== 1 ? 's' : ''} stored.
+                This data is only saved in this browser's local storage. To use your data across browsers or devices:
+              </p>
+              <ul className="list-disc list-inside mt-2 ml-2 space-y-1">
+                <li>Use the "Share Data" button to copy your data</li>
+                <li>Download a backup file with the "Download Backup" button</li>
+                <li>Data can be imported on any other browser or device</li>
+              </ul>
+            </div>
+          </div>
+        </Card>
       )}
     </div>
   );
