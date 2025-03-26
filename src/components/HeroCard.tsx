@@ -45,24 +45,25 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
       onClick={handleClick}
     >
       <CardContent className="p-4">
-        <div className="flex">
-          {/* Hero Image Container - Now on the left */}
-          <div className="w-20 h-20 bg-amber-800/20 border border-amber-700/30 rounded-md overflow-hidden flex-shrink-0">
-            <img 
-              src={heroImagePath} 
-              alt={hero.name}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                // If image fails to load, show placeholder text
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.parentElement!.innerHTML += '<span class="text-xs text-amber-600/60 font-rune">Hero Image</span>';
-              }}
-            />
-          </div>
-          
-          {/* Hero details - Now on the right */}
-          <div className="ml-3 flex flex-col justify-between flex-grow">
-            <div>
+        <div className="flex flex-col">
+          {/* Hero Image and Name row */}
+          <div className="flex items-start">
+            {/* Hero Image Container */}
+            <div className="w-20 h-20 bg-amber-800/20 border border-amber-700/30 rounded-md overflow-hidden flex-shrink-0">
+              <img 
+                src={heroImagePath} 
+                alt={hero.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // If image fails to load, show placeholder text
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.parentElement!.innerHTML += '<span class="text-xs text-amber-600/60 font-rune">Hero Image</span>';
+                }}
+              />
+            </div>
+            
+            {/* Hero name and stars - aligned with image */}
+            <div className="ml-3 flex flex-col">
               <h3 className="font-semibold truncate">{hero.name}</h3>
               
               <div className="flex items-center">
@@ -75,21 +76,22 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
                 ))}
               </div>
             </div>
-            
-            <div className="flex items-center justify-between w-full">
-              <div className="flex text-xs text-muted-foreground flex-wrap">
-                <span className="mr-1">A:{hero.stats.attack.base}</span>
-                <span className="mr-1">I:{hero.stats.initiative.base}</span>
-                <span className="mr-1">D:{hero.stats.defense.base}</span>
-                <span>M:{hero.stats.movement.base}</span>
-              </div>
-              
-              {/* Show win rate */}
-              <HeroWinRate 
-                winRate={stats?.winRate || 0} 
-                gamesPlayed={stats?.gamesPlayed || 0}
-              />
+          </div>
+          
+          {/* Stats and Win Rate row - below the image/name */}
+          <div className="flex justify-between items-center mt-3 w-full">
+            <div className="flex text-xs text-muted-foreground flex-wrap">
+              <span className="mr-1">A:{hero.stats.attack.base}</span>
+              <span className="mr-1">I:{hero.stats.initiative.base}</span>
+              <span className="mr-1">D:{hero.stats.defense.base}</span>
+              <span>M:{hero.stats.movement.base}</span>
             </div>
+            
+            {/* Show win rate */}
+            <HeroWinRate 
+              winRate={stats?.winRate || 0} 
+              gamesPlayed={stats?.gamesPlayed || 0}
+            />
           </div>
         </div>
       </CardContent>
