@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Upload, AlertCircle, Copy, Share2, QrCode } from 'lucide-react';
+import { Download, Upload, AlertCircle, Copy, Share2, QrCode, Database } from 'lucide-react';
 import { Game, Player } from '@/lib/game-stats-types';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -21,7 +21,7 @@ import { Card } from "@/components/ui/card";
 interface DataPersistenceProps {
   games: Game[];
   players: Player[];
-  onImport: (data: { games: Game[], players: Player[] }) => void;
+  onImport: (data: { games: Player[], players: Player[] }) => void;
 }
 
 export const DataPersistence: React.FC<DataPersistenceProps> = ({ 
@@ -183,7 +183,8 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
       <div className="flex flex-col space-y-2">
         <h2 className="text-xl font-semibold">Data Management</h2>
         <p className="text-sm text-muted-foreground">
-          Export your data to keep a backup or to transfer it to another device or browser.
+          Your data is now saved using IndexedDB, which provides persistent storage across sessions.
+          You can still export your data as a backup or to transfer to another device.
         </p>
       </div>
       
@@ -297,20 +298,24 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
       </div>
       
       {games.length > 0 && (
-        <Card className="p-4 border border-amber-200 bg-amber-50 dark:bg-amber-950 dark:border-amber-800">
-          <div className="flex items-start gap-2 text-sm text-amber-800 dark:text-amber-300">
-            <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+        <Card className="p-4 border border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800">
+          <div className="flex items-start gap-2 text-sm text-green-800 dark:text-green-300">
+            <Database className="h-4 w-4 mt-0.5 shrink-0" />
             <div>
-              <p className="font-medium mb-1">Browser Storage Notice</p>
+              <p className="font-medium mb-1">Enhanced Data Storage</p>
               <p>
                 You currently have {games.length} game{games.length !== 1 ? 's' : ''} and {players.length} player{players.length !== 1 ? 's' : ''} stored.
-                This data is only saved in this browser's local storage. To use your data across browsers or devices:
+                Your data is now saved using IndexedDB, which:
               </p>
               <ul className="list-disc list-inside mt-2 ml-2 space-y-1">
-                <li>Use the "Share Data" button to copy your data</li>
-                <li>Download a backup file with the "Download Backup" button</li>
-                <li>Data can be imported on any other browser or device</li>
+                <li>Persists data between browser sessions</li>
+                <li>Uses more reliable storage than localStorage</li>
+                <li>Still works offline and without a server</li>
+                <li>Can store more data than localStorage</li>
               </ul>
+              <p className="mt-2">
+                Note: Data is still tied to this browser. For cross-device access, use the export/import feature.
+              </p>
             </div>
           </div>
         </Card>

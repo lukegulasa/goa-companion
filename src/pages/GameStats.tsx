@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useLocalStorage } from '@/hooks/use-local-storage';
+import { useIndexedDB } from '@/hooks/use-indexed-db';
 import { useHeroes } from '@/hooks/use-heroes';
 import {
   Tabs,
@@ -16,8 +16,9 @@ import { DataPersistence } from '@/components/game-stats/DataPersistence';
 import { Game, GameLogFormValues, GamePlayer, NewPlayerFormValues, Player } from '@/lib/game-stats-types';
 
 const GameStats: React.FC = () => {
-  const [players, setPlayers] = useLocalStorage<Player[]>('game-players', []);
-  const [gameLogs, setGameLogs] = useLocalStorage<Game[]>('game-logs', []);
+  // Replace localStorage with IndexedDB
+  const [players, setPlayers] = useIndexedDB<Player>('players', []);
+  const [gameLogs, setGameLogs] = useIndexedDB<Game>('games', []);
   const [gameParticipants, setGameParticipants] = useState<GamePlayer[]>([]);
   const [activeTab, setActiveTab] = useState('log-game');
   const { heroes } = useHeroes();
