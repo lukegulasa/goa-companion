@@ -10,17 +10,15 @@ import { getHeroStats } from '@/lib/hero-stats-utils';
 
 interface HeroCardProps {
   hero: Hero;
-  onClick?: () => void; // Added onClick as an optional prop
+  onClick?: () => void;
 }
 
 const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
   const { selectHero } = useGallery();
   const { heroStats } = useHeroStats();
   
-  // Get win rate stats for this hero
   const stats = getHeroStats(hero.id, heroStats);
   
-  // Use the provided onClick if available, otherwise use selectHero
   const handleClick = () => {
     if (onClick) {
       onClick();
@@ -29,8 +27,17 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
     }
   };
   
-  // Create hero image path based on hero name (lowercase)
-  const heroImagePath = `/heroes/${hero.name.toLowerCase()}.jpg`;
+  // Create hero image path with special cases
+  const getHeroImagePath = (heroName: string) => {
+    // Handle special cases
+    if (heroName === "Widget and Pyro") return "/heroes/widget.jpg";
+    if (heroName === "Ignatia") return "/heroes/ingatia.jpg";
+    
+    // Default case
+    return `/heroes/${heroName.toLowerCase()}.jpg`;
+  };
+  
+  const heroImagePath = getHeroImagePath(hero.name);
   
   return (
     <Card 
