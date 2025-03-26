@@ -234,8 +234,8 @@ export const heroes: Hero[] = processHeroData([
   },
   {
     id: 14,
-    name: "Silvenarrow",
-    fullName: "Silvenarrow the Pathfinder",
+    name: "Silverarrow",
+    fullName: "Silverarrow the Pathfinder",
     stars: 2,
     primaryTags: ["Sniper", "Damager"],
     allTags: ["Sniper", "Damager", "Disabler", "Healer", "Farming"],
@@ -294,8 +294,8 @@ export const heroes: Hero[] = processHeroData([
   },
   {
     id: 18,
-    name: "Trinkels",
-    fullName: "Trinkels the Scavenger",
+    name: "Trinkets",
+    fullName: "Trinkets the Scavenger",
     stars: 3,
     primaryTags: ["Sniper", "Damager"],
     allTags: ["Sniper", "Damager", "Pusher"],
@@ -474,8 +474,8 @@ export const heroes: Hero[] = processHeroData([
   },
   {
     id: 30,
-    name: "Ignalia",
-    fullName: "Ignalia the Mad",
+    name: "Ignatia",
+    fullName: "Ignatia the Mad",
     stars: 4,
     primaryTags: ["Sniper", "Damager"],
     allTags: ["Sniper", "Damager", "Tokens", "Tactician", "Pusher"],

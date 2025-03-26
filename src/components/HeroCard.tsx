@@ -29,6 +29,9 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
     }
   };
   
+  // Create hero image path based on hero name (lowercase)
+  const heroImagePath = `/heroes/${hero.name.toLowerCase()}.jpg`;
+  
   return (
     <Card 
       className="overflow-hidden cursor-pointer transition-all hover:scale-[1.02] hover:shadow-md glass-panel"
@@ -39,8 +42,16 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
           {/* Hero Image Container */}
           <div className="w-full flex justify-center mb-2">
             <div className="w-20 h-20 bg-amber-800/20 border border-amber-700/30 rounded-md overflow-hidden flex items-center justify-center">
-              {/* Hero image will go here */}
-              <span className="text-xs text-amber-600/60 font-rune">Hero Image</span>
+              <img 
+                src={heroImagePath} 
+                alt={hero.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // If image fails to load, show placeholder text
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.parentElement!.innerHTML += '<span class="text-xs text-amber-600/60 font-rune">Hero Image</span>';
+                }}
+              />
             </div>
           </div>
           
