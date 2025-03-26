@@ -64,36 +64,50 @@ export const DraftHeroCard: React.FC<DraftHeroCardProps> = ({
               />
             </div>
             
-            {/* Hero name and stars - aligned with image */}
+            {/* Hero name and details column */}
             <div className="ml-2 flex flex-col">
               <h3 className="font-serif font-semibold truncate text-sm">{hero.name}</h3>
               
-              <div className="flex items-center">
-                {Array.from({ length: hero.stars }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-3 h-3 fill-amber-400 text-amber-400"
-                    strokeWidth={1}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  {Array.from({ length: hero.stars }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className="w-3 h-3 fill-amber-400 text-amber-400"
+                      strokeWidth={1}
+                    />
+                  ))}
+                </div>
+                
+                {/* Win rate moved up here */}
+                <div className="ml-2">
+                  <HeroWinRate 
+                    winRate={stats?.winRate || 0} 
+                    gamesPlayed={stats?.gamesPlayed || 0}
                   />
-                ))}
+                </div>
               </div>
             </div>
           </div>
           
-          {/* Stats and Win Rate row - below the image/name */}
-          <div className="flex justify-between items-center mt-2 w-full">
-            <div className="flex text-xs text-muted-foreground flex-wrap">
-              <span className="mr-1 font-rune">A:{hero.stats.attack.base}</span>
-              <span className="mr-1 font-rune">I:{hero.stats.initiative.base}</span>
-              <span className="mr-1 font-rune">D:{hero.stats.defense.base}</span>
-              <span className="font-rune">M:{hero.stats.movement.base}</span>
+          {/* Stats in a more spread out layout */}
+          <div className="grid grid-cols-4 gap-1 mt-2 text-xs text-muted-foreground">
+            <div className="text-center font-rune">
+              <span className="font-medium">ATK</span>
+              <div>{hero.stats.attack.base}</div>
             </div>
-            
-            {/* Show win rate */}
-            <HeroWinRate 
-              winRate={stats?.winRate || 0} 
-              gamesPlayed={stats?.gamesPlayed || 0}
-            />
+            <div className="text-center font-rune">
+              <span className="font-medium">INT</span>
+              <div>{hero.stats.initiative.base}</div>
+            </div>
+            <div className="text-center font-rune">
+              <span className="font-medium">DEF</span>
+              <div>{hero.stats.defense.base}</div>
+            </div>
+            <div className="text-center font-rune">
+              <span className="font-medium">MOV</span>
+              <div>{hero.stats.movement.base}</div>
+            </div>
           </div>
         </div>
       </CardContent>
