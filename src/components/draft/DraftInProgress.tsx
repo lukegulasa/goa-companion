@@ -10,6 +10,7 @@ import PlayerDraftMode from './PlayerDraftMode';
 import PickBanDraftMode from './PickBanDraftMode';
 import DraftResults from './DraftResults';
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface DraftInProgressProps {
   selectedMode: DraftMode;
@@ -34,6 +35,8 @@ const DraftInProgress: React.FC<DraftInProgressProps> = ({
   modeDescriptions,
   modeIcons
 }) => {
+  const isMobile = useIsMobile();
+
   const renderDraftComponent = () => {
     const draftProps = {
       playerCount,
@@ -61,8 +64,8 @@ const DraftInProgress: React.FC<DraftInProgressProps> = ({
 
   return (
     <Card className="mb-6">
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-center">
+      <CardHeader className={`${isMobile ? 'pb-2' : 'pb-3'}`}>
+        <div className={`${isMobile ? 'flex-col gap-2' : 'flex justify-between items-center'} flex`}>
           <CardTitle className="flex items-center">
             {selectedMode && modeIcons[selectedMode]}
             {selectedMode?.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
@@ -71,7 +74,7 @@ const DraftInProgress: React.FC<DraftInProgressProps> = ({
             New Draft
           </Button>
         </div>
-        <CardDescription>
+        <CardDescription className={isMobile ? 'mt-2 mb-4' : ''}>
           {selectedMode && modeDescriptions[selectedMode]}
         </CardDescription>
       </CardHeader>

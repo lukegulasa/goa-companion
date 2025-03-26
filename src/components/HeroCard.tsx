@@ -7,6 +7,7 @@ import { Hero } from '@/lib/types';
 import { HeroWinRate } from '@/components/HeroWinRate';
 import { useHeroStats } from '@/hooks/use-hero-stats';
 import { getHeroStats } from '@/lib/hero-stats-utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface HeroCardProps {
   hero: Hero;
@@ -16,6 +17,7 @@ interface HeroCardProps {
 const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
   const { selectHero } = useGallery();
   const { heroStats } = useHeroStats();
+  const isMobile = useIsMobile();
   
   const stats = getHeroStats(hero.id, heroStats);
   
@@ -47,9 +49,9 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
       <CardContent className="p-4">
         <div className="flex flex-col">
           {/* Hero Image and Name row */}
-          <div className="flex items-start">
+          <div className={`flex ${isMobile ? 'flex-col' : 'items-start'}`}>
             {/* Hero Image Container */}
-            <div className="w-20 h-20 bg-amber-800/20 border border-amber-700/30 rounded-md overflow-hidden flex-shrink-0">
+            <div className={`${isMobile ? 'w-full h-24 mb-2' : 'w-20 h-20'} bg-amber-800/20 border border-amber-700/30 rounded-md overflow-hidden flex-shrink-0`}>
               <img 
                 src={heroImagePath} 
                 alt={hero.name}
@@ -63,7 +65,7 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
             </div>
             
             {/* Hero name and details column */}
-            <div className="ml-3 flex flex-col">
+            <div className={`${isMobile ? '' : 'ml-3'} flex flex-col`}>
               <h3 className="font-semibold truncate">{hero.name}</h3>
               
               <div className="flex items-center">

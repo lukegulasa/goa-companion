@@ -8,10 +8,12 @@ import { Button } from '@/components/ui/button';
 import { InfoIcon, BarChart } from 'lucide-react';
 import { useHeroStats } from '@/hooks/use-hero-stats';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index: React.FC = () => {
   const [tagInfoOpen, setTagInfoOpen] = useState(false);
   const { heroStats, gamesLogged } = useHeroStats();
+  const isMobile = useIsMobile();
   
   // Sort heroes by win rate for the top performers
   const topHeroes = [...heroStats]
@@ -43,7 +45,7 @@ const Index: React.FC = () => {
               </div>
               
               <Tabs defaultValue="top" className="w-full">
-                <TabsList className="grid grid-cols-2 w-full mb-4">
+                <TabsList className={`grid grid-cols-2 w-full mb-4 ${isMobile ? 'text-xs' : ''}`}>
                   <TabsTrigger value="top">Top Performers</TabsTrigger>
                   <TabsTrigger value="most">Most Played</TabsTrigger>
                 </TabsList>
@@ -52,9 +54,9 @@ const Index: React.FC = () => {
                   {topHeroes.length > 0 ? (
                     <div className="space-y-2">
                       {topHeroes.map(hero => (
-                        <div key={hero.heroId} className="flex justify-between items-center p-2 bg-muted/30 rounded">
+                        <div key={hero.heroId} className={`flex ${isMobile ? 'flex-col' : 'justify-between items-center'} p-2 bg-muted/30 rounded`}>
                           <span className="font-medium">{hero.heroName}</span>
-                          <div className="flex items-center space-x-2">
+                          <div className={`flex ${isMobile ? 'mt-1 justify-between' : 'items-center space-x-2'}`}>
                             <span className="text-green-600 font-medium">{hero.winRate}% Win Rate</span>
                             <span className="text-muted-foreground text-sm">({hero.gamesPlayed} games)</span>
                           </div>
@@ -75,9 +77,9 @@ const Index: React.FC = () => {
                         .sort((a, b) => b.gamesPlayed - a.gamesPlayed)
                         .slice(0, 5)
                         .map(hero => (
-                          <div key={hero.heroId} className="flex justify-between items-center p-2 bg-muted/30 rounded">
+                          <div key={hero.heroId} className={`flex ${isMobile ? 'flex-col' : 'justify-between items-center'} p-2 bg-muted/30 rounded`}>
                             <span className="font-medium">{hero.heroName}</span>
-                            <div className="flex items-center space-x-2">
+                            <div className={`flex ${isMobile ? 'mt-1 justify-between' : 'items-center space-x-2'}`}>
                               <span className="text-sm">{hero.gamesPlayed} games</span>
                               <span className="text-sm text-muted-foreground">({hero.winRate}% win rate)</span>
                             </div>

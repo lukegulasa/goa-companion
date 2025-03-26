@@ -3,10 +3,12 @@ import React, { useEffect, useRef } from 'react';
 import { useGallery } from '@/context/GalleryContext';
 import HeroCard from './HeroCard';
 import { motion } from 'framer-motion';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const HeroGrid: React.FC = () => {
   const { filteredHeroes, selectHero } = useGallery();
   const gridRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   // Apply staggered animation to cards
   const container = {
@@ -45,7 +47,7 @@ const HeroGrid: React.FC = () => {
         </div>
       ) : (
         <motion.div 
-          className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
+          className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'} gap-4 sm:gap-6`}
           variants={container}
           initial="hidden"
           animate="show"
