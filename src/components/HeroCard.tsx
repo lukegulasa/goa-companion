@@ -45,51 +45,51 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
       onClick={handleClick}
     >
       <CardContent className="p-4">
-        <div className="flex flex-col">
-          {/* Hero Image Container */}
-          <div className="w-full flex justify-center mb-2">
-            <div className="w-20 h-20 bg-amber-800/20 border border-amber-700/30 rounded-md overflow-hidden flex items-center justify-center">
-              <img 
-                src={heroImagePath} 
-                alt={hero.name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  // If image fails to load, show placeholder text
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML += '<span class="text-xs text-amber-600/60 font-rune">Hero Image</span>';
-                }}
-              />
-            </div>
+        <div className="flex">
+          {/* Hero Image Container - Now on the left */}
+          <div className="w-20 h-20 bg-amber-800/20 border border-amber-700/30 rounded-md overflow-hidden flex-shrink-0">
+            <img 
+              src={heroImagePath} 
+              alt={hero.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                // If image fails to load, show placeholder text
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.parentElement!.innerHTML += '<span class="text-xs text-amber-600/60 font-rune">Hero Image</span>';
+              }}
+            />
           </div>
           
-          <div className="flex items-center justify-between mb-1">
-            <h3 className="font-semibold truncate">{hero.name}</h3>
-            <div className="flex items-center">
-              {Array.from({ length: hero.stars }).map((_, i) => (
-                <Star
-                  key={i}
-                  className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400"
-                  strokeWidth={1}
-                />
-              ))}
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between mt-2">
+          {/* Hero details - Now on the right */}
+          <div className="ml-3 flex flex-col justify-between flex-grow">
             <div>
-              <div className="flex text-xs text-muted-foreground">
+              <h3 className="font-semibold truncate">{hero.name}</h3>
+              
+              <div className="flex items-center">
+                {Array.from({ length: hero.stars }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400"
+                    strokeWidth={1}
+                  />
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between w-full">
+              <div className="flex text-xs text-muted-foreground flex-wrap">
                 <span className="mr-1">A:{hero.stats.attack.base}</span>
                 <span className="mr-1">I:{hero.stats.initiative.base}</span>
                 <span className="mr-1">D:{hero.stats.defense.base}</span>
                 <span>M:{hero.stats.movement.base}</span>
               </div>
+              
+              {/* Show win rate */}
+              <HeroWinRate 
+                winRate={stats?.winRate || 0} 
+                gamesPlayed={stats?.gamesPlayed || 0}
+              />
             </div>
-            
-            {/* Show win rate */}
-            <HeroWinRate 
-              winRate={stats?.winRate || 0} 
-              gamesPlayed={stats?.gamesPlayed || 0}
-            />
           </div>
         </div>
       </CardContent>
