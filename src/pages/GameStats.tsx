@@ -62,6 +62,15 @@ const GameStats: React.FC = () => {
     setGameLogs(gameLogs.filter(game => game.id !== gameId));
   };
 
+  // Edit a game
+  const onEditGame = (gameId: string, updatedGameData: Partial<Game>) => {
+    setGameLogs(gameLogs.map(game => 
+      game.id === gameId 
+        ? { ...game, ...updatedGameData } 
+        : game
+    ));
+  };
+
   // Handle importing data
   const handleDataImport = (data: { games: Game[], players: Player[] }) => {
     // Merge players (avoid duplicates based on id)
@@ -122,6 +131,7 @@ const GameStats: React.FC = () => {
           <GameHistory 
             games={gameLogs}
             onDeleteGame={onDeleteGame}
+            onEditGame={onEditGame}
           />
         </TabsContent>
         

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { TrophyIcon, Trash2 } from 'lucide-react';
+import { TrophyIcon, Trash2, Pencil } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -24,15 +24,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { EditGameDialog } from './EditGameDialog';
 
 interface GameHistoryProps {
   games: Game[];
   onDeleteGame?: (gameId: string) => void;
+  onEditGame?: (gameId: string, updatedGame: Partial<Game>) => void;
 }
 
-export const GameHistory: React.FC<GameHistoryProps> = ({ games, onDeleteGame }) => {
+export const GameHistory: React.FC<GameHistoryProps> = ({ 
+  games, 
+  onDeleteGame,
+  onEditGame
+}) => {
   const { toast } = useToast();
   const [gameToDelete, setGameToDelete] = useState<string | null>(null);
+  const [gameToEdit, setGameToEdit] = useState<Game | null>(null);
   
   const handleDeleteGame = (gameId: string) => {
     if (onDeleteGame) {
@@ -43,6 +50,17 @@ export const GameHistory: React.FC<GameHistoryProps> = ({ games, onDeleteGame })
       });
     }
     setGameToDelete(null);
+  };
+
+  const handleEditGame = (gameId: string, updatedGame: Partial<Game>) => {
+    if (onEditGame) {
+      onEditGame(gameId, updatedGame);
+      toast({
+        title: "Game Updated",
+        description: "The game has been successfully updated."
+      });
+    }
+    setGameToEdit(null);
   };
 
   return (
@@ -68,17 +86,31 @@ export const GameHistory: React.FC<GameHistoryProps> = ({ games, onDeleteGame })
                     <span className="font-medium">{game.winningTeam}</span>
                   </div>
                   
-                  {onDeleteGame && (
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="text-destructive/70 hover:text-destructive hover:bg-destructive/10 ml-4"
-                      onClick={() => setGameToDelete(game.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Delete game</span>
-                    </Button>
-                  )}
+                  <div className="flex items-center gap-2 ml-4">
+                    {onEditGame && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-primary/70 hover:text-primary hover:bg-primary/10"
+                        onClick={() => setGameToEdit(game)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                        <span className="sr-only">Edit game</span>
+                      </Button>
+                    )}
+                    
+                    {onDeleteGame && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-destructive/70 hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => setGameToDelete(game.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Delete game</span>
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
               
@@ -140,6 +172,14 @@ export const GameHistory: React.FC<GameHistoryProps> = ({ games, onDeleteGame })
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {gameToEdit && (
+        <EditGameDialog 
+          game={gameToEdit}
+          onSave={handleEditGame}
+          onCancel={() => setGameToEdit(null)}
+        />
+      )}
     </div>
   );
 };
