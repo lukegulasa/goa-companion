@@ -66,24 +66,22 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
             <div className="ml-3 flex flex-col">
               <h3 className="font-semibold truncate">{hero.name}</h3>
               
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  {Array.from({ length: hero.stars }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400"
-                      strokeWidth={1}
-                    />
-                  ))}
-                </div>
-                
-                {/* Win rate moved up here */}
-                <div className="ml-2">
-                  <HeroWinRate 
-                    winRate={stats?.winRate || 0} 
-                    gamesPlayed={stats?.gamesPlayed || 0}
+              <div className="flex items-center">
+                {Array.from({ length: hero.stars }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400"
+                    strokeWidth={1}
                   />
-                </div>
+                ))}
+              </div>
+              
+              {/* Win rate positioned below stars but still inline with image */}
+              <div className="mt-1">
+                <HeroWinRate 
+                  winRate={stats?.winRate || 0} 
+                  gamesPlayed={stats?.gamesPlayed || 0}
+                />
               </div>
             </div>
           </div>

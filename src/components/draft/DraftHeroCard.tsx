@@ -68,24 +68,22 @@ export const DraftHeroCard: React.FC<DraftHeroCardProps> = ({
             <div className="ml-2 flex flex-col">
               <h3 className="font-serif font-semibold truncate text-sm">{hero.name}</h3>
               
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  {Array.from({ length: hero.stars }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-3 h-3 fill-amber-400 text-amber-400"
-                      strokeWidth={1}
-                    />
-                  ))}
-                </div>
-                
-                {/* Win rate moved up here */}
-                <div className="ml-2">
-                  <HeroWinRate 
-                    winRate={stats?.winRate || 0} 
-                    gamesPlayed={stats?.gamesPlayed || 0}
+              <div className="flex items-center">
+                {Array.from({ length: hero.stars }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className="w-3 h-3 fill-amber-400 text-amber-400"
+                    strokeWidth={1}
                   />
-                </div>
+                ))}
+              </div>
+              
+              {/* Win rate positioned below stars but still inline with image */}
+              <div className="mt-1">
+                <HeroWinRate 
+                  winRate={stats?.winRate || 0} 
+                  gamesPlayed={stats?.gamesPlayed || 0}
+                />
               </div>
             </div>
           </div>
