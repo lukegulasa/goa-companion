@@ -43,25 +43,30 @@ const DraftModeSelector: React.FC<DraftModeSelectorProps> = ({
   };
 
   return (
-    <Tabs defaultValue="all-random" className="w-full" onValueChange={(value) => onModeChange(value as DraftMode)}>
-      <TabsList className={`grid ${isMobile ? 'grid-cols-2 gap-1' : 'grid-cols-2 md:grid-cols-3'} w-full`}>
-        {Object.keys(modeDescriptions).map((mode) => (
-          <TabsTrigger 
-            key={mode} 
-            value={mode} 
-            className={`flex items-center justify-center ${isMobile ? 'text-xs py-1.5 px-1' : ''}`}
-          >
-            {modeIcons[mode as DraftMode]}
-            <span>{mode.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</span>
-          </TabsTrigger>
-        ))}
-      </TabsList>
-      {Object.entries(modeDescriptions).map(([mode, description]) => (
-        <TabsContent key={mode} value={mode} className={`${isMobile ? 'mt-4' : 'mt-6'} space-y-4`}>
-          <p className="text-muted-foreground text-sm">{description}</p>
-        </TabsContent>
-      ))}
-    </Tabs>
+    <div className="w-full">
+      <Tabs defaultValue="all-random" className="w-full" onValueChange={(value) => onModeChange(value as DraftMode)}>
+        <TabsList className={`grid ${isMobile ? 'grid-cols-2 gap-1' : 'grid-cols-2 md:grid-cols-3'} w-full`}>
+          {Object.keys(modeDescriptions).map((mode) => (
+            <TabsTrigger 
+              key={mode} 
+              value={mode} 
+              className={`flex items-center justify-center ${isMobile ? 'text-xs py-1.5 px-1' : ''}`}
+            >
+              {modeIcons[mode as DraftMode]}
+              <span>{mode.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        
+        <div className={`${isMobile ? 'pt-14' : 'pt-6'}`}>
+          {Object.entries(modeDescriptions).map(([mode, description]) => (
+            <TabsContent key={mode} value={mode} className="space-y-4">
+              <p className="text-muted-foreground text-sm">{description}</p>
+            </TabsContent>
+          ))}
+        </div>
+      </Tabs>
+    </div>
   );
 };
 
