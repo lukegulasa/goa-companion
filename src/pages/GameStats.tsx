@@ -57,6 +57,11 @@ const GameStats: React.FC = () => {
     setActiveTab('game-history');
   };
 
+  // Delete a game
+  const onDeleteGame = (gameId: string) => {
+    setGameLogs(gameLogs.filter(game => game.id !== gameId));
+  };
+
   // Handle importing data
   const handleDataImport = (data: { games: Game[], players: Player[] }) => {
     // Merge players (avoid duplicates based on id)
@@ -114,7 +119,10 @@ const GameStats: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="game-history" className="space-y-6">
-          <GameHistory games={gameLogs} />
+          <GameHistory 
+            games={gameLogs}
+            onDeleteGame={onDeleteGame}
+          />
         </TabsContent>
         
         <TabsContent value="player-stats" className="space-y-6">
