@@ -28,7 +28,7 @@ export const DraftHeroCard: React.FC<DraftHeroCardProps> = ({
   const getHeroImagePath = (heroName: string) => {
     // Handle special cases
     if (heroName === "Widget and Pyro") return "/heroes/widget.jpg";
-    if (heroName === "Ignatia") return "/heroes/ingatia.jpg";
+    if (heroName === "Ignatia") return "/heroes/ignatia.jpg"; // Fixed typo in filename
     
     // Default case
     return `/heroes/${heroName.toLowerCase()}.jpg`;
