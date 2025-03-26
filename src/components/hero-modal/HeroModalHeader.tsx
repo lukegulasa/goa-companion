@@ -7,7 +7,7 @@ interface HeroModalHeaderProps {
   stars: number;
 }
 
-export const HeroModalHeader: React.FC<HeroModalHeaderProps> = ({ fullName, stars }) => {
+export const HeroModalHeader: React.FC<HeroModalHeaderProps> = ({ fullName }) => {
   return (
     <DialogHeader className="p-6 pb-2">
       <DialogTitle className="text-2xl">
