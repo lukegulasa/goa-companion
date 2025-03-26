@@ -7,6 +7,7 @@ import { Shuffle, List, ListTree, Dice5, Users, Check, Ban } from 'lucide-react'
 import DraftSetupCard from '@/components/draft/DraftSetupCard';
 import DraftInProgress from '@/components/draft/DraftInProgress';
 import DraftResults from '@/components/draft/DraftResults';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export type DraftMode = 'all-random' | 'all-pick' | 'single-draft' | 'random-draft' | 'player-draft' | 'pick-ban';
 export type DraftState = 'setup' | 'in-progress' | 'completed';
@@ -19,6 +20,7 @@ const DraftPage = () => {
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>(Array(8).fill(''));
   const [completedDraftData, setCompletedDraftData] = useState<any[]>([]);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const modeDescriptions = {
     'all-random': 'Randomly select heroes for each player.',

@@ -11,6 +11,7 @@ import {
   Ban,
 } from 'lucide-react';
 import { DraftMode } from '@/pages/DraftPage';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface DraftModeSelectorProps {
   selectedMode: DraftMode;
@@ -21,6 +22,8 @@ const DraftModeSelector: React.FC<DraftModeSelectorProps> = ({
   selectedMode, 
   onModeChange 
 }) => {
+  const isMobile = useIsMobile();
+  
   const modeDescriptions = {
     'all-random': 'Randomly select heroes for each player.',
     'all-pick': 'Players pick a hero to play out of all available heroes (starting with the team showing on the Tie breaker coin and alternating between teams).',
@@ -41,17 +44,21 @@ const DraftModeSelector: React.FC<DraftModeSelectorProps> = ({
 
   return (
     <Tabs defaultValue="all-random" className="w-full" onValueChange={(value) => onModeChange(value as DraftMode)}>
-      <TabsList className="grid grid-cols-2 md:grid-cols-3 w-full">
+      <TabsList className={`grid ${isMobile ? 'grid-cols-2 gap-1' : 'grid-cols-2 md:grid-cols-3'} w-full`}>
         {Object.keys(modeDescriptions).map((mode) => (
-          <TabsTrigger key={mode} value={mode} className="flex items-center justify-center">
+          <TabsTrigger 
+            key={mode} 
+            value={mode} 
+            className={`flex items-center justify-center ${isMobile ? 'text-xs py-1.5 px-1' : ''}`}
+          >
             {modeIcons[mode as DraftMode]}
             <span>{mode.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</span>
           </TabsTrigger>
         ))}
       </TabsList>
       {Object.entries(modeDescriptions).map(([mode, description]) => (
-        <TabsContent key={mode} value={mode} className="mt-6 space-y-4">
-          <p className="text-muted-foreground">{description}</p>
+        <TabsContent key={mode} value={mode} className={`${isMobile ? 'mt-4' : 'mt-6'} space-y-4`}>
+          <p className="text-muted-foreground text-sm">{description}</p>
         </TabsContent>
       ))}
     </Tabs>
