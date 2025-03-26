@@ -17,8 +17,8 @@ import { Game, GameLogFormValues, GamePlayer, NewPlayerFormValues, Player } from
 
 const GameStats: React.FC = () => {
   // Replace localStorage with IndexedDB
-  const [players, setPlayers] = useIndexedDB<Player>('players', []);
-  const [gameLogs, setGameLogs] = useIndexedDB<Game>('games', []);
+  const [players, setPlayers] = useIndexedDB<'players'>('players', []);
+  const [gameLogs, setGameLogs] = useIndexedDB<'games'>('games', []);
   const [gameParticipants, setGameParticipants] = useState<GamePlayer[]>([]);
   const [activeTab, setActiveTab] = useState('log-game');
   const { heroes } = useHeroes();

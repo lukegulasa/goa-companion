@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Upload, AlertCircle, Copy, Share2, QrCode, Database } from 'lucide-react';
@@ -21,7 +20,7 @@ import { Card } from "@/components/ui/card";
 interface DataPersistenceProps {
   games: Game[];
   players: Player[];
-  onImport: (data: { games: Player[], players: Player[] }) => void;
+  onImport: (data: { games: Game[], players: Player[] }) => void;
 }
 
 export const DataPersistence: React.FC<DataPersistenceProps> = ({ 

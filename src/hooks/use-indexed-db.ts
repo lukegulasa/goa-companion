@@ -1,12 +1,16 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import * as dbService from '@/lib/db';
+import { Game, Player } from '@/lib/game-stats-types';
 
-export function useIndexedDB<T extends { id: string }>(
-  storeName: 'players' | 'games',
-  defaultValue: T[] = []
-): [T[], (value: T[] | ((val: T[]) => T[])) => void] {
-  const [data, setData] = useState<T[]>(defaultValue);
+// More specific type to handle the two cases we have
+type StoreData<T> = T extends 'players' ? Player : Game;
+
+export function useIndexedDB<T extends 'players' | 'games'>(
+  storeName: T,
+  defaultValue: StoreData<T>[] = []
+): [StoreData<T>[], (value: StoreData<T>[] | ((val: StoreData<T>[]) => StoreData<T>[])) => void] {
+  const [data, setData] = useState<StoreData<T>[]>(defaultValue);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load initial data
@@ -14,15 +18,15 @@ export function useIndexedDB<T extends { id: string }>(
     const loadData = async () => {
       try {
         setIsLoading(true);
-        let items: T[];
+        let items: any[];
         
         if (storeName === 'players') {
-          items = await dbService.getPlayers() as T[];
+          items = await dbService.getPlayers();
         } else {
-          items = await dbService.getGames() as T[];
+          items = await dbService.getGames();
         }
         
-        setData(items);
+        setData(items as StoreData<T>[]);
       } catch (error) {
         console.error(`Error loading data from IndexedDB (${storeName}):`, error);
         // Fallback to default value if DB fails
@@ -36,7 +40,7 @@ export function useIndexedDB<T extends { id: string }>(
   }, [storeName, defaultValue]);
 
   // Function to update the data
-  const setItems = useCallback(async (value: T[] | ((val: T[]) => T[])) => {
+  const setItems = useCallback(async (value: StoreData<T>[] | ((val: StoreData<T>[]) => StoreData<T>[])) => {
     try {
       // Calculate the new value
       const newValue = value instanceof Function ? value(data) : value;
@@ -47,7 +51,7 @@ export function useIndexedDB<T extends { id: string }>(
       // Clear existing data and add new data
       if (storeName === 'players') {
         await Promise.all([
-          ...newValue.map(item => dbService.addPlayer(item as unknown as Player))
+          ...newValue.map(item => dbService.addPlayer(item as Player))
         ]);
       } else {
         // For games, we need to handle updates differently
@@ -66,9 +70,9 @@ export function useIndexedDB<T extends { id: string }>(
         await Promise.all(
           newValue.map(async (item) => {
             if (existingIds.has(item.id)) {
-              return dbService.updateGame(item.id, item as unknown as Game);
+              return dbService.updateGame(item.id, item as Game);
             } else {
-              return dbService.addGame(item as unknown as Game);
+              return dbService.addGame(item as Game);
             }
           })
         );
