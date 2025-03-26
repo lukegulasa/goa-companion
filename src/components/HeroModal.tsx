@@ -11,6 +11,7 @@ import { HeroModalTags } from './hero-modal/HeroModalTags';
 import { HeroModalStats } from './hero-modal/HeroModalStats';
 import { HeroModalPerformance } from './hero-modal/HeroModalPerformance';
 import { HeroModalAdditionalInfo } from './hero-modal/HeroModalAdditionalInfo';
+import { Star } from 'lucide-react';
 
 const HeroModal: React.FC = () => {
   const { selectedHero, isModalOpen, closeModal, heroes } = useGallery();
@@ -36,12 +37,33 @@ const HeroModal: React.FC = () => {
         />
         
         <div className="p-6 pt-2">
-          <HeroModalImage heroName={selectedHero.name} />
-          
-          <HeroModalWinRate 
-            heroStat={heroStat} 
-            gamesLogged={gamesLogged} 
-          />
+          {/* Hero image and stars layout */}
+          <div className="flex items-start mb-6">
+            <HeroModalImage heroName={selectedHero.name} />
+            
+            <div className="ml-4 flex flex-col">
+              {/* Display stars */}
+              <div className="flex items-center mb-2">
+                {Array.from({ length: selectedHero.stars }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className="w-5 h-5 fill-yellow-400 text-yellow-400"
+                    strokeWidth={1}
+                  />
+                ))}
+              </div>
+              
+              {/* Win rate */}
+              {gamesLogged > 0 && (
+                <div className="mt-1">
+                  <HeroModalWinRate 
+                    heroStat={heroStat} 
+                    gamesLogged={gamesLogged} 
+                  />
+                </div>
+              )}
+            </div>
+          </div>
           
           <HeroModalTags tags={selectedHero.allTags} />
           

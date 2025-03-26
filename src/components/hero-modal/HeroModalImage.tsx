@@ -19,18 +19,16 @@ export const HeroModalImage: React.FC<HeroModalImageProps> = ({ heroName }) => {
   const heroImagePath = getHeroImagePath(heroName);
   
   return (
-    <div className="mb-6 flex justify-center">
-      <div className="w-48 h-48 bg-amber-800/20 border border-amber-700/30 rounded-lg overflow-hidden">
-        <img 
-          src={heroImagePath}
-          alt={heroName}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-            e.currentTarget.parentElement!.innerHTML += '<div class="flex items-center justify-center w-full h-full text-amber-600/60 font-rune text-lg">No Image</div>';
-          }}
-        />
-      </div>
+    <div className="w-24 h-24 bg-amber-800/20 border border-amber-700/30 rounded-lg overflow-hidden flex-shrink-0">
+      <img 
+        src={heroImagePath}
+        alt={heroName}
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          e.currentTarget.style.display = 'none';
+          e.currentTarget.parentElement!.innerHTML += '<div class="flex items-center justify-center w-full h-full text-amber-600/60 font-rune text-lg">No Image</div>';
+        }}
+      />
     </div>
   );
 };

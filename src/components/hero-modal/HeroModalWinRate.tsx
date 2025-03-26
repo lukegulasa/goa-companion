@@ -15,15 +15,12 @@ export const HeroModalWinRate: React.FC<HeroModalWinRateProps> = ({
   if (gamesLogged === 0) return null;
   
   return (
-    <div className="mb-6 flex items-center justify-between">
-      <h3 className="text-sm font-medium">Win Rate</h3>
-      <div className="flex items-center gap-2">
-        <HeroWinRate 
-          winRate={heroStat?.winRate || 0} 
-          gamesPlayed={heroStat?.gamesPlayed || 0}
-          showDetails={true}
-        />
-      </div>
+    <div className="flex items-center gap-2">
+      <HeroWinRate 
+        winRate={heroStat?.winRate || 0} 
+        gamesPlayed={heroStat?.gamesPlayed || 0}
+        showDetails={true}
+      />
     </div>
   );
 };
