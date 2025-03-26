@@ -50,6 +50,18 @@ const HeroModal: React.FC = () => {
     return heroes.find(h => h.id === id)?.name || "Unknown Hero";
   };
 
+  // Create hero image path with special cases
+  const getHeroImagePath = (heroName: string) => {
+    // Handle special cases
+    if (heroName === "Widget and Pyro") return "/heroes/widget.jpg";
+    if (heroName === "Ignatia") return "/heroes/ignatia.jpg";
+    
+    // Default case
+    return `/heroes/${heroName.toLowerCase()}.jpg`;
+  };
+  
+  const heroImagePath = getHeroImagePath(selectedHero.name);
+
   return (
     <Dialog open={isModalOpen} onOpenChange={closeModal}>
       <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden glass-panel max-h-[90vh] overflow-y-auto">
@@ -69,6 +81,21 @@ const HeroModal: React.FC = () => {
         </DialogHeader>
         
         <div className="p-6 pt-2">
+          {/* Hero Image */}
+          <div className="mb-6 flex justify-center">
+            <div className="w-48 h-48 bg-amber-800/20 border border-amber-700/30 rounded-lg overflow-hidden">
+              <img 
+                src={heroImagePath}
+                alt={selectedHero.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.parentElement!.innerHTML += '<div class="flex items-center justify-center w-full h-full text-amber-600/60 font-rune text-lg">No Image</div>';
+                }}
+              />
+            </div>
+          </div>
+          
           {/* Win Rate Section */}
           {gamesLogged > 0 && (
             <div className="mb-6 flex items-center justify-between">
