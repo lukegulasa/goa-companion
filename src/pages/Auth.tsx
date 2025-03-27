@@ -19,6 +19,7 @@ const Auth: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -50,20 +51,36 @@ const Auth: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMsg(null);
     
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log(`Attempting login with: ${email}`);
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Login error:', error);
+        setErrorMsg(error.message);
+        toast({
+          title: "Login failed",
+          description: error.message || "Invalid login credentials",
+          variant: "destructive"
+        });
+        return;
+      }
       
-      toast({
-        title: "Login successful",
-        description: "You are now logged in as an admin"
-      });
+      if (data.user) {
+        console.log('Login successful for user:', data.user.id);
+        toast({
+          title: "Login successful",
+          description: "You are now logged in as an admin"
+        });
+      }
     } catch (error: any) {
+      console.error('Unexpected error during login:', error);
+      setErrorMsg(error.message || "An unexpected error occurred");
       toast({
         title: "Login failed",
         description: error.message || "An error occurred during login",
@@ -86,6 +103,12 @@ const Auth: React.FC = () => {
         
         <form onSubmit={handleLogin}>
           <CardContent className="space-y-4">
+            {errorMsg && (
+              <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
+                {errorMsg}
+              </div>
+            )}
+            
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">Email</label>
               <Input

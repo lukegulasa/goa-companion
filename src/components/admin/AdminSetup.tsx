@@ -10,7 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -30,6 +29,7 @@ const AdminSetup: React.FC = () => {
   
   const checkForAdmin = async () => {
     try {
+      console.log('Checking for existing admin users...');
       const { data, error } = await supabase.rpc('check_admin_count');
       
       if (error) {
@@ -37,6 +37,7 @@ const AdminSetup: React.FC = () => {
         return;
       }
       
+      console.log('Admin count:', data);
       setAdminExists(data > 0);
       setShowDialog(data === 0);
     } catch (error) {
@@ -48,16 +49,19 @@ const AdminSetup: React.FC = () => {
     setLoading(true);
     
     try {
+      console.log('Setting up admin account with:', ADMIN_EMAIL);
       const result = await setupAdminUser(
         ADMIN_EMAIL,
         ADMIN_PASSWORD,
         ADMIN_NAME
       );
       
+      console.log('Setup admin result:', result);
+      
       if (result.success) {
         toast({
           title: "Admin account created",
-          description: `Admin account for ${ADMIN_EMAIL} was created successfully`
+          description: `Admin account for ${ADMIN_EMAIL} was created successfully. You can now sign in.`
         });
         setShowDialog(false);
         setAdminExists(true);
@@ -69,6 +73,7 @@ const AdminSetup: React.FC = () => {
         });
       }
     } catch (error: any) {
+      console.error('Error in handleSetupAdmin:', error);
       toast({
         title: "Error",
         description: error.message || "An unexpected error occurred",
@@ -102,6 +107,10 @@ const AdminSetup: React.FC = () => {
               <div className="grid grid-cols-3 gap-2">
                 <span className="text-sm font-medium">Email:</span>
                 <span className="text-sm col-span-2">{ADMIN_EMAIL}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <span className="text-sm font-medium">Password:</span>
+                <span className="text-sm col-span-2">••••••••</span>
               </div>
             </div>
           </div>
