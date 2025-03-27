@@ -12,20 +12,25 @@ const Auth: React.FC = () => {
   const { toast } = useToast();
   const [makingAdmin, setMakingAdmin] = useState(false);
   const [hasAdmins, setHasAdmins] = useState(true);
+  const [isCheckingAdmins, setIsCheckingAdmins] = useState(true);
   
   useEffect(() => {
     // Check if there are any admins in the system
     if (user) {
       const checkAdmins = async () => {
+        setIsCheckingAdmins(true);
         try {
-          const { data, error, count } = await supabase
-            .from('admin_users')
-            .select('*', { count: 'exact' });
+          // Use the new function we created in SQL to get an accurate count
+          const { data, error } = await supabase.rpc('check_admin_count');
           
           if (error) throw error;
-          setHasAdmins(count !== null && count > 0);
+          setHasAdmins(data > 0);
         } catch (error) {
           console.error('Error checking admin users:', error);
+          // Default to assuming no admins if there's an error
+          setHasAdmins(false);
+        } finally {
+          setIsCheckingAdmins(false);
         }
       };
       
@@ -33,7 +38,7 @@ const Auth: React.FC = () => {
     }
   }, [user]);
   
-  // If user is authenticated, redirect to game stats
+  // If user is authenticated and an admin, redirect to game stats
   if (user && !isLoading && isAdmin) {
     return <Navigate to="/game-stats" replace />;
   }
@@ -99,25 +104,33 @@ const Auth: React.FC = () => {
               </div>
             </div>
             
-            {!hasAdmins && (
-              <div className="space-y-2">
-                <p className="text-sm">
-                  No admin users have been set up yet. As the first user, you can make yourself an admin:
-                </p>
-                <Button 
-                  onClick={makeAdmin} 
-                  className="w-full"
-                  disabled={makingAdmin}
-                >
-                  {makingAdmin ? "Setting up admin..." : "Make me an admin"}
-                </Button>
+            {isCheckingAdmins ? (
+              <div className="py-2 text-center">
+                <p className="text-sm">Checking admin status...</p>
               </div>
-            )}
-            
-            {hasAdmins && (
-              <div className="bg-amber-100 dark:bg-amber-950 border border-amber-200 dark:border-amber-900 p-3 rounded text-sm">
-                <p>There are already admin users in the system. Only existing admins can grant admin privileges.</p>
-              </div>
+            ) : (
+              <>
+                {!hasAdmins && (
+                  <div className="space-y-2">
+                    <p className="text-sm">
+                      No admin users have been set up yet. As the first user, you can make yourself an admin:
+                    </p>
+                    <Button 
+                      onClick={makeAdmin} 
+                      className="w-full"
+                      disabled={makingAdmin}
+                    >
+                      {makingAdmin ? "Setting up admin..." : "Make me an admin"}
+                    </Button>
+                  </div>
+                )}
+                
+                {hasAdmins && (
+                  <div className="bg-amber-100 dark:bg-amber-950 border border-amber-200 dark:border-amber-900 p-3 rounded text-sm">
+                    <p>There are already admin users in the system. Only existing admins can grant admin privileges.</p>
+                  </div>
+                )}
+              </>
             )}
             
             <div className="pt-2">
