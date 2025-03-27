@@ -2,10 +2,11 @@
 import { supabase } from '@/integrations/supabase/client';
 import { DataType, SyncStatus } from './types';
 
-export const fetchCloudData = async <T extends 'players' | 'games'>(): Promise<{ data: DataType<T>[], hasChanges: boolean }> => {
+export const fetchCloudData = async <T extends 'players' | 'games'>
+(store: T): Promise<{ data: DataType<T>[], hasChanges: boolean }> => {
   try {
     let result;
-    if (T === 'players') {
+    if (store === 'players') {
       result = await supabase.from('players').select('*');
     } else {
       result = await supabase.from('games').select('*');
@@ -22,22 +23,56 @@ export const fetchCloudData = async <T extends 'players' | 'games'>(): Promise<{
   }
 };
 
-export const pushToCloud = async <T extends 'players' | 'games'>(data: DataType<T>[]): Promise<void> => {
+export const pushToCloud = async <T extends 'players' | 'games'>(
+  store: T,
+  data: DataType<T>[]
+): Promise<void> => {
   try {
-    if (T === 'players') {
-      await supabase.from('players').upsert(data);
+    if (store === 'players') {
+      // Map player data to match database column names
+      const playerData = data.map(player => ({
+        id: (player as any).id,
+        name: (player as any).name
+      }));
+      
+      await supabase.from('players').upsert(playerData);
     } else {
-      // For games, we would need to handle the relation with game_players
-      // This is a simplified version
+      // For games, handle column name mapping and the relation with game_players
       for (const game of data) {
-        await supabase.from('games').upsert({
-          id: game.id,
-          // Add other game fields here
-        });
+        const gameData = {
+          id: (game as any).id,
+          date: (game as any).date,
+          winningteam: (game as any).winningTeam, // Note: lowercase column name in DB
+          victorymethod: (game as any).victoryMethod // Note: lowercase column name in DB
+        };
+        
+        await supabase.from('games').upsert(gameData);
+        
+        // Handle game players if they exist
+        if ((game as any).players && (game as any).players.length > 0) {
+          // Delete existing game players
+          await supabase
+            .from('game_players')
+            .delete()
+            .eq('game_id', (game as any).id);
+            
+          // Insert new game players
+          const gamePlayers = (game as any).players.map((player: any) => ({
+            game_id: (game as any).id,
+            player_id: player.playerId,
+            playername: player.playerName,
+            team: player.team,
+            heroid: player.heroId,
+            heroname: player.heroName
+          }));
+          
+          await supabase.from('game_players').insert(gamePlayers);
+        }
       }
     }
   } catch (error) {
     console.error(`Error pushing data to Supabase:`, error);
+    throw error;
   }
 };
 

@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { CloudSyncResult, DataType, SyncStatus, SYNC_CONSTANTS } from './types';
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import { fetchCloudData, pushToCloud, setupCloudListener } from './utils';
 
 export function useCloudSync<T extends 'players' | 'games'>(
   storeName: T,
@@ -14,48 +15,50 @@ export function useCloudSync<T extends 'players' | 'games'>(
   const [syncEnabled, setSyncEnabledState] = useLocalStorage(SYNC_CONSTANTS.ENABLED_KEY, true);
   
   // Load initial data from Supabase
-  const fetchData = useCallback(async () => {
+  const fetchInitialData = useCallback(async () => {
     if (!syncEnabled) return;
     
     try {
       setSyncStatus('syncing');
       
-      let result;
-      if (storeName === 'players') {
-        result = await supabase.from('players').select('*');
-      } else {
-        // For games, we need to fetch both games and their players
-        result = await supabase.from('games').select('*');
-      }
+      const { data: cloudData } = await fetchCloudData(storeName);
       
-      if (result.error) {
-        throw result.error;
-      }
-      
-      if (storeName === 'games' && result.data) {
-        // Fetch the game players for each game
-        const gamesWithPlayers = await Promise.all(
-          result.data.map(async (game) => {
-            const playersResult = await supabase
+      // If we have cloud data, use it
+      if (cloudData && cloudData.length > 0) {
+        // Transform data from Supabase's column names to our application's property names
+        if (storeName === 'games') {
+          const transformedGames = cloudData.map((game: any) => ({
+            id: game.id,
+            date: game.date,
+            winningTeam: game.winningteam, // Note: capitalize for app
+            victoryMethod: game.victorymethod, // Note: capitalize for app
+            // We'll fetch players separately
+            players: []
+          }));
+          
+          // For games, fetch the related players
+          for (const game of transformedGames) {
+            const { data: playerData } = await supabase
               .from('game_players')
               .select('*')
               .eq('game_id', game.id);
               
-            if (playersResult.error) {
-              console.error('Error fetching game players:', playersResult.error);
-              return { ...game, players: [] };
+            if (playerData) {
+              game.players = playerData.map((p: any) => ({
+                playerId: p.player_id,
+                playerName: p.playername,
+                team: p.team,
+                heroId: p.heroid,
+                heroName: p.heroname
+              }));
             }
-            
-            return {
-              ...game,
-              players: playersResult.data
-            };
-          })
-        );
-        
-        setLocalData(gamesWithPlayers as DataType<T>[]);
-      } else if (result.data) {
-        setLocalData(result.data as DataType<T>[]);
+          }
+          
+          setLocalData(transformedGames as DataType<T>[]);
+        } else {
+          // For players, we can use the data directly
+          setLocalData(cloudData as DataType<T>[]);
+        }
       }
       
       setSyncStatus('synced');
@@ -68,8 +71,19 @@ export function useCloudSync<T extends 'players' | 'games'>(
   
   // Initial data load
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    fetchInitialData();
+  }, [fetchInitialData]);
+  
+  // Set up real-time listener for changes
+  useEffect(() => {
+    if (!syncEnabled) return;
+    
+    const cleanupListener = setupCloudListener(storeName, fetchInitialData);
+    
+    return () => {
+      cleanupListener();
+    };
+  }, [storeName, syncEnabled, fetchInitialData]);
   
   // Function to save data to Supabase
   const saveData = useCallback(async (newData: DataType<T>[]): Promise<void> => {
@@ -81,62 +95,7 @@ export function useCloudSync<T extends 'players' | 'games'>(
     try {
       setSyncStatus('syncing');
       
-      if (storeName === 'players') {
-        // For players, simply upsert all records
-        const { error } = await supabase
-          .from('players')
-          .upsert(
-            newData.map(player => ({
-              id: player.id,
-              name: (player as any).name
-            }))
-          );
-          
-        if (error) throw error;
-      } else if (storeName === 'games') {
-        // For games, we need to handle the games and their players separately
-        for (const game of newData) {
-          const gameData = {
-            id: game.id,
-            date: (game as any).date,
-            winningTeam: (game as any).winningTeam,
-            victoryMethod: (game as any).victoryMethod
-          };
-          
-          // Upsert the game
-          const { error: gameError } = await supabase
-            .from('games')
-            .upsert(gameData);
-            
-          if (gameError) throw gameError;
-          
-          // Delete existing game players and insert new ones
-          const { error: deleteError } = await supabase
-            .from('game_players')
-            .delete()
-            .eq('game_id', game.id);
-            
-          if (deleteError) throw deleteError;
-          
-          // Insert new game players
-          if ((game as any).players && (game as any).players.length > 0) {
-            const { error: playersError } = await supabase
-              .from('game_players')
-              .insert(
-                (game as any).players.map((player: any) => ({
-                  game_id: game.id,
-                  player_id: player.playerId,
-                  playerName: player.playerName,
-                  team: player.team,
-                  heroId: player.heroId,
-                  heroName: player.heroName
-                }))
-              );
-              
-            if (playersError) throw playersError;
-          }
-        }
-      }
+      await pushToCloud(storeName, newData);
       
       setLocalData(newData);
       setSyncStatus('synced');
@@ -152,17 +111,17 @@ export function useCloudSync<T extends 'players' | 'games'>(
   
   // Function to manually trigger sync
   const syncNow = useCallback(async () => {
-    await fetchData();
-  }, [fetchData]);
+    await fetchInitialData();
+  }, [fetchInitialData]);
   
   // Function to toggle sync
   const setSyncEnabled = useCallback((enabled: boolean) => {
     setSyncEnabledState(enabled);
     if (enabled) {
       // Trigger sync when enabled
-      fetchData();
+      fetchInitialData();
     }
-  }, [setSyncEnabledState, fetchData]);
+  }, [setSyncEnabledState, fetchInitialData]);
   
   return {
     data,
@@ -174,3 +133,4 @@ export function useCloudSync<T extends 'players' | 'games'>(
     syncEnabled
   };
 }
+
