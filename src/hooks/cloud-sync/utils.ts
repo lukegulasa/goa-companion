@@ -126,41 +126,11 @@ export const setupCloudListener = <T extends 'players' | 'games'>(
 };
 
 export const checkAdminStatus = async (): Promise<boolean> => {
-  try {
-    const { data: session } = await supabase.auth.getSession();
-    if (!session?.session) return false;
-    
-    const { data: adminData, error } = await supabase
-      .from('admin_users')
-      .select('*')
-      .eq('user_id', session.session.user.id)
-      .single();
-    
-    if (error || !adminData) {
-      return false;
-    }
-    
-    return true;
-  } catch (error) {
-    console.error('Error checking admin status:', error);
-    return false;
-  }
+  // All users are considered admins since authentication is removed
+  return true;
 };
 
-export const addUserAsAdmin = async (userId: string): Promise<boolean> => {
-  try {
-    const { data, error } = await supabase
-      .from('admin_users')
-      .insert({ user_id: userId });
-    
-    if (error) {
-      console.error('Error adding admin user:', error);
-      return false;
-    }
-    
-    return true;
-  } catch (error) {
-    console.error('Error adding admin user:', error);
-    return false;
-  }
+export const addUserAsAdmin = async (userId: string): Promise<void> => {
+  // No-op function since admin management is removed
+  console.log('Admin management is disabled');
 };

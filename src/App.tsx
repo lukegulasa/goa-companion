@@ -10,9 +10,7 @@ import NotFound from './pages/NotFound';
 import HeroModal from '@/components/HeroModal';
 import GameStats from './pages/GameStats';
 import TeamBalance from './pages/TeamBalance';
-import Auth from './pages/Auth';
 import { GalleryProvider } from '@/context/GalleryContext';
-import { AuthProvider } from '@/context/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Create a client
@@ -31,23 +29,20 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider defaultTheme="system" storageKey="goa-theme">
           <Toaster />
-          <AuthProvider>
-            <GalleryProvider>
-              <HeroModal />
-              <BrowserRouter>
-                <Layout>
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/draft" element={<DraftPage />} />
-                    <Route path="/game-stats" element={<GameStats />} />
-                    <Route path="/team-balance" element={<TeamBalance />} />
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Layout>
-              </BrowserRouter>
-            </GalleryProvider>
-          </AuthProvider>
+          <GalleryProvider>
+            <HeroModal />
+            <BrowserRouter>
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/draft" element={<DraftPage />} />
+                  <Route path="/game-stats" element={<GameStats />} />
+                  <Route path="/team-balance" element={<TeamBalance />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Layout>
+            </BrowserRouter>
+          </GalleryProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </div>
