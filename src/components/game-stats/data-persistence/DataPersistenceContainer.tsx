@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
-import { AlertCircle, Badge } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { Game, Player } from '@/lib/game-stats-types';
 import { useToast } from '@/hooks/use-toast';
 import { SyncStatus } from '@/hooks/use-cloud-sync';
+import { Badge } from '@/components/ui/badge';
 import { CloudSyncStatus } from './CloudSyncStatus';
 import { DataActionButtons } from './DataActionButtons';
 import { ImportExportDialog } from './ImportExportDialog';
