@@ -15,7 +15,7 @@ export const PlayerStats: React.FC<PlayerStatsProps> = ({ players, games }) => {
       {players.length > 0 ? (
         <div className="space-y-8">
           {players.map((player) => {
-            // Calculate player stats
+            // Calculate player stats from database data
             const playerGames = games.filter(game => 
               game.players.some(p => p.playerId === player.id)
             );
@@ -85,4 +85,4 @@ export const PlayerStats: React.FC<PlayerStatsProps> = ({ players, games }) => {
       )}
     </div>
   );
-};
+}

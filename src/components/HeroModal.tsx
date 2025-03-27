@@ -19,7 +19,7 @@ const HeroModal: React.FC = () => {
 
   if (!selectedHero) return null;
 
-  // Get stats for the selected hero
+  // Get stats for the selected hero from database data
   const heroStat = getHeroStats(selectedHero.id, heroStats);
   const matchups = getHeroMatchups(selectedHero.id, heroMatchups)
     .filter(m => m.gamesPlayed >= 1)
