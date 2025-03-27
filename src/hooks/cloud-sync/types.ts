@@ -1,7 +1,7 @@
 
 import { Game, Player } from '@/lib/game-stats-types';
 
-// This is used for backwards compatibility
+// Status types for sync operations
 export type SyncStatus = 'idle' | 'syncing' | 'synced' | 'error';
 
 // Fixed mapping type to directly use Player or Game based on T
@@ -15,9 +15,3 @@ export interface CloudSyncResult<T extends 'players' | 'games'> {
   lastSynced: Date | null;
   syncNow: () => Promise<void>;
 }
-
-// Constants kept for compatibility
-export const SYNC_CONSTANTS = {
-  INTERVAL: 60000,
-  KEY_PREFIX: 'goa-sync-',
-};

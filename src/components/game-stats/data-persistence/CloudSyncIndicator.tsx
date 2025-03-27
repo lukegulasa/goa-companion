@@ -1,19 +1,17 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2, CloudOff, CheckCircle, RefreshCw } from 'lucide-react';
+import { Loader2, CheckCircle, CloudOff, RefreshCw } from 'lucide-react';
 import { SyncStatus } from '@/hooks/cloud-sync/types';
 
 interface CloudSyncIndicatorProps {
   syncStatus: SyncStatus;
   onSyncNow: () => void;
-  isAdmin?: boolean;
 }
 
 export const CloudSyncIndicator: React.FC<CloudSyncIndicatorProps> = ({
   syncStatus,
   onSyncNow,
-  isAdmin = false,
 }) => {
   return (
     <div className="flex items-center space-x-3">
@@ -28,20 +26,20 @@ export const CloudSyncIndicator: React.FC<CloudSyncIndicatorProps> = ({
         ) : (
           <RefreshCw className="h-4 w-4 mr-1" />
         )}
-        Sync Now
+        Refresh Data
       </Button>
       
       <div className="flex items-center">
         {syncStatus === 'syncing' && (
           <>
             <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
-            <span className="text-xs ml-1 text-muted-foreground">Syncing...</span>
+            <span className="text-xs ml-1 text-muted-foreground">Loading...</span>
           </>
         )}
         {syncStatus === 'synced' && (
           <>
             <CheckCircle className="h-4 w-4 text-green-500" />
-            <span className="text-xs ml-1 text-muted-foreground">Synced</span>
+            <span className="text-xs ml-1 text-muted-foreground">Data Ready</span>
           </>
         )}
         {syncStatus === 'error' && (

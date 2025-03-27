@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { DataType, SyncStatus } from './types';
+import { DataType } from './types';
 
 export const fetchCloudData = async <T extends 'players' | 'games'>
 (store: T): Promise<{ data: DataType<T>[], hasChanges: boolean }> => {
@@ -68,8 +68,8 @@ export const pushToCloud = async <T extends 'players' | 'games'>(
         const gameData = {
           id: (game as any).id,
           date: (game as any).date,
-          winningteam: (game as any).winningTeam, // Note: lowercase column name in DB
-          victorymethod: (game as any).victoryMethod // Note: lowercase column name in DB
+          winningteam: (game as any).winningTeam,
+          victorymethod: (game as any).victoryMethod
         };
         
         await supabase.from('games').upsert(gameData);
