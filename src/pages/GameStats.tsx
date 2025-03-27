@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useIndexedDB } from '@/hooks/use-indexed-db';
+import { useCloudSync } from '@/hooks/use-cloud-sync';
 import { useHeroes } from '@/hooks/use-heroes';
 import {
   Tabs,
@@ -16,9 +16,25 @@ import { DataPersistence } from '@/components/game-stats/DataPersistence';
 import { Game, GameLogFormValues, GamePlayer, NewPlayerFormValues, Player } from '@/lib/game-stats-types';
 
 const GameStats: React.FC = () => {
-  // Replace localStorage with IndexedDB
-  const [players, setPlayers] = useIndexedDB<'players'>('players', []);
-  const [gameLogs, setGameLogs] = useIndexedDB<'games'>('games', []);
+  // Replace IndexedDB with Cloud Sync hook
+  const { 
+    data: players, 
+    setData: setPlayers,
+    syncStatus: playersSyncStatus,
+    lastSynced: playersLastSynced,
+    syncNow: syncPlayersNow,
+    syncEnabled,
+    setSyncEnabled
+  } = useCloudSync<'players'>('players', []);
+
+  const { 
+    data: gameLogs, 
+    setData: setGameLogs,
+    syncStatus: gamesSyncStatus,
+    lastSynced: gamesLastSynced,
+    syncNow: syncGamesNow
+  } = useCloudSync<'games'>('games', []);
+
   const [gameParticipants, setGameParticipants] = useState<GamePlayer[]>([]);
   const [activeTab, setActiveTab] = useState('log-game');
   const { heroes } = useHeroes();
@@ -92,6 +108,11 @@ const GameStats: React.FC = () => {
     setGameLogs(newGames);
   };
 
+  // Force sync both data types
+  const syncAllData = async () => {
+    await Promise.all([syncPlayersNow(), syncGamesNow()]);
+  };
+
   return (
     <div className="container max-w-6xl mx-auto py-8 px-4 sm:px-6">
       <header className="mb-8">
@@ -103,7 +124,14 @@ const GameStats: React.FC = () => {
         <DataPersistence 
           games={gameLogs} 
           players={players} 
-          onImport={handleDataImport} 
+          onImport={handleDataImport}
+          syncStatus={playersSyncStatus !== 'error' && gamesSyncStatus !== 'error' 
+            ? playersSyncStatus 
+            : 'error'}
+          lastSynced={playersLastSynced}
+          onSyncNow={syncAllData}
+          syncEnabled={syncEnabled}
+          onToggleSync={setSyncEnabled}
         />
       </div>
       

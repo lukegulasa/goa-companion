@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Upload, AlertCircle, Copy, Share2, QrCode, Database } from 'lucide-react';
+import { Download, Upload, AlertCircle, Copy, Share2, QrCode, Database, Cloud, CloudOff, RefreshCw } from 'lucide-react';
 import { Game, Player } from '@/lib/game-stats-types';
 import { useToast } from '@/hooks/use-toast';
+import { SyncStatus } from '@/hooks/use-cloud-sync';
 import {
   Dialog,
   DialogContent,
@@ -16,17 +17,31 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { format } from 'date-fns';
 
 interface DataPersistenceProps {
   games: Game[];
   players: Player[];
   onImport: (data: { games: Game[], players: Player[] }) => void;
+  syncStatus?: SyncStatus;
+  lastSynced: Date | null;
+  onSyncNow: () => void;
+  syncEnabled: boolean;
+  onToggleSync: (enabled: boolean) => void;
 }
 
 export const DataPersistence: React.FC<DataPersistenceProps> = ({ 
   games, 
   players,
-  onImport
+  onImport,
+  syncStatus = 'idle',
+  lastSynced,
+  onSyncNow,
+  syncEnabled,
+  onToggleSync
 }) => {
   const { toast } = useToast();
   const [jsonData, setJsonData] = useState<string>('');
@@ -176,15 +191,82 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
       });
     }
   };
+
+  // Get appropriate color for sync status badge
+  const getSyncStatusColor = (status: SyncStatus) => {
+    switch (status) {
+      case 'synced': return 'green';
+      case 'syncing': return 'yellow';
+      case 'error': return 'destructive';
+      default: return 'secondary';
+    }
+  };
+
+  // Get human-readable sync status
+  const getSyncStatusText = (status: SyncStatus) => {
+    switch (status) {
+      case 'synced': return 'Synced';
+      case 'syncing': return 'Syncing...';
+      case 'error': return 'Sync Error';
+      case 'idle': return 'Idle';
+      default: return 'Not synced';
+    }
+  };
   
   return (
     <div className="bg-card rounded-lg border shadow-sm p-6 space-y-4">
       <div className="flex flex-col space-y-2">
-        <h2 className="text-xl font-semibold">Data Management</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Data Management</h2>
+          {syncEnabled && (
+            <Badge variant={getSyncStatusColor(syncStatus)}>
+              {getSyncStatusText(syncStatus)}
+            </Badge>
+          )}
+        </div>
         <p className="text-sm text-muted-foreground">
-          Your data is now saved using IndexedDB, which provides persistent storage across sessions.
-          You can still export your data as a backup or to transfer to another device.
+          Your data is saved using IndexedDB and can be synchronized across devices.
         </p>
+      </div>
+      
+      <div className="flex items-center justify-between p-3 border rounded-md bg-muted/30">
+        <div className="flex items-center space-x-2">
+          <Switch 
+            id="sync-mode"
+            checked={syncEnabled}
+            onCheckedChange={onToggleSync}
+          />
+          <Label htmlFor="sync-mode" className="cursor-pointer">
+            <div className="flex items-center gap-1.5">
+              {syncEnabled ? (
+                <Cloud className="h-4 w-4 text-primary" />
+              ) : (
+                <CloudOff className="h-4 w-4 text-muted-foreground" />
+              )}
+              <span>Cross-Device Sync</span>
+            </div>
+          </Label>
+        </div>
+        
+        {syncEnabled && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">
+              {lastSynced 
+                ? `Last synced: ${format(lastSynced, 'MMM d, h:mm a')}` 
+                : 'Not synced yet'}
+            </span>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={onSyncNow}
+              disabled={syncStatus === 'syncing'}
+              className="h-8 px-2"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${syncStatus === 'syncing' ? 'animate-spin' : ''}`} />
+              <span className="ml-1.5">Sync Now</span>
+            </Button>
+          </div>
+        )}
       </div>
       
       <div className="flex flex-col sm:flex-row gap-4">
@@ -296,24 +378,32 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
         </div>
       </div>
       
-      {games.length > 0 && (
+      {syncEnabled ? (
+        <Card className="p-4 border border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
+          <div className="flex items-start gap-2 text-sm text-blue-800 dark:text-blue-300">
+            <Cloud className="h-4 w-4 mt-0.5 shrink-0" />
+            <div>
+              <p className="font-medium mb-1">Cloud Synchronization Enabled</p>
+              <p>
+                Your data ({games.length} games and {players.length} players) is now synchronized across all your devices.
+              </p>
+              <ul className="list-disc list-inside mt-2 ml-2 space-y-1">
+                <li>Changes made on any device will automatically sync to all your other devices</li>
+                <li>Data is securely stored in the cloud and locally on each device</li>
+                <li>Works even when offline - changes will sync when you're back online</li>
+              </ul>
+            </div>
+          </div>
+        </Card>
+      ) : (
         <Card className="p-4 border border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800">
           <div className="flex items-start gap-2 text-sm text-green-800 dark:text-green-300">
             <Database className="h-4 w-4 mt-0.5 shrink-0" />
             <div>
-              <p className="font-medium mb-1">Enhanced Data Storage</p>
+              <p className="font-medium mb-1">Local Storage Mode</p>
               <p>
-                You currently have {games.length} game{games.length !== 1 ? 's' : ''} and {players.length} player{players.length !== 1 ? 's' : ''} stored.
-                Your data is now saved using IndexedDB, which:
-              </p>
-              <ul className="list-disc list-inside mt-2 ml-2 space-y-1">
-                <li>Persists data between browser sessions</li>
-                <li>Uses more reliable storage than localStorage</li>
-                <li>Still works offline and without a server</li>
-                <li>Can store more data than localStorage</li>
-              </ul>
-              <p className="mt-2">
-                Note: Data is still tied to this browser. For cross-device access, use the export/import feature.
+                You have {games.length} game{games.length !== 1 ? 's' : ''} and {players.length} player{players.length !== 1 ? 's' : ''} stored locally.
+                Enable cloud sync for cross-device access or use the export/import feature for manual transfers.
               </p>
             </div>
           </div>
