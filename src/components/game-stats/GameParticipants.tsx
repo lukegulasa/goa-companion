@@ -27,6 +27,7 @@ interface GameParticipantsProps {
   onAddPlayer: (playerId: string) => void;
   onRemovePlayer: (index: number) => void;
   onUpdateParticipant: (index: number, field: keyof GamePlayer, value: any) => void;
+  isAdmin?: boolean;
 }
 
 export const GameParticipants: React.FC<GameParticipantsProps> = ({
@@ -36,12 +37,13 @@ export const GameParticipants: React.FC<GameParticipantsProps> = ({
   onAddPlayer,
   onRemovePlayer,
   onUpdateParticipant,
+  isAdmin = false,
 }) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium">Game Participants</h3>
-        <Select onValueChange={onAddPlayer}>
+        <Select onValueChange={onAddPlayer} disabled={!isAdmin}>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Add player to game" />
           </SelectTrigger>
@@ -50,7 +52,7 @@ export const GameParticipants: React.FC<GameParticipantsProps> = ({
               <SelectItem 
                 key={player.id} 
                 value={player.id}
-                disabled={participants.some(p => p.playerId === player.id)}
+                disabled={participants.some(p => p.playerId === player.id) || !isAdmin}
               >
                 {player.name}
               </SelectItem>
@@ -80,6 +82,7 @@ export const GameParticipants: React.FC<GameParticipantsProps> = ({
                       onValueChange={(value) => 
                         onUpdateParticipant(index, 'team', value as 'Red' | 'Blue')
                       }
+                      disabled={!isAdmin}
                     >
                       <SelectTrigger className="w-[130px]">
                         <SelectValue />
@@ -96,6 +99,7 @@ export const GameParticipants: React.FC<GameParticipantsProps> = ({
                       onValueChange={(value) => 
                         onUpdateParticipant(index, 'heroId', Number(value))
                       }
+                      disabled={!isAdmin}
                     >
                       <SelectTrigger className="w-[150px]">
                         <SelectValue placeholder="Select hero" />
@@ -110,13 +114,15 @@ export const GameParticipants: React.FC<GameParticipantsProps> = ({
                     </Select>
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onRemovePlayer(index)}
-                    >
-                      <TrashIcon className="h-4 w-4" />
-                    </Button>
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onRemovePlayer(index)}
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -126,7 +132,9 @@ export const GameParticipants: React.FC<GameParticipantsProps> = ({
       ) : (
         <div className="flex h-[100px] items-center justify-center rounded-md border border-dashed">
           <p className="text-muted-foreground">
-            Add players to the game using the dropdown above
+            {isAdmin 
+              ? "Add players to the game using the dropdown above" 
+              : "No players have been added to this game yet"}
           </p>
         </div>
       )}

@@ -30,18 +30,22 @@ interface GameHistoryProps {
   games: Game[];
   onDeleteGame?: (gameId: string) => void;
   onEditGame?: (gameId: string, updatedGame: Partial<Game>) => void;
+  isAdmin?: boolean;
 }
 
 export const GameHistory: React.FC<GameHistoryProps> = ({ 
   games, 
   onDeleteGame,
-  onEditGame
+  onEditGame,
+  isAdmin = false
 }) => {
   const { toast } = useToast();
   const [gameToDelete, setGameToDelete] = useState<string | null>(null);
   const [gameToEdit, setGameToEdit] = useState<Game | null>(null);
   
   const handleDeleteGame = (gameId: string) => {
+    if (!isAdmin) return;
+    
     if (onDeleteGame) {
       onDeleteGame(gameId);
       toast({
@@ -53,6 +57,8 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
   };
 
   const handleEditGame = (gameId: string, updatedGame: Partial<Game>) => {
+    if (!isAdmin) return;
+    
     if (onEditGame) {
       onEditGame(gameId, updatedGame);
       toast({
@@ -86,31 +92,33 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
                     <span className="font-medium">{game.winningTeam}</span>
                   </div>
                   
-                  <div className="flex items-center gap-2 ml-4">
-                    {onEditGame && (
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-primary/70 hover:text-primary hover:bg-primary/10"
-                        onClick={() => setGameToEdit(game)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                        <span className="sr-only">Edit game</span>
-                      </Button>
-                    )}
-                    
-                    {onDeleteGame && (
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-destructive/70 hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => setGameToDelete(game.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Delete game</span>
-                      </Button>
-                    )}
-                  </div>
+                  {isAdmin && (
+                    <div className="flex items-center gap-2 ml-4">
+                      {onEditGame && (
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="text-primary/70 hover:text-primary hover:bg-primary/10"
+                          onClick={() => setGameToEdit(game)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                          <span className="sr-only">Edit game</span>
+                        </Button>
+                      )}
+                      
+                      {onDeleteGame && (
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="text-destructive/70 hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => setGameToDelete(game.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">Delete game</span>
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
               
@@ -152,33 +160,37 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
         </div>
       )}
       
-      <AlertDialog open={!!gameToDelete} onOpenChange={(open) => !open && setGameToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Game</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this game? This action cannot be undone and will
-              remove this game from your statistics.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={() => gameToDelete && handleDeleteGame(gameToDelete)}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {isAdmin && (
+        <>
+          <AlertDialog open={!!gameToDelete} onOpenChange={(open) => !open && setGameToDelete(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Game</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete this game? This action cannot be undone and will
+                  remove this game from your statistics.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={() => gameToDelete && handleDeleteGame(gameToDelete)}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
-      {gameToEdit && (
-        <EditGameDialog 
-          game={gameToEdit}
-          onSave={handleEditGame}
-          onCancel={() => setGameToEdit(null)}
-        />
+          {gameToEdit && (
+            <EditGameDialog 
+              game={gameToEdit}
+              onSave={handleEditGame}
+              onCancel={() => setGameToEdit(null)}
+            />
+          )}
+        </>
       )}
     </div>
   );

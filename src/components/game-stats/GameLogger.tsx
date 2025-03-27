@@ -32,6 +32,7 @@ interface GameLoggerProps {
   gameParticipants: GamePlayer[];
   setGameParticipants: React.Dispatch<React.SetStateAction<GamePlayer[]>>;
   onLogGame: (data: GameLogFormValues) => void;
+  isAdmin?: boolean;
 }
 
 export const GameLogger: React.FC<GameLoggerProps> = ({
@@ -40,6 +41,7 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
   gameParticipants,
   setGameParticipants,
   onLogGame,
+  isAdmin = false,
 }) => {
   const gameLogForm = useForm<GameLogFormValues>({
     resolver: zodResolver(gameLogSchema),
@@ -53,6 +55,8 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
 
   // Add a player to the current game
   const addPlayerToGame = (playerId: string) => {
+    if (!isAdmin) return;
+    
     const player = players.find(p => p.id === playerId);
     if (!player) return;
     
@@ -73,6 +77,8 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
 
   // Remove a player from the current game
   const removePlayerFromGame = (index: number) => {
+    if (!isAdmin) return;
+    
     const updatedParticipants = [...gameParticipants];
     updatedParticipants.splice(index, 1);
     setGameParticipants(updatedParticipants);
@@ -80,6 +86,8 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
 
   // Update a participant's details
   const updateParticipant = (index: number, field: keyof GamePlayer, value: any) => {
+    if (!isAdmin) return;
+    
     const updatedParticipants = [...gameParticipants];
     updatedParticipants[index] = {
       ...updatedParticipants[index],
@@ -98,6 +106,8 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
   };
 
   const handleSubmit = (data: GameLogFormValues) => {
+    if (!isAdmin) return;
+    
     // If victory method is not needed, filter it out
     if (!showVictoryMethod) {
       const { victoryMethod, ...rest } = data;
@@ -110,6 +120,13 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
   return (
     <div className="bg-card rounded-lg border shadow-sm p-6">
       <h2 className="text-xl font-semibold mb-4">Log a Game</h2>
+      
+      {!isAdmin && (
+        <div className="mb-4 p-4 border rounded-md bg-muted">
+          <p className="text-sm">You need administrator privileges to log games.</p>
+        </div>
+      )}
+      
       <Form {...gameLogForm}>
         <form onSubmit={gameLogForm.handleSubmit(handleSubmit)} className="space-y-6">
           {/* Date Picker */}
@@ -128,6 +145,7 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
                           "w-[240px] pl-3 text-left font-normal",
                           !field.value && "text-muted-foreground"
                         )}
+                        disabled={!isAdmin}
                       >
                         {field.value ? (
                           format(field.value, "PPP")
@@ -145,6 +163,7 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
                       onSelect={field.onChange}
                       initialFocus
                       className="p-3 pointer-events-auto"
+                      disabled={!isAdmin}
                     />
                   </PopoverContent>
                 </Popover>
@@ -161,6 +180,7 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
             onAddPlayer={addPlayerToGame}
             onRemovePlayer={removePlayerFromGame}
             onUpdateParticipant={updateParticipant}
+            isAdmin={isAdmin}
           />
 
           {/* Victory Information */}
@@ -177,13 +197,14 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                       className="flex flex-col space-y-1"
+                      disabled={!isAdmin}
                     >
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="Red" id="red" />
+                        <RadioGroupItem value="Red" id="red" disabled={!isAdmin} />
                         <label htmlFor="red">Red</label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="Blue" id="blue" />
+                        <RadioGroupItem value="Blue" id="blue" disabled={!isAdmin} />
                         <label htmlFor="blue">Blue</label>
                       </div>
                     </RadioGroup>
@@ -199,7 +220,8 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
                 <Checkbox 
                   id="victoryMethodToggle" 
                   checked={showVictoryMethod}
-                  onCheckedChange={(checked) => setShowVictoryMethod(!!checked)} 
+                  onCheckedChange={(checked) => isAdmin && setShowVictoryMethod(!!checked)} 
+                  disabled={!isAdmin}
                 />
                 <label htmlFor="victoryMethodToggle" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                   Add Victory Method
@@ -218,17 +240,18 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                           className="flex flex-col space-y-1"
+                          disabled={!isAdmin}
                         >
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="Wave Counter" id="wave" />
+                            <RadioGroupItem value="Wave Counter" id="wave" disabled={!isAdmin} />
                             <label htmlFor="wave">Wave Counter</label>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="Base Push" id="base" />
+                            <RadioGroupItem value="Base Push" id="base" disabled={!isAdmin} />
                             <label htmlFor="base">Base Push</label>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="Hero Kills" id="kills" />
+                            <RadioGroupItem value="Hero Kills" id="kills" disabled={!isAdmin} />
                             <label htmlFor="kills">Hero Kills</label>
                           </div>
                         </RadioGroup>
@@ -244,7 +267,7 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
           <Button 
             type="submit" 
             className="w-full md:w-auto"
-            disabled={gameParticipants.length < 2 || gameParticipants.some(p => !p.heroId)}
+            disabled={!isAdmin || gameParticipants.length < 2 || gameParticipants.some(p => !p.heroId)}
           >
             <TrophyIcon className="mr-2 h-4 w-4" />
             Log Game

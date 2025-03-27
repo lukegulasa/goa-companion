@@ -6,17 +6,20 @@ import { DataActionButtons } from './DataActionButtons';
 import { ImportExportDialog } from './ImportExportDialog';
 import { CloudSyncIndicator } from './CloudSyncIndicator';
 import { useCloudSync } from '@/hooks/cloud-sync';
+import { useAuth } from '@/context/AuthContext';
 
 interface DataPersistenceContainerProps {
   games: Game[];
   players: Player[];
   onImport: (data: { games: Game[], players: Player[] }) => void;
+  isAdmin?: boolean;
 }
 
 export const DataPersistenceContainer: React.FC<DataPersistenceContainerProps> = ({ 
   games, 
   players,
-  onImport
+  onImport,
+  isAdmin = false
 }) => {
   const { toast } = useToast();
   const [jsonData, setJsonData] = useState<string>('');
@@ -103,6 +106,16 @@ export const DataPersistenceContainer: React.FC<DataPersistenceContainerProps> =
   };
   
   const handleImportFromText = (text: string) => {
+    // Only admin can import data
+    if (!isAdmin) {
+      toast({
+        variant: "destructive",
+        title: "Permission Denied",
+        description: "Only administrators can import data."
+      });
+      return;
+    }
+    
     try {
       const importedData = JSON.parse(text);
       
@@ -132,6 +145,16 @@ export const DataPersistenceContainer: React.FC<DataPersistenceContainerProps> =
   };
   
   const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // Only admin can import data
+    if (!isAdmin) {
+      toast({
+        variant: "destructive",
+        title: "Permission Denied",
+        description: "Only administrators can import data."
+      });
+      return;
+    }
+    
     try {
       const file = event.target.files?.[0];
       if (!file) return;
@@ -165,6 +188,14 @@ export const DataPersistenceContainer: React.FC<DataPersistenceContainerProps> =
   };
 
   const handleImportButtonClick = () => {
+    if (!isAdmin) {
+      toast({
+        variant: "destructive",
+        title: "Permission Denied",
+        description: "Only administrators can import data."
+      });
+      return;
+    }
     document.getElementById('import-file')?.click();
   };
   
@@ -178,6 +209,15 @@ export const DataPersistenceContainer: React.FC<DataPersistenceContainerProps> =
   };
   
   const handleToggleSync = (enabled: boolean) => {
+    if (!isAdmin && !enabled) {
+      toast({
+        variant: "destructive",
+        title: "Permission Denied",
+        description: "Only administrators can disable cloud sync."
+      });
+      return;
+    }
+    
     setSyncEnabled(enabled);
     toast({
       title: enabled ? "Cloud Sync Enabled" : "Cloud Sync Disabled",
@@ -198,10 +238,11 @@ export const DataPersistenceContainer: React.FC<DataPersistenceContainerProps> =
             syncEnabled={syncEnabled}
             onSyncNow={handleSyncNow}
             onToggleSync={handleToggleSync}
+            isAdmin={isAdmin}
           />
         </div>
         <p className="text-sm text-muted-foreground">
-          Your data is saved in Supabase and synced across devices. Export your data to create backups or transfer between browsers.
+          Your data is saved in Supabase and synced across devices. Anyone can view the data, but only admins can add, edit, or import data.
         </p>
       </div>
       
@@ -210,6 +251,7 @@ export const DataPersistenceContainer: React.FC<DataPersistenceContainerProps> =
         onImportClick={handleImportButtonClick}
         onShareClick={handleGenerateShareableData}
         isDataEmpty={isDataEmpty}
+        isAdmin={isAdmin}
       />
       
       <input 
@@ -227,6 +269,7 @@ export const DataPersistenceContainer: React.FC<DataPersistenceContainerProps> =
         onJsonDataChange={setJsonData}
         onCopyToClipboard={handleCopyToClipboard}
         onImportFromText={handleImportFromText}
+        isAdmin={isAdmin}
       />
     </div>
   );

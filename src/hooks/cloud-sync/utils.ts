@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { DataType, SyncStatus } from './types';
 
@@ -28,6 +27,8 @@ export const pushToCloud = async <T extends 'players' | 'games'>(
   data: DataType<T>[]
 ): Promise<void> => {
   try {
+    const { data: session } = await supabase.auth.getSession();
+    
     if (store === 'players') {
       // Map player data to match database column names
       const playerData = data.map(player => ({
@@ -122,4 +123,44 @@ export const setupCloudListener = <T extends 'players' | 'games'>(
   return () => {
     supabase.removeChannel(channel);
   };
+};
+
+export const checkAdminStatus = async (): Promise<boolean> => {
+  try {
+    const { data: session } = await supabase.auth.getSession();
+    if (!session?.session) return false;
+    
+    const { data: adminData, error } = await supabase
+      .from('admin_users')
+      .select('*')
+      .eq('user_id', session.session.user.id)
+      .single();
+    
+    if (error || !adminData) {
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error checking admin status:', error);
+    return false;
+  }
+};
+
+export const addUserAsAdmin = async (userId: string): Promise<boolean> => {
+  try {
+    const { data, error } = await supabase
+      .from('admin_users')
+      .insert({ user_id: userId });
+    
+    if (error) {
+      console.error('Error adding admin user:', error);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error adding admin user:', error);
+    return false;
+  }
 };

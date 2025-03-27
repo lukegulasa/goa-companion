@@ -1,74 +1,73 @@
 
 import React from 'react';
-import { Cloud, CloudOff, RefreshCw } from 'lucide-react';
-import { SyncStatus } from '@/hooks/cloud-sync/types';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Loader2, CloudOff, CloudCheck, RefreshCw } from 'lucide-react';
+import { SyncStatus } from '@/hooks/cloud-sync/types';
 
 interface CloudSyncIndicatorProps {
   syncStatus: SyncStatus;
   syncEnabled: boolean;
   onSyncNow: () => void;
   onToggleSync: (enabled: boolean) => void;
+  isAdmin?: boolean;
 }
 
 export const CloudSyncIndicator: React.FC<CloudSyncIndicatorProps> = ({
   syncStatus,
   syncEnabled,
   onSyncNow,
-  onToggleSync
+  onToggleSync,
+  isAdmin = false,
 }) => {
   return (
-    <div className="flex items-center space-x-2">
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex items-center space-x-1">
-              <Switch
-                checked={syncEnabled}
-                onCheckedChange={onToggleSync}
-                id="sync-toggle"
-              />
-              <label htmlFor="sync-toggle" className="text-xs text-muted-foreground cursor-pointer">
-                {syncEnabled ? (
-                  <Cloud className="h-4 w-4" />
-                ) : (
-                  <CloudOff className="h-4 w-4" />
-                )}
-              </label>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{syncEnabled ? "Cloud sync enabled" : "Cloud sync disabled"}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+    <div className="flex items-center space-x-3">
+      <div className="flex items-center">
+        <span className="text-sm mr-2">Cloud Sync</span>
+        <Switch 
+          checked={syncEnabled} 
+          onCheckedChange={onToggleSync} 
+          disabled={!isAdmin && !syncEnabled} // Non-admins can't disable, but can enable
+        />
+      </div>
       
       {syncEnabled && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="icon" 
-                className="h-8 w-8"
-                onClick={onSyncNow}
-                disabled={syncStatus === 'syncing'}
-              >
-                <RefreshCw className={`h-4 w-4 ${syncStatus === 'syncing' ? 'animate-spin' : ''}`} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Sync now</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onSyncNow}
+            disabled={syncStatus === 'syncing'}
+          >
+            {syncStatus === 'syncing' ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-1" />
+            ) : (
+              <RefreshCw className="h-4 w-4 mr-1" />
+            )}
+            Sync Now
+          </Button>
+          
+          <div className="flex items-center">
+            {syncStatus === 'syncing' && (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                <span className="text-xs ml-1 text-muted-foreground">Syncing...</span>
+              </>
+            )}
+            {syncStatus === 'synced' && (
+              <>
+                <CloudCheck className="h-4 w-4 text-green-500" />
+                <span className="text-xs ml-1 text-muted-foreground">Synced</span>
+              </>
+            )}
+            {syncStatus === 'error' && (
+              <>
+                <CloudOff className="h-4 w-4 text-red-500" />
+                <span className="text-xs ml-1 text-muted-foreground">Error</span>
+              </>
+            )}
+          </div>
+        </>
       )}
     </div>
   );

@@ -2,12 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { useCloudSync } from '@/hooks/cloud-sync';
 import { useHeroes } from '@/hooks/use-heroes';
+import { useAuth } from '@/context/AuthContext';
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { PlayerForm } from '@/components/game-stats/PlayerForm';
 import { GameLogger } from '@/components/game-stats/GameLogger';
 import { GameHistory } from '@/components/game-stats/GameHistory';
@@ -15,9 +17,11 @@ import { PlayerStats } from '@/components/game-stats/PlayerStats';
 import { DataPersistence } from '@/components/game-stats/data-persistence';
 import { Game, GameLogFormValues, GamePlayer, NewPlayerFormValues, Player } from '@/lib/game-stats-types';
 import { useToast } from '@/hooks/use-toast';
+import { Navigate } from 'react-router-dom';
 
 const GameStats: React.FC = () => {
   const { toast } = useToast();
+  const { user, isAdmin } = useAuth();
   
   const { 
     data: players, 
@@ -53,6 +57,16 @@ const GameStats: React.FC = () => {
   }, [playersSyncStatus, gamesSyncStatus, toast]);
 
   const onAddPlayer = (data: NewPlayerFormValues) => {
+    // Only admin can add players
+    if (!isAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "Only administrators can add new players.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     const newPlayer: Player = {
       id: Date.now().toString(),
       name: data.playerName.trim(),
@@ -61,6 +75,16 @@ const GameStats: React.FC = () => {
   };
 
   const onLogGame = (data: GameLogFormValues) => {
+    // Only admin can log games
+    if (!isAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "Only administrators can log new games.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     if (gameParticipants.length < 2) {
       return;
     }
@@ -89,10 +113,30 @@ const GameStats: React.FC = () => {
   };
 
   const onDeleteGame = (gameId: string) => {
+    // Only admin can delete games
+    if (!isAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "Only administrators can delete games.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setGameLogs(gameLogs.filter(game => (game as Game).id !== gameId));
   };
 
   const onEditGame = (gameId: string, updatedGameData: Partial<Game>) => {
+    // Only admin can edit games
+    if (!isAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "Only administrators can edit games.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setGameLogs(gameLogs.map(game => 
       (game as Game).id === gameId 
         ? { ...game, ...updatedGameData } 
@@ -101,6 +145,16 @@ const GameStats: React.FC = () => {
   };
 
   const handleDataImport = (data: { games: Game[], players: Player[] }) => {
+    // Only admin can import data
+    if (!isAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "Only administrators can import data.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     const existingPlayerIds = new Set(players.map(p => (p as Player).id));
     const newPlayers = [
       ...players,
@@ -132,6 +186,18 @@ const GameStats: React.FC = () => {
       <header className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Game Statistics</h1>
         <p className="text-muted-foreground mt-1">Track your games and player statistics</p>
+        
+        {!user && (
+          <div className="mt-4 p-4 border rounded-md bg-muted">
+            <p className="text-sm">You are viewing this data as a guest. <Button variant="link" className="p-0" onClick={() => window.location.href = '/auth'}>Sign in</Button> to add or edit game data.</p>
+          </div>
+        )}
+        
+        {user && !isAdmin && (
+          <div className="mt-4 p-4 border rounded-md bg-muted">
+            <p className="text-sm">You are signed in but don't have admin privileges. Only admins can add or edit game data.</p>
+          </div>
+        )}
       </header>
       
       <div className="mb-8">
@@ -139,6 +205,7 @@ const GameStats: React.FC = () => {
           games={gameLogs as Game[]} 
           players={players as Player[]} 
           onImport={handleDataImport}
+          isAdmin={isAdmin}
         />
       </div>
       
@@ -150,13 +217,14 @@ const GameStats: React.FC = () => {
         </TabsList>
         
         <TabsContent value="log-game" className="space-y-8">
-          <PlayerForm onAddPlayer={onAddPlayer} />
+          <PlayerForm onAddPlayer={onAddPlayer} isAdmin={isAdmin} />
           <GameLogger
             players={players as Player[]}
             heroes={heroes}
             gameParticipants={gameParticipants}
             setGameParticipants={setGameParticipants}
             onLogGame={onLogGame}
+            isAdmin={isAdmin}
           />
         </TabsContent>
         
@@ -165,6 +233,7 @@ const GameStats: React.FC = () => {
             games={gameLogs as Game[]}
             onDeleteGame={onDeleteGame}
             onEditGame={onEditGame}
+            isAdmin={isAdmin}
           />
         </TabsContent>
         

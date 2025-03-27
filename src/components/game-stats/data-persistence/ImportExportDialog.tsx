@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Copy, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -10,8 +9,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from '@/components/ui/dialog';
+import { Copy, Download } from 'lucide-react';
 
 interface ImportExportDialogProps {
   open: boolean;
@@ -20,6 +19,7 @@ interface ImportExportDialogProps {
   onJsonDataChange: (data: string) => void;
   onCopyToClipboard: () => void;
   onImportFromText: (text: string) => void;
+  isAdmin?: boolean;
 }
 
 export const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
@@ -28,73 +28,47 @@ export const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
   jsonData,
   onJsonDataChange,
   onCopyToClipboard,
-  onImportFromText
+  onImportFromText,
+  isAdmin = false,
 }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px]">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Transfer Your Game Data</DialogTitle>
+          <DialogTitle>Share Game Data</DialogTitle>
           <DialogDescription>
-            Copy this data and paste it on another device or browser to transfer your game statistics.
+            Copy this JSON data or paste shared data to import
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs defaultValue="export" className="mt-4">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="export">Export</TabsTrigger>
-            <TabsTrigger value="import">Import</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="export" className="space-y-4">
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
-                Copy this text and save it somewhere safe. You can paste it on another device.
-              </p>
-              <Textarea 
-                value={jsonData} 
-                readOnly 
-                className="h-[200px] font-mono text-xs"
-              />
-              <Button 
-                variant="secondary" 
-                className="w-full" 
-                onClick={onCopyToClipboard}
-              >
-                <Copy className="h-4 w-4 mr-2" />
-                Copy to Clipboard
-              </Button>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="import" className="space-y-4">
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
-                Paste the exported data here to import your game statistics.
-              </p>
-              <Textarea 
-                placeholder="Paste your data here..." 
-                className="h-[200px] font-mono text-xs"
-                onChange={(e) => onJsonDataChange(e.target.value)}
-                value={jsonData}
-              />
-              <Button 
-                variant="secondary" 
-                className="w-full" 
-                onClick={() => onImportFromText(jsonData)}
-                disabled={!jsonData}
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                Import Data
-              </Button>
-            </div>
-          </TabsContent>
-        </Tabs>
+        <Textarea
+          className="font-mono text-xs h-[300px]"
+          value={jsonData}
+          onChange={(e) => onJsonDataChange(e.target.value)}
+          spellCheck={false}
+        />
         
-        <DialogFooter className="mt-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Close
+        <DialogFooter className="flex-col sm:flex-row gap-2">
+          <Button 
+            variant="secondary" 
+            className="w-full sm:w-auto" 
+            onClick={onCopyToClipboard}
+          >
+            <Copy className="mr-2 h-4 w-4" />
+            Copy to Clipboard
           </Button>
+          
+          {isAdmin && (
+            <Button 
+              type="submit" 
+              className="w-full sm:w-auto"
+              onClick={() => onImportFromText(jsonData)}
+              disabled={!jsonData}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Import from Text
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
