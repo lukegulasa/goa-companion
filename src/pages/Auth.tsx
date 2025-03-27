@@ -14,9 +14,10 @@ import {
 } from '@/components/ui/card';
 import { LogIn } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import AdminSetup from '@/components/admin/AdminSetup';
 
 const Auth: React.FC = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('lukeggulasa@gmail.com'); // Pre-fill with admin email
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -77,6 +78,7 @@ const Auth: React.FC = () => {
           title: "Login successful",
           description: "You are now logged in as an admin"
         });
+        navigate('/');
       }
     } catch (error: any) {
       console.error('Unexpected error during login:', error);
@@ -93,6 +95,9 @@ const Auth: React.FC = () => {
   
   return (
     <div className="container max-w-md mx-auto py-8">
+      {/* First time admin setup component */}
+      <AdminSetup />
+      
       <Card>
         <CardHeader>
           <CardTitle>Admin Login</CardTitle>

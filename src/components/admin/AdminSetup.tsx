@@ -13,6 +13,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
+// These should exactly match what you specified
 const ADMIN_EMAIL = 'lukeggulasa@gmail.com';
 const ADMIN_PASSWORD = 'goa123';
 const ADMIN_NAME = 'luke';
@@ -20,7 +21,7 @@ const ADMIN_NAME = 'luke';
 const AdminSetup: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
-  const [adminExists, setAdminExists] = useState(true);
+  const [adminExists, setAdminExists] = useState(false);
   const { toast } = useToast();
   
   useEffect(() => {
@@ -39,7 +40,11 @@ const AdminSetup: React.FC = () => {
       
       console.log('Admin count:', data);
       setAdminExists(data > 0);
-      setShowDialog(data === 0);
+      
+      // Only show the dialog if no admin exists
+      if (data === 0) {
+        setShowDialog(true);
+      }
     } catch (error) {
       console.error('Error in checkForAdmin:', error);
     }

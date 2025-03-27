@@ -58,22 +58,17 @@ export const setupAdminUser = async (
       console.log('Admin user setup complete');
       
       // Try to sign in immediately to confirm the account works
-      try {
-        console.log('Testing login with new credentials...');
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-        
-        if (signInError) {
-          console.warn('Note: New admin could not be signed in automatically:', signInError);
-          // Don't return error here as the account was still created
-        } else {
-          console.log('Auto sign-in successful');
-        }
-      } catch (signInErr) {
-        console.warn('Error during auto sign-in test:', signInErr);
-        // Don't fail the overall operation, just log the warning
+      console.log('Testing login with new credentials...');
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      
+      if (signInError) {
+        console.warn('Note: New admin could not be signed in automatically:', signInError);
+        // Don't return error here as the account was still created
+      } else {
+        console.log('Auto sign-in successful:', signInData);
       }
       
       return { success: true, user: authData.user };
