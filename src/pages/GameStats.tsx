@@ -12,7 +12,7 @@ import { PlayerForm } from '@/components/game-stats/PlayerForm';
 import { GameLogger } from '@/components/game-stats/GameLogger';
 import { GameHistory } from '@/components/game-stats/GameHistory';
 import { PlayerStats } from '@/components/game-stats/PlayerStats';
-import { DataPersistence } from '@/components/game-stats/DataPersistence';
+import { DataPersistence } from '@/components/game-stats/data-persistence';
 import { Game, GameLogFormValues, GamePlayer, NewPlayerFormValues, Player } from '@/lib/game-stats-types';
 
 const GameStats: React.FC = () => {
