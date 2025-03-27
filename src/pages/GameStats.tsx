@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCloudSync } from '@/hooks/cloud-sync';
 import { useHeroes } from '@/hooks/use-heroes';
 import {
@@ -14,21 +14,43 @@ import { GameHistory } from '@/components/game-stats/GameHistory';
 import { PlayerStats } from '@/components/game-stats/PlayerStats';
 import { DataPersistence } from '@/components/game-stats/data-persistence';
 import { Game, GameLogFormValues, GamePlayer, NewPlayerFormValues, Player } from '@/lib/game-stats-types';
+import { useToast } from '@/hooks/use-toast';
 
 const GameStats: React.FC = () => {
+  const { toast } = useToast();
+  
   const { 
     data: players, 
     setData: setPlayers,
+    syncStatus: playersSyncStatus
   } = useCloudSync<'players'>('players', []);
 
   const { 
     data: gameLogs, 
     setData: setGameLogs,
+    syncStatus: gamesSyncStatus,
+    syncNow
   } = useCloudSync<'games'>('games', []);
 
   const [gameParticipants, setGameParticipants] = useState<GamePlayer[]>([]);
   const [activeTab, setActiveTab] = useState('log-game');
   const { heroes } = useHeroes();
+  
+  // Show toast notification when sync status changes
+  useEffect(() => {
+    if (playersSyncStatus === 'error' || gamesSyncStatus === 'error') {
+      toast({
+        title: "Sync Error",
+        description: "There was an error syncing with the cloud. Your data is saved locally.",
+        variant: "destructive"
+      });
+    } else if (playersSyncStatus === 'synced' && gamesSyncStatus === 'synced') {
+      toast({
+        title: "Sync Complete",
+        description: "Your game data has been synced with the cloud."
+      });
+    }
+  }, [playersSyncStatus, gamesSyncStatus, toast]);
 
   const onAddPlayer = (data: NewPlayerFormValues) => {
     const newPlayer: Player = {
@@ -59,6 +81,11 @@ const GameStats: React.FC = () => {
     
     setGameParticipants([]);
     setActiveTab('game-history');
+    
+    toast({
+      title: "Game Logged",
+      description: "Your game has been successfully saved to the cloud."
+    });
   };
 
   const onDeleteGame = (gameId: string) => {
@@ -88,6 +115,16 @@ const GameStats: React.FC = () => {
     
     setPlayers(newPlayers);
     setGameLogs(newGames);
+    
+    // Force a sync after import
+    setTimeout(() => {
+      syncNow();
+    }, 500);
+    
+    toast({
+      title: "Import Complete",
+      description: "Your imported data has been merged and synced with the cloud."
+    });
   };
 
   return (

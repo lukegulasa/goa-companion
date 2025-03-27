@@ -4,6 +4,8 @@ import { Game, Player } from '@/lib/game-stats-types';
 import { useToast } from '@/hooks/use-toast';
 import { DataActionButtons } from './DataActionButtons';
 import { ImportExportDialog } from './ImportExportDialog';
+import { CloudSyncIndicator } from './CloudSyncIndicator';
+import { useCloudSync } from '@/hooks/cloud-sync';
 
 interface DataPersistenceContainerProps {
   games: Game[];
@@ -20,6 +22,10 @@ export const DataPersistenceContainer: React.FC<DataPersistenceContainerProps> =
   const [jsonData, setJsonData] = useState<string>('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const isDataEmpty = games.length === 0 && players.length === 0;
+  
+  // Get sync status from the hooks
+  const { syncStatus: playersSyncStatus, syncNow: syncPlayers, syncEnabled, setSyncEnabled } = useCloudSync('players');
+  const { syncStatus: gamesSyncStatus, syncNow: syncGames } = useCloudSync('games');
   
   const handleExport = () => {
     try {
@@ -162,14 +168,40 @@ export const DataPersistenceContainer: React.FC<DataPersistenceContainerProps> =
     document.getElementById('import-file')?.click();
   };
   
+  const handleSyncNow = () => {
+    syncPlayers();
+    syncGames();
+    toast({
+      title: "Sync Started",
+      description: "Synchronizing your game data with the cloud..."
+    });
+  };
+  
+  const handleToggleSync = (enabled: boolean) => {
+    setSyncEnabled(enabled);
+    toast({
+      title: enabled ? "Cloud Sync Enabled" : "Cloud Sync Disabled",
+      description: enabled 
+        ? "Your game data will now be automatically synced with the cloud."
+        : "Your game data will no longer be synced with the cloud."
+    });
+  };
+  
   return (
     <div className="bg-card rounded-lg border shadow-sm p-6 space-y-4">
       <div className="flex flex-col space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Data Management</h2>
+          <CloudSyncIndicator 
+            syncStatus={playersSyncStatus === 'syncing' || gamesSyncStatus === 'syncing' ? 'syncing' : 
+                        playersSyncStatus === 'error' || gamesSyncStatus === 'error' ? 'error' : 'synced'}
+            syncEnabled={syncEnabled}
+            onSyncNow={handleSyncNow}
+            onToggleSync={handleToggleSync}
+          />
         </div>
         <p className="text-sm text-muted-foreground">
-          Your data is saved locally using IndexedDB. Export your data to create backups or transfer between devices.
+          Your data is saved in Supabase and synced across devices. Export your data to create backups or transfer between browsers.
         </p>
       </div>
       

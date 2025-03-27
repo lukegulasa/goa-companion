@@ -1,3 +1,12 @@
 
-// Export the main component and any additional types
-export { DataPersistenceContainer as DataPersistence } from './DataPersistenceContainer';
+import { DataPersistenceContainer } from './DataPersistenceContainer';
+import { DataActionButtons } from './DataActionButtons';
+import { ImportExportDialog } from './ImportExportDialog';
+import { CloudSyncIndicator } from './CloudSyncIndicator';
+
+export {
+  DataPersistenceContainer as DataPersistence,
+  DataActionButtons,
+  ImportExportDialog,
+  CloudSyncIndicator
+};
