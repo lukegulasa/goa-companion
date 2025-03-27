@@ -41,7 +41,7 @@ const GameStats: React.FC = () => {
 
   // Add a new player
   const onAddPlayer = (data: NewPlayerFormValues) => {
-    const newPlayer = {
+    const newPlayer: Player = {
       id: Date.now().toString(),
       name: data.playerName.trim(),
     };
@@ -122,8 +122,8 @@ const GameStats: React.FC = () => {
       
       <div className="mb-8">
         <DataPersistence 
-          games={gameLogs} 
-          players={players} 
+          games={gameLogs as Game[]} 
+          players={players as Player[]} 
           onImport={handleDataImport}
           syncStatus={playersSyncStatus !== 'error' && gamesSyncStatus !== 'error' 
             ? playersSyncStatus 
@@ -148,7 +148,7 @@ const GameStats: React.FC = () => {
 
           {/* Game Logger */}
           <GameLogger
-            players={players}
+            players={players as Player[]}
             heroes={heroes}
             gameParticipants={gameParticipants}
             setGameParticipants={setGameParticipants}
@@ -158,14 +158,14 @@ const GameStats: React.FC = () => {
         
         <TabsContent value="game-history" className="space-y-6">
           <GameHistory 
-            games={gameLogs}
+            games={gameLogs as Game[]}
             onDeleteGame={onDeleteGame}
             onEditGame={onEditGame}
           />
         </TabsContent>
         
         <TabsContent value="player-stats" className="space-y-6">
-          <PlayerStats players={players} games={gameLogs} />
+          <PlayerStats players={players as Player[]} games={gameLogs as Game[]} />
         </TabsContent>
       </Tabs>
     </div>
