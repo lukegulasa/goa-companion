@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCloudSync } from '@/hooks/cloud-sync';
 import { useHeroes } from '@/hooks/use-heroes';
+import { useAuth } from '@/context/AuthContext';
 import {
   Tabs,
   TabsContent,
@@ -12,15 +13,14 @@ import { Button } from '@/components/ui/button';
 import { PlayerForm } from '@/components/game-stats/PlayerForm';
 import { GameLogger } from '@/components/game-stats/GameLogger';
 import { GameHistory } from '@/components/game-stats/GameHistory';
-import { PlayerStats } from '@/components/game-stats/PlayerStats';
+import { PlayerStats } from '@/components/PlayerStats';
 import { DataPersistence } from '@/components/game-stats/data-persistence';
 import { Game, GameLogFormValues, GamePlayer, NewPlayerFormValues, Player } from '@/lib/game-stats-types';
 import { useToast } from '@/hooks/use-toast';
 
 const GameStats: React.FC = () => {
   const { toast } = useToast();
-  // Since auth is removed, we'll hardcode isAdmin to true
-  const isAdmin = true;
+  const { isAdmin } = useAuth();
   
   const { 
     data: players, 
@@ -56,6 +56,8 @@ const GameStats: React.FC = () => {
   }, [playersSyncStatus, gamesSyncStatus, toast]);
 
   const onAddPlayer = (data: NewPlayerFormValues) => {
+    if (!isAdmin) return;
+    
     const newPlayer: Player = {
       id: Date.now().toString(),
       name: data.playerName.trim(),
@@ -64,6 +66,8 @@ const GameStats: React.FC = () => {
   };
 
   const onLogGame = (data: GameLogFormValues) => {
+    if (!isAdmin) return;
+    
     if (gameParticipants.length < 2) {
       return;
     }
@@ -92,10 +96,14 @@ const GameStats: React.FC = () => {
   };
 
   const onDeleteGame = (gameId: string) => {
+    if (!isAdmin) return;
+    
     setGameLogs(gameLogs.filter(game => (game as Game).id !== gameId));
   };
 
   const onEditGame = (gameId: string, updatedGameData: Partial<Game>) => {
+    if (!isAdmin) return;
+    
     setGameLogs(gameLogs.map(game => 
       (game as Game).id === gameId 
         ? { ...game, ...updatedGameData } 

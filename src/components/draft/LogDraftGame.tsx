@@ -24,6 +24,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { GamePlayer } from '@/lib/game-stats-types';
 import { useCloudSync } from '@/hooks/cloud-sync';
+import { useAuth } from '@/context/AuthContext';
 
 interface LogDraftGameProps {
   playerData: {
@@ -38,6 +39,7 @@ interface LogDraftGameProps {
 
 const LogDraftGame: React.FC<LogDraftGameProps> = ({ playerData, onComplete }) => {
   const { toast } = useToast();
+  const { isAdmin } = useAuth();
   const [winningTeam, setWinningTeam] = useState<'Red' | 'Blue'>('Red');
   const [dialogOpen, setDialogOpen] = useState(false);
   
@@ -45,6 +47,15 @@ const LogDraftGame: React.FC<LogDraftGameProps> = ({ playerData, onComplete }) =
   const { data: games, setData: setGames } = useCloudSync<'games'>('games');
   
   const handleConfirm = () => {
+    if (!isAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "Only admins can log games",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     // Create game players data
     const gamePlayers: GamePlayer[] = playerData.map(player => ({
       playerId: player.id,
@@ -82,6 +93,7 @@ const LogDraftGame: React.FC<LogDraftGameProps> = ({ playerData, onComplete }) =
           <Select
             value={winningTeam}
             onValueChange={(value) => setWinningTeam(value as 'Red' | 'Blue')}
+            disabled={!isAdmin}
           >
             <SelectTrigger id="winning-team" className="w-full mt-1">
               <SelectValue placeholder="Select winning team" />
@@ -96,9 +108,13 @@ const LogDraftGame: React.FC<LogDraftGameProps> = ({ playerData, onComplete }) =
       
       <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <AlertDialogTrigger asChild>
-          <Button className="flex items-center" onClick={() => setDialogOpen(true)}>
+          <Button 
+            className="flex items-center" 
+            onClick={() => setDialogOpen(true)}
+            disabled={!isAdmin}
+          >
             <Trophy className="mr-2 h-4 w-4" />
-            Log Draft as Game
+            {isAdmin ? 'Log Draft as Game' : 'Admin Only: Log Draft as Game'}
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
