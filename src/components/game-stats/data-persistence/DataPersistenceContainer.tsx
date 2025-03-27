@@ -14,7 +14,7 @@ export const DataPersistenceContainer: React.FC<DataPersistenceContainerProps> =
   const { toast } = useToast();
   
   // Get sync status from the hooks
-  const { syncStatus: playersSyncStatus, syncNow: syncPlayers, syncEnabled, setSyncEnabled } = useCloudSync('players');
+  const { syncStatus: playersSyncStatus, syncNow: syncPlayers } = useCloudSync('players');
   const { syncStatus: gamesSyncStatus, syncNow: syncGames } = useCloudSync('games');
   
   const handleSyncNow = () => {
@@ -26,16 +26,6 @@ export const DataPersistenceContainer: React.FC<DataPersistenceContainerProps> =
     });
   };
   
-  const handleToggleSync = (enabled: boolean) => {
-    setSyncEnabled(enabled);
-    toast({
-      title: enabled ? "Cloud Sync Enabled" : "Cloud Sync Disabled",
-      description: enabled 
-        ? "Your game data will now be automatically synced with the cloud."
-        : "Your game data will no longer be synced with the cloud."
-    });
-  };
-  
   return (
     <div className="bg-card rounded-lg border shadow-sm p-6 space-y-4">
       <div className="flex flex-col space-y-2">
@@ -43,10 +33,8 @@ export const DataPersistenceContainer: React.FC<DataPersistenceContainerProps> =
           <h2 className="text-xl font-semibold">Cloud Database</h2>
           <CloudSyncIndicator 
             syncStatus={playersSyncStatus === 'syncing' || gamesSyncStatus === 'syncing' ? 'syncing' : 
-                        playersSyncStatus === 'error' || gamesSyncStatus === 'error' ? 'error' : 'synced'}
-            syncEnabled={syncEnabled}
+                      playersSyncStatus === 'error' || gamesSyncStatus === 'error' ? 'error' : 'synced'}
             onSyncNow={handleSyncNow}
-            onToggleSync={handleToggleSync}
             isAdmin={isAdmin}
           />
         </div>

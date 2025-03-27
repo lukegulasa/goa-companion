@@ -14,13 +14,10 @@ export interface CloudSyncResult<T extends 'players' | 'games'> {
   syncStatus: SyncStatus;
   lastSynced: Date | null;
   syncNow: () => Promise<void>;
-  setSyncEnabled: (enabled: boolean) => void;
-  syncEnabled: boolean;
 }
 
 // Constants kept for compatibility
 export const SYNC_CONSTANTS = {
   INTERVAL: 60000,
   KEY_PREFIX: 'goa-sync-',
-  ENABLED_KEY: 'goa-sync-enabled',
 };
