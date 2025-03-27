@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { useCloudSync } from '@/hooks/use-cloud-sync';
+import { useCloudSync } from '@/hooks/cloud-sync';
 import { useHeroes } from '@/hooks/use-heroes';
 import {
   Tabs,
@@ -16,7 +15,6 @@ import { DataPersistence } from '@/components/game-stats/data-persistence';
 import { Game, GameLogFormValues, GamePlayer, NewPlayerFormValues, Player } from '@/lib/game-stats-types';
 
 const GameStats: React.FC = () => {
-  // Replace IndexedDB with Cloud Sync hook
   const { 
     data: players, 
     setData: setPlayers,
@@ -39,7 +37,6 @@ const GameStats: React.FC = () => {
   const [activeTab, setActiveTab] = useState('log-game');
   const { heroes } = useHeroes();
 
-  // Add a new player
   const onAddPlayer = (data: NewPlayerFormValues) => {
     const newPlayer: Player = {
       id: Date.now().toString(),
@@ -48,15 +45,13 @@ const GameStats: React.FC = () => {
     setPlayers([...players, newPlayer]);
   };
 
-  // Log a new game
   const onLogGame = (data: GameLogFormValues) => {
-    // Validate that we have players and they all have heroes selected
     if (gameParticipants.length < 2) {
-      return; // Need at least 2 players
+      return;
     }
     
     if (gameParticipants.some(p => !p.heroId)) {
-      return; // All players need a hero
+      return;
     }
     
     const newGame: Game = {
@@ -69,17 +64,14 @@ const GameStats: React.FC = () => {
     
     setGameLogs([...gameLogs, newGame]);
     
-    // Reset the form
     setGameParticipants([]);
     setActiveTab('game-history');
   };
 
-  // Delete a game
   const onDeleteGame = (gameId: string) => {
     setGameLogs(gameLogs.filter(game => (game as Game).id !== gameId));
   };
 
-  // Edit a game
   const onEditGame = (gameId: string, updatedGameData: Partial<Game>) => {
     setGameLogs(gameLogs.map(game => 
       (game as Game).id === gameId 
@@ -88,16 +80,13 @@ const GameStats: React.FC = () => {
     ));
   };
 
-  // Handle importing data
   const handleDataImport = (data: { games: Game[], players: Player[] }) => {
-    // Merge players (avoid duplicates based on id)
     const existingPlayerIds = new Set(players.map(p => (p as Player).id));
     const newPlayers = [
       ...players,
       ...data.players.filter(p => !existingPlayerIds.has(p.id))
     ];
     
-    // Merge games (avoid duplicates based on id)
     const existingGameIds = new Set(gameLogs.map(g => (g as Game).id));
     const newGames = [
       ...gameLogs,
@@ -108,7 +97,6 @@ const GameStats: React.FC = () => {
     setGameLogs(newGames);
   };
 
-  // Force sync both data types
   const syncAllData = async () => {
     await Promise.all([syncPlayersNow(), syncGamesNow()]);
   };
@@ -143,10 +131,7 @@ const GameStats: React.FC = () => {
         </TabsList>
         
         <TabsContent value="log-game" className="space-y-8">
-          {/* New Player Form */}
           <PlayerForm onAddPlayer={onAddPlayer} />
-
-          {/* Game Logger */}
           <GameLogger
             players={players as Player[]}
             heroes={heroes}
