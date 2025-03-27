@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, CloudOff, CloudCheck, RefreshCw } from 'lucide-react';
+import { Loader2, CloudOff, CheckCircle, RefreshCw } from 'lucide-react';
 import { SyncStatus } from '@/hooks/cloud-sync/types';
 
 interface CloudSyncIndicatorProps {
@@ -56,7 +56,7 @@ export const CloudSyncIndicator: React.FC<CloudSyncIndicatorProps> = ({
             )}
             {syncStatus === 'synced' && (
               <>
-                <CloudCheck className="h-4 w-4 text-green-500" />
+                <CheckCircle className="h-4 w-4 text-green-500" />
                 <span className="text-xs ml-1 text-muted-foreground">Synced</span>
               </>
             )}
