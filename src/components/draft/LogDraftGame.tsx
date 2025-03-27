@@ -23,7 +23,7 @@ import { Trophy, Database } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { GamePlayer } from '@/lib/game-stats-types';
-import { Hero } from '@/lib/types';
+import { useCloudSync } from '@/hooks/cloud-sync';
 
 interface LogDraftGameProps {
   playerData: {
@@ -41,6 +41,9 @@ const LogDraftGame: React.FC<LogDraftGameProps> = ({ playerData, onComplete }) =
   const [winningTeam, setWinningTeam] = useState<'Red' | 'Blue'>('Red');
   const [dialogOpen, setDialogOpen] = useState(false);
   
+  // Use cloud sync for games
+  const { data: games, setData: setGames } = useCloudSync<'games'>('games');
+  
   const handleConfirm = () => {
     // Create game players data
     const gamePlayers: GamePlayer[] = playerData.map(player => ({
@@ -51,9 +54,6 @@ const LogDraftGame: React.FC<LogDraftGameProps> = ({ playerData, onComplete }) =
       heroName: player.heroName
     }));
     
-    // Get existing games
-    const existingGames = JSON.parse(localStorage.getItem('game-logs') || '[]');
-    
     // Create new game entry
     const newGame = {
       id: Date.now().toString(),
@@ -62,8 +62,8 @@ const LogDraftGame: React.FC<LogDraftGameProps> = ({ playerData, onComplete }) =
       winningTeam: winningTeam
     };
     
-    // Save updated games
-    localStorage.setItem('game-logs', JSON.stringify([...existingGames, newGame]));
+    // Save to cloud
+    setGames([...games, newGame]);
     
     toast({
       title: "Game Logged",

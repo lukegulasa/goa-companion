@@ -44,13 +44,13 @@ const GameStats: React.FC = () => {
     if (playersSyncStatus === 'error' || gamesSyncStatus === 'error') {
       toast({
         title: "Sync Error",
-        description: "There was an error syncing with the cloud. Please try again later.",
+        description: "There was an error syncing with the database. Please try again later.",
         variant: "destructive"
       });
     } else if (playersSyncStatus === 'synced' && gamesSyncStatus === 'synced') {
       toast({
         title: "Sync Complete",
-        description: "Your game data has been synced with the cloud."
+        description: "Your game data has been synced with the database."
       });
     }
   }, [playersSyncStatus, gamesSyncStatus, toast]);
@@ -111,7 +111,7 @@ const GameStats: React.FC = () => {
       </header>
       
       <div className="mb-8">
-        <DataPersistence isAdmin={isAdmin} />
+        <DataPersistence />
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">

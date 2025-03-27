@@ -1,5 +1,5 @@
 
-import { useLocalStorage } from '@/hooks/use-local-storage';
+import { useCloudSync } from '@/hooks/cloud-sync';
 import { Game } from '@/lib/game-stats-types';
 import { 
   calculateHeroStats, 
@@ -13,16 +13,17 @@ import {
 import { useMemo } from 'react';
 
 export function useHeroStats() {
-  const [gameLogs] = useLocalStorage<Game[]>('game-logs', []);
+  // Use cloud data instead of localStorage
+  const { data: gameLogs } = useCloudSync<'games'>('games', []);
   
   // Calculate hero stats from game logs
-  const heroStats = useMemo(() => calculateHeroStats(gameLogs), [gameLogs]);
+  const heroStats = useMemo(() => calculateHeroStats(gameLogs as Game[]), [gameLogs]);
   
   // Calculate hero matchups
-  const heroMatchups = useMemo(() => calculateHeroMatchups(gameLogs), [gameLogs]);
+  const heroMatchups = useMemo(() => calculateHeroMatchups(gameLogs as Game[]), [gameLogs]);
   
   // Calculate hero synergies
-  const heroSynergies = useMemo(() => calculateHeroSynergies(gameLogs), [gameLogs]);
+  const heroSynergies = useMemo(() => calculateHeroSynergies(gameLogs as Game[]), [gameLogs]);
   
   return {
     heroStats,
