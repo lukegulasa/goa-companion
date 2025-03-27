@@ -69,7 +69,7 @@ const AdminSetup: React.FC = () => {
       if (result.success) {
         toast({
           title: "Admin account created",
-          description: `Admin account for ${ADMIN_EMAIL} was created successfully. You can now sign in.`
+          description: result.message || `Admin account for ${ADMIN_EMAIL} was created. Please check your email to confirm your account before logging in.`
         });
         setShowDialog(false);
         setAdminExists(true);
@@ -121,6 +121,9 @@ const AdminSetup: React.FC = () => {
                 <span className="text-sm col-span-2">••••••••</span>
               </div>
             </div>
+            <p className="text-sm text-muted-foreground mt-4">
+              You'll need to confirm your email address before logging in.
+            </p>
           </div>
           
           <DialogFooter>

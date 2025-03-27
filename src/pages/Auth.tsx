@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,14 +15,36 @@ import {
 import { LogIn } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import AdminSetup from '@/components/admin/AdminSetup';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Auth: React.FC = () => {
   const [email, setEmail] = useState('lukeggulasa@gmail.com'); // Pre-fill with admin email
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [confirmationSuccess, setConfirmationSuccess] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+  
+  // Check for email confirmation success
+  useEffect(() => {
+    // Extract hash fragment from URL
+    const hash = location.hash;
+    if (hash && hash.includes('access_token')) {
+      // This means the user has successfully confirmed their email
+      setConfirmationSuccess(true);
+      
+      // Clear the hash to prevent reprocessing on refresh
+      window.history.replaceState(null, '', location.pathname);
+      
+      // Show a success message
+      toast({
+        title: "Email confirmed",
+        description: "Your email has been confirmed. You can now log in."
+      });
+    }
+  }, [location, toast]);
   
   // Check if user is already logged in
   useEffect(() => {
@@ -66,11 +88,27 @@ const Auth: React.FC = () => {
       if (error) {
         console.error('Login error:', error);
         setErrorMsg(error.message);
-        toast({
-          title: "Login failed",
-          description: error.message || "Invalid login credentials",
-          variant: "destructive"
-        });
+        
+        // Show more helpful message for common errors
+        if (error.message.includes('Invalid login credentials')) {
+          toast({
+            title: "Login failed",
+            description: "Invalid email or password. If you recently created your account, please check your email and confirm your account first.",
+            variant: "destructive"
+          });
+        } else if (error.message.includes('Email not confirmed')) {
+          toast({
+            title: "Email not confirmed",
+            description: "Please check your email and follow the confirmation link before logging in.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Login failed",
+            description: error.message || "Invalid login credentials",
+            variant: "destructive"
+          });
+        }
         return;
       }
       
@@ -99,6 +137,14 @@ const Auth: React.FC = () => {
     <div className="container max-w-md mx-auto py-8">
       {/* First time admin setup component */}
       <AdminSetup />
+      
+      {confirmationSuccess && (
+        <Alert className="mb-4 bg-green-50 border-green-200 text-green-800">
+          <AlertDescription>
+            Your email has been confirmed successfully. You can now log in.
+          </AlertDescription>
+        </Alert>
+      )}
       
       <Card>
         <CardHeader>

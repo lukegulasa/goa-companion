@@ -24,7 +24,7 @@ export const setupAdminUser = async (
       return { success: false, error: 'An admin user already exists' };
     }
     
-    // Sign up the user with detailed debug info
+    // Sign up the user with email confirmation enabled
     console.log('Creating user account with email:', email);
     const { data: authData, error: signupError } = await supabase.auth.signUp({
       email,
@@ -33,8 +33,7 @@ export const setupAdminUser = async (
         data: {
           name
         },
-        // Make sure email confirmation is not required for the admin account
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: `${window.location.origin}/auth`
       }
     });
     
@@ -58,22 +57,11 @@ export const setupAdminUser = async (
       }
       
       console.log('Admin user setup complete');
-      
-      // Try to sign in immediately to confirm the account works
-      console.log('Testing login with new credentials...');
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-      
-      if (signInError) {
-        console.error('Note: New admin could not be signed in automatically:', signInError);
-        // Don't return error here as the account was still created
-      } else {
-        console.log('Auto sign-in successful:', signInData);
-      }
-      
-      return { success: true, user: authData.user };
+      return { 
+        success: true, 
+        user: authData.user,
+        message: 'Admin account created. Please check your email to confirm your account before logging in.' 
+      };
     } else {
       return { success: false, error: 'User was not created' };
     }
