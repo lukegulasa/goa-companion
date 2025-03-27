@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useIndexedDB } from '@/hooks/use-indexed-db';
 import { useToast } from '@/hooks/use-toast';
 import { CloudSyncResult, DataType, SyncStatus, SYNC_CONSTANTS } from './types';
-import { fetchCloudData, pushToCloud, mergeData } from './utils';
+import { fetchCloudData, pushToCloud, mergeData, setupCloudListener } from './utils';
 
 export function useCloudSync<T extends 'players' | 'games'>(
   storeName: T,
@@ -15,7 +15,11 @@ export function useCloudSync<T extends 'players' | 'games'>(
   
   // Add state for sync status
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
-  const [lastSynced, setLastSynced] = useState<Date | null>(null);
+  const [lastSynced, setLastSynced] = useState<Date | null>(() => {
+    const syncKey = `${SYNC_CONSTANTS.KEY_PREFIX}${storeName}-last-sync`;
+    const lastSyncTime = localStorage.getItem(syncKey);
+    return lastSyncTime ? new Date(lastSyncTime) : null;
+  });
   const [syncEnabled, setSyncEnabled] = useState<boolean>(() => {
     try {
       return localStorage.getItem(SYNC_CONSTANTS.ENABLED_KEY) === 'true';
@@ -37,19 +41,17 @@ export function useCloudSync<T extends 'players' | 'games'>(
       const syncKey = `${SYNC_CONSTANTS.KEY_PREFIX}${storeName}-last-sync`;
       const lastSyncTime = localStorage.getItem(syncKey);
       
-      // In a real app, we would send the lastSyncTime to the server
-      // to only get changes since that time
+      // First, fetch any changes from the cloud
       const cloudDataResponse = await fetchCloudData<T>(storeName, lastSyncTime);
       
       if (cloudDataResponse.hasChanges) {
         // Merge local data with cloud data
-        // In a real implementation, this would handle conflicts
         const mergedData = mergeData<T>(localData as DataType<T>[], cloudDataResponse.data);
         setLocalData(mergedData as any);
-        
-        // Then push our merged data back to the cloud
-        await pushToCloud<T>(storeName, mergedData);
       }
+      
+      // Then push our current data back to the cloud
+      await pushToCloud<T>(storeName, localData as DataType<T>[]);
       
       // Update last sync time
       const now = new Date();
@@ -124,6 +126,18 @@ export function useCloudSync<T extends 'players' | 'games'>(
       if (interval) clearInterval(interval);
     };
   }, [syncEnabled]);
+  
+  // Set up cloud listener for changes from other tabs/windows
+  useEffect(() => {
+    if (!syncEnabled) return;
+    
+    // Set up cloud listener and get cleanup function
+    const cleanup = setupCloudListener(storeName, () => {
+      syncWithCloud();
+    });
+    
+    return cleanup;
+  }, [syncEnabled, storeName]);
   
   // Also sync when we detect the online status has changed to online
   useEffect(() => {
