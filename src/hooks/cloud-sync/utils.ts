@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { DataType, SyncStatus } from './types';
 
@@ -27,8 +28,6 @@ export const pushToCloud = async <T extends 'players' | 'games'>(
   data: DataType<T>[]
 ): Promise<void> => {
   try {
-    const { data: session } = await supabase.auth.getSession();
-    
     if (store === 'players') {
       // Map player data to match database column names
       const playerData = data.map(player => ({

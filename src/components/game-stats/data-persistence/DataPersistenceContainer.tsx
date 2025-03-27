@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Game, Player } from '@/lib/game-stats-types';
 import { useToast } from '@/hooks/use-toast';
@@ -6,7 +5,6 @@ import { DataActionButtons } from './DataActionButtons';
 import { ImportExportDialog } from './ImportExportDialog';
 import { CloudSyncIndicator } from './CloudSyncIndicator';
 import { useCloudSync } from '@/hooks/cloud-sync';
-import { useAuth } from '@/context/AuthContext';
 
 interface DataPersistenceContainerProps {
   games: Game[];
