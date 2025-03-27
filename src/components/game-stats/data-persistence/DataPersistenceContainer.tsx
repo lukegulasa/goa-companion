@@ -1,35 +1,20 @@
 
 import React, { useState } from 'react';
-import { AlertCircle } from 'lucide-react';
 import { Game, Player } from '@/lib/game-stats-types';
 import { useToast } from '@/hooks/use-toast';
-import { SyncStatus } from '@/hooks/use-cloud-sync';
-import { Badge } from '@/components/ui/badge';
-import { CloudSyncStatus } from './CloudSyncStatus';
 import { DataActionButtons } from './DataActionButtons';
 import { ImportExportDialog } from './ImportExportDialog';
-import { SyncInfoCards } from './SyncInfoCards';
 
 interface DataPersistenceContainerProps {
   games: Game[];
   players: Player[];
   onImport: (data: { games: Game[], players: Player[] }) => void;
-  syncStatus?: SyncStatus;
-  lastSynced: Date | null;
-  onSyncNow: () => void;
-  syncEnabled: boolean;
-  onToggleSync: (enabled: boolean) => void;
 }
 
 export const DataPersistenceContainer: React.FC<DataPersistenceContainerProps> = ({ 
   games, 
   players,
-  onImport,
-  syncStatus = 'idle',
-  lastSynced,
-  onSyncNow,
-  syncEnabled,
-  onToggleSync
+  onImport
 }) => {
   const { toast } = useToast();
   const [jsonData, setJsonData] = useState<string>('');
@@ -182,26 +167,11 @@ export const DataPersistenceContainer: React.FC<DataPersistenceContainerProps> =
       <div className="flex flex-col space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Data Management</h2>
-          {syncEnabled && (
-            <Badge variant={getSyncStatusColor(syncStatus)}>
-              {getSyncStatusText(syncStatus)}
-            </Badge>
-          )}
         </div>
         <p className="text-sm text-muted-foreground">
-          Your data is saved using IndexedDB and can be synchronized across devices.
+          Your data is saved locally using IndexedDB. Export your data to create backups or transfer between devices.
         </p>
       </div>
-      
-      <CloudSyncStatus 
-        syncStatus={syncStatus}
-        lastSynced={lastSynced}
-        onSyncNow={onSyncNow}
-        syncEnabled={syncEnabled}
-        onToggleSync={onToggleSync}
-        gamesCount={games.length}
-        playersCount={players.length}
-      />
       
       <DataActionButtons 
         onExport={handleExport}
@@ -226,31 +196,6 @@ export const DataPersistenceContainer: React.FC<DataPersistenceContainerProps> =
         onCopyToClipboard={handleCopyToClipboard}
         onImportFromText={handleImportFromText}
       />
-      
-      <SyncInfoCards 
-        syncEnabled={syncEnabled}
-        gamesCount={games.length}
-        playersCount={players.length}
-      />
     </div>
   );
-
-  function getSyncStatusColor(status: SyncStatus): "default" | "destructive" | "secondary" | "outline" | "green" | "yellow" {
-    switch (status) {
-      case 'synced': return 'green';
-      case 'syncing': return 'yellow';
-      case 'error': return 'destructive';
-      default: return 'secondary';
-    }
-  }
-
-  function getSyncStatusText(status: SyncStatus) {
-    switch (status) {
-      case 'synced': return 'Synced';
-      case 'syncing': return 'Syncing...';
-      case 'error': return 'Sync Error';
-      case 'idle': return 'Idle';
-      default: return 'Not synced';
-    }
-  }
 };

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useCloudSync } from '@/hooks/cloud-sync';
 import { useHeroes } from '@/hooks/use-heroes';
@@ -18,19 +19,11 @@ const GameStats: React.FC = () => {
   const { 
     data: players, 
     setData: setPlayers,
-    syncStatus: playersSyncStatus,
-    lastSynced: playersLastSynced,
-    syncNow: syncPlayersNow,
-    syncEnabled,
-    setSyncEnabled
   } = useCloudSync<'players'>('players', []);
 
   const { 
     data: gameLogs, 
     setData: setGameLogs,
-    syncStatus: gamesSyncStatus,
-    lastSynced: gamesLastSynced,
-    syncNow: syncGamesNow
   } = useCloudSync<'games'>('games', []);
 
   const [gameParticipants, setGameParticipants] = useState<GamePlayer[]>([]);
@@ -97,10 +90,6 @@ const GameStats: React.FC = () => {
     setGameLogs(newGames);
   };
 
-  const syncAllData = async () => {
-    await Promise.all([syncPlayersNow(), syncGamesNow()]);
-  };
-
   return (
     <div className="container max-w-6xl mx-auto py-8 px-4 sm:px-6">
       <header className="mb-8">
@@ -113,13 +102,6 @@ const GameStats: React.FC = () => {
           games={gameLogs as Game[]} 
           players={players as Player[]} 
           onImport={handleDataImport}
-          syncStatus={playersSyncStatus !== 'error' && gamesSyncStatus !== 'error' 
-            ? playersSyncStatus 
-            : 'error'}
-          lastSynced={playersLastSynced}
-          onSyncNow={syncAllData}
-          syncEnabled={syncEnabled}
-          onToggleSync={setSyncEnabled}
         />
       </div>
       
