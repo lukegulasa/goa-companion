@@ -28,6 +28,7 @@ const Auth: React.FC = () => {
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      console.log('Current session:', session);
       if (session) {
         navigate('/');
       }
@@ -40,6 +41,7 @@ const Auth: React.FC = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('Auth state changed:', event, session);
         if (session) {
           navigate('/');
         }

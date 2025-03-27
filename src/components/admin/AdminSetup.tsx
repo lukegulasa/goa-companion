@@ -43,7 +43,10 @@ const AdminSetup: React.FC = () => {
       
       // Only show the dialog if no admin exists
       if (data === 0) {
+        console.log('No admin exists, showing setup dialog');
         setShowDialog(true);
+      } else {
+        console.log('Admin already exists, not showing setup dialog');
       }
     } catch (error) {
       console.error('Error in checkForAdmin:', error);

@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from "@/components/ui/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
@@ -14,7 +14,6 @@ import TeamBalance from './pages/TeamBalance';
 import { GalleryProvider } from '@/context/GalleryContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import AdminSetup from './components/admin/AdminSetup';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -35,7 +34,6 @@ function App() {
           <AuthProvider>
             <GalleryProvider>
               <HeroModal />
-              <AdminSetup />
               <BrowserRouter>
                 <Layout>
                   <Routes>
