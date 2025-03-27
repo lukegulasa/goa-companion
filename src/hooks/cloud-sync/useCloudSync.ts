@@ -11,7 +11,7 @@ export function useCloudSync<T extends 'players' | 'games'>(
   const [data, setLocalData] = useState<DataType<T>[]>(defaultValue);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
-  const [syncEnabled, setSyncEnabled] = useLocalStorage('goa-sync-enabled', true);
+  const [syncEnabled, setSyncEnabledState] = useLocalStorage('goa-sync-enabled', true);
   
   // Load initial data from Supabase
   const fetchInitialData = useCallback(async () => {
@@ -81,13 +81,13 @@ export function useCloudSync<T extends 'players' | 'games'>(
   }, [fetchInitialData]);
   
   // Function to toggle sync
-  const setSyncEnabled = useCallback((enabled: boolean) => {
-    setSyncEnabled(enabled);
+  const toggleSyncEnabled = useCallback((enabled: boolean) => {
+    setSyncEnabledState(enabled);
     if (enabled) {
       // Trigger sync when enabled
       fetchInitialData();
     }
-  }, [setSyncEnabled, fetchInitialData]);
+  }, [setSyncEnabledState, fetchInitialData]);
   
   return {
     data,
@@ -95,7 +95,7 @@ export function useCloudSync<T extends 'players' | 'games'>(
     syncStatus,
     lastSynced,
     syncNow,
-    setSyncEnabled,
+    setSyncEnabled: toggleSyncEnabled,
     syncEnabled
   };
 }
