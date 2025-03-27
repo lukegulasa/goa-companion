@@ -76,13 +76,13 @@ const GameStats: React.FC = () => {
 
   // Delete a game
   const onDeleteGame = (gameId: string) => {
-    setGameLogs(gameLogs.filter(game => game.id !== gameId));
+    setGameLogs(gameLogs.filter(game => (game as Game).id !== gameId));
   };
 
   // Edit a game
   const onEditGame = (gameId: string, updatedGameData: Partial<Game>) => {
     setGameLogs(gameLogs.map(game => 
-      game.id === gameId 
+      (game as Game).id === gameId 
         ? { ...game, ...updatedGameData } 
         : game
     ));
@@ -91,14 +91,14 @@ const GameStats: React.FC = () => {
   // Handle importing data
   const handleDataImport = (data: { games: Game[], players: Player[] }) => {
     // Merge players (avoid duplicates based on id)
-    const existingPlayerIds = new Set(players.map(p => p.id));
+    const existingPlayerIds = new Set(players.map(p => (p as Player).id));
     const newPlayers = [
       ...players,
       ...data.players.filter(p => !existingPlayerIds.has(p.id))
     ];
     
     // Merge games (avoid duplicates based on id)
-    const existingGameIds = new Set(gameLogs.map(g => g.id));
+    const existingGameIds = new Set(gameLogs.map(g => (g as Game).id));
     const newGames = [
       ...gameLogs,
       ...data.games.filter(g => !existingGameIds.has(g.id))

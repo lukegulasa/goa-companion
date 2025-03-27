@@ -31,7 +31,8 @@ export function useCloudSync<T extends 'players' | 'games'>(
   defaultValue: DataType<T>[] = [] as DataType<T>[]
 ): CloudSyncResult<T> {
   // Use our existing IndexedDB hook for local storage
-  const [localData, setLocalData] = useIndexedDB<DataType<T>>(storeName, defaultValue);
+  // We need to cast types properly between the hooks
+  const [localData, setLocalData] = useIndexedDB(storeName, defaultValue as any);
   
   // Add state for sync status
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
@@ -64,8 +65,8 @@ export function useCloudSync<T extends 'players' | 'games'>(
       if (cloudDataResponse.hasChanges) {
         // Merge local data with cloud data
         // In a real implementation, this would handle conflicts
-        const mergedData = mergeData(localData, cloudDataResponse.data);
-        setLocalData(mergedData);
+        const mergedData = mergeData(localData as DataType<T>[], cloudDataResponse.data);
+        setLocalData(mergedData as any);
         
         // Then push our merged data back to the cloud
         await pushToCloud(storeName, mergedData);
@@ -188,8 +189,8 @@ export function useCloudSync<T extends 'players' | 'games'>(
   }, [syncEnabled]);
   
   return {
-    data: localData,
-    setData: setLocalData,
+    data: localData as DataType<T>[],
+    setData: setLocalData as (value: DataType<T>[] | ((val: DataType<T>[]) => DataType<T>[])) => void,
     syncStatus,
     lastSynced,
     syncNow,
