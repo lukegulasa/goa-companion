@@ -7,10 +7,16 @@ import { useToast } from './use-toast';
 // This is used to track sync status
 export type SyncStatus = 'idle' | 'syncing' | 'synced' | 'error';
 
+// Mapping type to data type
+type DataType<T extends 'players' | 'games'> = {
+  'players': Player;
+  'games': Game;
+}
+
 // This defines the structure of our cloud sync hook return
 export interface CloudSyncResult<T extends 'players' | 'games'> {
-  data: T extends 'players' ? Player[] : Game[];
-  setData: (value: (T extends 'players' ? Player[] : Game[]) | ((val: T extends 'players' ? Player[] : Game[]) => T extends 'players' ? Player[] : Game[])) => void;
+  data: Array<DataType<T>>;
+  setData: (value: Array<DataType<T>> | ((val: Array<DataType<T>>) => Array<DataType<T>>)) => void;
   syncStatus: SyncStatus;
   lastSynced: Date | null;
   syncNow: () => Promise<void>;
@@ -25,7 +31,7 @@ const SYNC_ENABLED_KEY = 'goa-sync-enabled';
 
 export function useCloudSync<T extends 'players' | 'games'>(
   storeName: T,
-  defaultValue: T extends 'players' ? Player[] : Game[] = [] as any
+  defaultValue: Array<DataType<T>> = [] as Array<DataType<T>>
 ): CloudSyncResult<T> {
   // Use our existing IndexedDB hook for local storage
   const [localData, setLocalData] = useIndexedDB<T>(storeName, defaultValue);
@@ -87,7 +93,7 @@ export function useCloudSync<T extends 'players' | 'games'>(
   
   // Mock functions for cloud operations
   // In a real app, these would make API calls to your backend
-  const fetchCloudData = async (store: string, lastSync: string | null): Promise<{ data: any[], hasChanges: boolean }> => {
+  const fetchCloudData = async (store: string, lastSync: string | null): Promise<{ data: Array<DataType<T>>, hasChanges: boolean }> => {
     // In a real implementation, this would fetch from your backend API
     console.log(`Fetching cloud data for ${store} since ${lastSync}`);
     
@@ -96,13 +102,13 @@ export function useCloudSync<T extends 'players' | 'games'>(
     return { data: [], hasChanges: false };
   };
   
-  const pushToCloud = async (store: string, data: any[]): Promise<void> => {
+  const pushToCloud = async (store: string, data: Array<DataType<T>>): Promise<void> => {
     // In a real implementation, this would push to your backend API
     console.log(`Pushing ${data.length} items to cloud for ${store}`);
     // Here we would actually send the data to the server
   };
   
-  const mergeData = (localData: any[], cloudData: any[]): any[] => {
+  const mergeData = (localData: Array<DataType<T>>, cloudData: Array<DataType<T>>): Array<DataType<T>> => {
     // In a real implementation, this would handle merging and conflict resolution
     // For now, we'll just use local data
     return localData;

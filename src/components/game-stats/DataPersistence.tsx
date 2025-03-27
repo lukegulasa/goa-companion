@@ -47,7 +47,6 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
   const [jsonData, setJsonData] = useState<string>('');
   const [dialogOpen, setDialogOpen] = useState(false);
   
-  // Export data as JSON file
   const handleExport = () => {
     try {
       const dataToExport = {
@@ -66,7 +65,6 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
       document.body.appendChild(a);
       a.click();
       
-      // Clean up
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
@@ -84,7 +82,6 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
     }
   };
   
-  // Generate shareable JSON string
   const handleGenerateShareableData = () => {
     try {
       const dataToExport = {
@@ -106,7 +103,6 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
     }
   };
   
-  // Copy JSON to clipboard
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(jsonData).then(
       () => {
@@ -126,12 +122,10 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
     );
   };
   
-  // Import data from pasted JSON
   const handleImportFromText = (text: string) => {
     try {
       const importedData = JSON.parse(text);
       
-      // Basic validation
       if (!importedData.games || !importedData.players || !Array.isArray(importedData.games) || !Array.isArray(importedData.players)) {
         throw new Error('Invalid import format');
       }
@@ -157,7 +151,6 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
     }
   };
   
-  // Import data from JSON file
   const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const file = event.target.files?.[0];
@@ -180,7 +173,6 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
       
       reader.readAsText(file);
       
-      // Reset file input
       event.target.value = '';
     } catch (error) {
       console.error('Import error:', error);
@@ -192,8 +184,7 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
     }
   };
 
-  // Get appropriate color for sync status badge
-  const getSyncStatusColor = (status: SyncStatus) => {
+  const getSyncStatusColor = (status: SyncStatus): "default" | "destructive" | "secondary" | "outline" | "green" | "yellow" => {
     switch (status) {
       case 'synced': return 'green';
       case 'syncing': return 'yellow';
@@ -202,7 +193,6 @@ export const DataPersistence: React.FC<DataPersistenceProps> = ({
     }
   };
 
-  // Get human-readable sync status
   const getSyncStatusText = (status: SyncStatus) => {
     switch (status) {
       case 'synced': return 'Synced';
