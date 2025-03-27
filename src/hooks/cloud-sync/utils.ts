@@ -16,6 +16,32 @@ export const fetchCloudData = async <T extends 'players' | 'games'>
       throw result.error;
     }
     
+    // For games, fetch the related players
+    if (store === 'games' && result.data) {
+      for (const game of result.data) {
+        const { data: playerData } = await supabase
+          .from('game_players')
+          .select('*')
+          .eq('game_id', game.id);
+          
+        if (playerData) {
+          game.players = playerData.map((p: any) => ({
+            playerId: p.player_id,
+            playerName: p.playername,
+            team: p.team,
+            heroId: p.heroid,
+            heroName: p.heroname
+          }));
+        } else {
+          game.players = [];
+        }
+        
+        // Transform database column names to match our application names
+        game.winningTeam = game.winningteam;
+        game.victoryMethod = game.victorymethod;
+      }
+    }
+    
     return { data: result.data || [], hasChanges: true };
   } catch (error) {
     console.error(`Error fetching data from Supabase:`, error);
@@ -76,34 +102,6 @@ export const pushToCloud = async <T extends 'players' | 'games'>(
   }
 };
 
-export const mergeData = <T extends 'players' | 'games'>(
-  localData: DataType<T>[],
-  cloudData: DataType<T>[]
-): DataType<T>[] => {
-  // Create a map of local items by ID
-  const localMap = new Map(localData.map(item => [item.id, item]));
-  
-  // Create a map of cloud items by ID
-  const cloudMap = new Map(cloudData.map(item => [item.id, item]));
-  
-  // Merge the data, preferring cloud data if it exists
-  const allIds = new Set([...localMap.keys(), ...cloudMap.keys()]);
-  
-  const mergedData: DataType<T>[] = [];
-  allIds.forEach(id => {
-    const cloudItem = cloudMap.get(id);
-    const localItem = localMap.get(id);
-    
-    if (cloudItem) {
-      mergedData.push(cloudItem);
-    } else if (localItem) {
-      mergedData.push(localItem);
-    }
-  });
-  
-  return mergedData;
-};
-
 export const setupCloudListener = <T extends 'players' | 'games'>(
   store: T,
   onCloudUpdate: () => void
@@ -122,14 +120,4 @@ export const setupCloudListener = <T extends 'players' | 'games'>(
   return () => {
     supabase.removeChannel(channel);
   };
-};
-
-export const checkAdminStatus = async (): Promise<boolean> => {
-  // All users are considered admins since authentication is removed
-  return true;
-};
-
-export const addUserAsAdmin = async (userId: string): Promise<void> => {
-  // No-op function since admin management is removed
-  console.log('Admin management is disabled');
 };

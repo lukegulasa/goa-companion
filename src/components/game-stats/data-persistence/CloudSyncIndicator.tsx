@@ -27,7 +27,7 @@ export const CloudSyncIndicator: React.FC<CloudSyncIndicatorProps> = ({
         <Switch 
           checked={syncEnabled} 
           onCheckedChange={onToggleSync} 
-          disabled={!isAdmin && !syncEnabled} // Non-admins can't disable, but can enable
+          disabled={!isAdmin} 
         />
       </div>
       

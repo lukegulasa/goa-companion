@@ -44,7 +44,7 @@ const GameStats: React.FC = () => {
     if (playersSyncStatus === 'error' || gamesSyncStatus === 'error') {
       toast({
         title: "Sync Error",
-        description: "There was an error syncing with the cloud. Your data is saved locally.",
+        description: "There was an error syncing with the cloud. Please try again later.",
         variant: "destructive"
       });
     } else if (playersSyncStatus === 'synced' && gamesSyncStatus === 'synced') {
@@ -87,7 +87,7 @@ const GameStats: React.FC = () => {
     
     toast({
       title: "Game Logged",
-      description: "Your game has been successfully saved to the cloud."
+      description: "Your game has been successfully saved to the database."
     });
   };
 
@@ -103,33 +103,6 @@ const GameStats: React.FC = () => {
     ));
   };
 
-  const handleDataImport = (data: { games: Game[], players: Player[] }) => {
-    const existingPlayerIds = new Set(players.map(p => (p as Player).id));
-    const newPlayers = [
-      ...players,
-      ...data.players.filter(p => !existingPlayerIds.has(p.id))
-    ];
-    
-    const existingGameIds = new Set(gameLogs.map(g => (g as Game).id));
-    const newGames = [
-      ...gameLogs,
-      ...data.games.filter(g => !existingGameIds.has(g.id))
-    ];
-    
-    setPlayers(newPlayers);
-    setGameLogs(newGames);
-    
-    // Force a sync after import
-    setTimeout(() => {
-      syncNow();
-    }, 500);
-    
-    toast({
-      title: "Import Complete",
-      description: "Your imported data has been merged and synced with the cloud."
-    });
-  };
-
   return (
     <div className="container max-w-6xl mx-auto py-8 px-4 sm:px-6">
       <header className="mb-8">
@@ -138,12 +111,7 @@ const GameStats: React.FC = () => {
       </header>
       
       <div className="mb-8">
-        <DataPersistence 
-          games={gameLogs as Game[]} 
-          players={players as Player[]} 
-          onImport={handleDataImport}
-          isAdmin={isAdmin}
-        />
+        <DataPersistence isAdmin={isAdmin} />
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
