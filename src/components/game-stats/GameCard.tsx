@@ -39,8 +39,8 @@ export const GameCard: React.FC<GameCardProps> = ({
   };
 
   return (
-    <div className={`rounded-md border ${isMobile ? 'p-1' : 'p-3 sm:p-4'} w-full`}>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-1 sm:mb-2">
+    <div className={`rounded-md border ${isMobile ? 'p-3' : 'p-3 sm:p-4'} w-full`}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 sm:mb-3">
         <div>
           <h3 className={`font-medium ${isMobile ? 'text-sm' : ''}`}>
             Game on {format(new Date(game.date), 'MMMM d, yyyy')}
@@ -56,7 +56,7 @@ export const GameCard: React.FC<GameCardProps> = ({
           </div>
           
           {isAdmin && (
-            <div className="flex items-center gap-1 sm:gap-2 ml-2 sm:ml-4">
+            <div className="flex items-center gap-2 ml-3 sm:ml-4">
               {onEditGame && (
                 <Button 
                   variant="ghost" 
@@ -64,7 +64,7 @@ export const GameCard: React.FC<GameCardProps> = ({
                   className="text-primary/70 hover:text-primary hover:bg-primary/10 h-7 w-7 p-0"
                   onClick={() => onEditGame(game)}
                 >
-                  <Pencil className={`${isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
+                  <Pencil className={`${isMobile ? 'h-4 w-4' : 'h-4 w-4'}`} />
                   <span className="sr-only">Edit game</span>
                 </Button>
               )}
@@ -76,7 +76,7 @@ export const GameCard: React.FC<GameCardProps> = ({
                   className="text-destructive/70 hover:text-destructive hover:bg-destructive/10 h-7 w-7 p-0"
                   onClick={() => onDeleteGame(game.id)}
                 >
-                  <Trash2 className={`${isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
+                  <Trash2 className={`${isMobile ? 'h-4 w-4' : 'h-4 w-4'}`} />
                   <span className="sr-only">Delete game</span>
                 </Button>
               )}
@@ -86,8 +86,8 @@ export const GameCard: React.FC<GameCardProps> = ({
       </div>
       
       {isMobile ? (
-        // Mobile view - full width with minimal margins
-        <div className="w-full mt-1">
+        // Mobile view with proper padding
+        <div className="w-full">
           <GameMobileView players={game.players} />
         </div>
       ) : (
