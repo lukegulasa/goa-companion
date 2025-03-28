@@ -27,6 +27,11 @@ export const SyncStatusNotifications: React.FC<SyncStatusNotificationsProps> = (
         title: "Sync Complete",
         description: "Your game data has been synced with the database."
       });
+    } else if (playersSyncStatus === 'syncing' || gamesSyncStatus === 'syncing') {
+      toast({
+        title: "Syncing",
+        description: "Your game data is being synced with the database."
+      });
     }
   }, [playersSyncStatus, gamesSyncStatus, toast]);
   

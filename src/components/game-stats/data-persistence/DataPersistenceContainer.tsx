@@ -3,6 +3,7 @@ import React from 'react';
 import { CloudSyncIndicator } from './CloudSyncIndicator';
 import { useCloudSync } from '@/hooks/cloud-sync';
 import { useToast } from '@/hooks/use-toast';
+import { SyncStatus } from '@/hooks/cloud-sync/types';
 
 export const DataPersistenceContainer: React.FC = () => {
   const { toast } = useToast();
@@ -20,14 +21,19 @@ export const DataPersistenceContainer: React.FC = () => {
     });
   };
   
+  // Map to combined status
+  const combinedStatus: SyncStatus = 
+    playersSyncStatus === 'syncing' || gamesSyncStatus === 'syncing' ? 'syncing' : 
+    playersSyncStatus === 'error' || gamesSyncStatus === 'error' ? 'error' : 
+    playersSyncStatus === 'synced' && gamesSyncStatus === 'synced' ? 'synced' : 'idle';
+  
   return (
     <div className="bg-card rounded-lg border shadow-sm p-6 space-y-4">
       <div className="flex flex-col space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">Game Database</h2>
           <CloudSyncIndicator 
-            syncStatus={playersSyncStatus === 'syncing' || gamesSyncStatus === 'syncing' ? 'syncing' : 
-                      playersSyncStatus === 'error' || gamesSyncStatus === 'error' ? 'error' : 'synced'}
+            syncStatus={combinedStatus}
             onSyncNow={handleSyncNow}
           />
         </div>
