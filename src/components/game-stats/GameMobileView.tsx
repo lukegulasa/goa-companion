@@ -11,28 +11,33 @@ import {
 } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { GamePlayer } from '@/lib/game-stats-types';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface GameMobileViewProps {
   players: GamePlayer[];
 }
 
 export const GameMobileView: React.FC<GameMobileViewProps> = ({ players }) => {
+  const isMobile = useIsMobile();
+  
   return (
     <div className="rounded-md border w-full overflow-hidden">
       <div className="w-full overflow-x-auto">
-        <Table>
+        <Table className={cn(isMobile && "table-condensed")}>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[34%] py-2 px-1 text-left">Player</TableHead>
-              <TableHead className="w-[26%] py-2 px-1 text-center">Team</TableHead>
-              <TableHead className="w-[40%] py-2 px-1 text-left">Hero</TableHead>
+              <TableHead className="w-[36%] py-1 px-1 text-left text-xs">Player</TableHead>
+              <TableHead className="w-[24%] py-1 px-0 text-center text-xs">Team</TableHead>
+              <TableHead className="w-[40%] py-1 px-1 text-left text-xs">Hero</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {players.map((player) => (
               <TableRow key={player.playerId}>
-                <TableCell className="py-2 px-1 whitespace-normal break-words">{player.playerName}</TableCell>
-                <TableCell className="py-2 px-1 text-center">
+                <TableCell className="py-1 px-1 text-xs whitespace-normal break-words">
+                  {player.playerName}
+                </TableCell>
+                <TableCell className="py-1 px-0 text-center">
                   <span className={cn(
                     "px-1 py-0.5 rounded-full text-xs font-medium inline-block",
                     player.team === "Blue" 
@@ -42,12 +47,12 @@ export const GameMobileView: React.FC<GameMobileViewProps> = ({ players }) => {
                     {player.team}
                   </span>
                 </TableCell>
-                <TableCell className="flex items-center gap-1 py-2 px-1">
-                  <Avatar className="h-5 w-5 flex-shrink-0">
+                <TableCell className="flex items-center gap-1 py-1 px-1">
+                  <Avatar className="h-4 w-4 flex-shrink-0">
                     <AvatarImage src={`/heroes/${player.heroName.toLowerCase()}.jpg`} alt={player.heroName} />
-                    <AvatarFallback className="text-xs bg-amber-100 text-amber-800">{player.heroName.charAt(0)}</AvatarFallback>
+                    <AvatarFallback className="text-[10px] bg-amber-100 text-amber-800">{player.heroName.charAt(0)}</AvatarFallback>
                   </Avatar>
-                  <span className="truncate text-xs sm:text-sm">{player.heroName}</span>
+                  <span className="truncate text-xs">{player.heroName}</span>
                 </TableCell>
               </TableRow>
             ))}

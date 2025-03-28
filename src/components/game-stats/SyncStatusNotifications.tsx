@@ -1,10 +1,11 @@
 
 import React, { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { SyncStatus } from '@/hooks/cloud-sync/types';
 
 interface SyncStatusNotificationsProps {
-  playersSyncStatus: 'idle' | 'loading' | 'synced' | 'error';
-  gamesSyncStatus: 'idle' | 'loading' | 'synced' | 'error';
+  playersSyncStatus: SyncStatus;
+  gamesSyncStatus: SyncStatus;
 }
 
 export const SyncStatusNotifications: React.FC<SyncStatusNotificationsProps> = ({

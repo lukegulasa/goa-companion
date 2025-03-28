@@ -30,31 +30,31 @@ export const GameCard: React.FC<GameCardProps> = ({
 
   return (
     <div className={`rounded-md border ${isMobile ? 'p-2' : 'p-3 sm:p-4'} w-full`}>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 sm:mb-4">
         <div>
-          <h3 className="font-medium">
+          <h3 className={`font-medium ${isMobile ? 'text-sm' : ''}`}>
             Game on {format(new Date(game.date), 'MMMM d, yyyy')}
           </h3>
-          <p className="text-sm text-muted-foreground">
+          <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
             {game.winningTeam} won by {game.victoryMethod || 'Victory'}
           </p>
         </div>
-        <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto mt-2 sm:mt-0">
+        <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto mt-1 sm:mt-0">
           <div className="flex items-center">
-            <TrophyIcon className="h-5 w-5 mr-1 text-yellow-500" />
-            <span className="font-medium">{game.winningTeam}</span>
+            <TrophyIcon className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'} mr-1 text-yellow-500`} />
+            <span className={`font-medium ${isMobile ? 'text-xs' : ''}`}>{game.winningTeam}</span>
           </div>
           
           {isAdmin && (
-            <div className="flex items-center gap-2 ml-4">
+            <div className="flex items-center gap-1 sm:gap-2 ml-2 sm:ml-4">
               {onEditGame && (
                 <Button 
                   variant="ghost" 
-                  size="icon" 
-                  className="text-primary/70 hover:text-primary hover:bg-primary/10"
+                  size={isMobile ? "sm" : "icon"} 
+                  className="text-primary/70 hover:text-primary hover:bg-primary/10 h-7 w-7 p-0"
                   onClick={() => onEditGame(game)}
                 >
-                  <Pencil className="h-4 w-4" />
+                  <Pencil className={`${isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
                   <span className="sr-only">Edit game</span>
                 </Button>
               )}
@@ -62,11 +62,11 @@ export const GameCard: React.FC<GameCardProps> = ({
               {onDeleteGame && (
                 <Button 
                   variant="ghost" 
-                  size="icon" 
-                  className="text-destructive/70 hover:text-destructive hover:bg-destructive/10"
+                  size={isMobile ? "sm" : "icon"}
+                  className="text-destructive/70 hover:text-destructive hover:bg-destructive/10 h-7 w-7 p-0"
                   onClick={() => onDeleteGame(game.id)}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className={`${isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
                   <span className="sr-only">Delete game</span>
                 </Button>
               )}
@@ -77,7 +77,7 @@ export const GameCard: React.FC<GameCardProps> = ({
       
       {isMobile ? (
         // Mobile view - full width with no excess margins
-        <div className="w-full">
+        <div className="w-full mt-1">
           <GameMobileView players={game.players} />
         </div>
       ) : (
