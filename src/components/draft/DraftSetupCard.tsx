@@ -33,13 +33,13 @@ const DraftSetupCard: React.FC<DraftSetupCardProps> = ({
 }) => {
   return (
     <Card className="w-full max-w-4xl mb-8">
-      <CardHeader className="border-b">
+      <CardHeader className="border-b pb-4">
         <CardTitle>Select Draft Mode</CardTitle>
         <CardDescription>
           Choose how you want to draft heroes for your game
         </CardDescription>
       </CardHeader>
-      <CardContent className="pt-6 space-y-8">
+      <CardContent className="pt-6 space-y-10">
         <div>
           <DraftModeSelector 
             selectedMode={selectedMode} 

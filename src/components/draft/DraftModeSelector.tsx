@@ -50,12 +50,12 @@ const DraftModeSelector: React.FC<DraftModeSelectorProps> = ({
         onValueChange={(value) => onModeChange(value as DraftMode)}
         value={selectedMode}
       >
-        <TabsList className={`${isMobile ? 'grid grid-cols-2 gap-1' : 'grid grid-cols-3 gap-1'} w-full mb-4`}>
+        <TabsList className={`${isMobile ? 'grid grid-cols-2' : 'grid grid-cols-3'} gap-2 w-full mb-6 p-1.5 h-auto`}>
           {Object.keys(modeDescriptions).map((mode) => (
             <TabsTrigger 
               key={mode} 
               value={mode} 
-              className="flex items-center justify-start px-3 py-2 h-auto"
+              className="flex items-center justify-start px-3 py-2.5 h-auto"
             >
               {modeIcons[mode as DraftMode]}
               <span className="text-sm whitespace-nowrap">{mode.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</span>
@@ -63,7 +63,7 @@ const DraftModeSelector: React.FC<DraftModeSelectorProps> = ({
           ))}
         </TabsList>
         
-        <div className="mt-2 border-t pt-3">
+        <div className="mt-4 border-t pt-4">
           {Object.entries(modeDescriptions).map(([mode, description]) => (
             <TabsContent key={mode} value={mode}>
               <p className="text-sm text-muted-foreground">{description}</p>
