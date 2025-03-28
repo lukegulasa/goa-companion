@@ -36,7 +36,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // If user is set, check if they're an admin
         if (session?.user) {
-          checkAdminStatus(session.user.id);
+          setTimeout(() => {
+            // Use setTimeout to prevent potential auth deadlocks
+            checkAdminStatus(session.user.id);
+          }, 0);
         } else {
           setIsAdmin(false);
         }
@@ -61,39 +64,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.log('Checking admin status for user:', userId);
       
-      // First, let's check if this user exists in the admin_users table
+      // First, directly query the admin_users table
       const { data: adminUser, error: adminUserError } = await supabase
         .from('admin_users')
         .select('*')
-        .eq('user_id', userId)
-        .single();
+        .eq('user_id', userId);
       
-      console.log('Admin user check result:', adminUser, adminUserError);
+      console.log('Admin user direct query result:', adminUser, adminUserError);
       
-      // Now let's check the RPC function result
-      const { data: isAdminResult, error } = await supabase.rpc('is_admin', { user_id: userId });
-      
-      if (error) {
-        console.error('Error checking admin status:', error);
-        setIsAdmin(false);
+      // Check if the user exists in the admin_users table
+      if (adminUser && adminUser.length > 0) {
+        console.log('User is an admin based on direct table query');
+        setIsAdmin(true);
         return;
       }
       
-      console.log('Admin status result:', isAdminResult);
-      setIsAdmin(isAdminResult || false);
+      // Fall back to RPC function
+      const { data: isAdminResult, error } = await supabase.rpc('is_admin', { user_id: userId });
       
-      // If not an admin, but should be, let's try to add them as admin
-      if (!isAdminResult && userId) {
-        // This is the email we expect for the admin
+      if (error) {
+        console.error('Error checking admin status via RPC:', error);
+        // Don't return here, continue to auto-fix attempt
+      } else {
+        console.log('Admin status RPC result:', isAdminResult);
+        if (isAdminResult) {
+          setIsAdmin(true);
+          return;
+        }
+      }
+      
+      // Auto-fix attempt for specific admin email
+      if (userId) {
         const userEmail = user?.email;
-        console.log('Current user email:', userEmail);
+        console.log('Auto-fix check - Current user email:', userEmail);
         
         if (userEmail === 'lukeggulasa@gmail.com') {
           console.log('Attempting to fix admin status for expected admin user');
           const { error: insertError } = await supabase
             .from('admin_users')
-            .upsert({ user_id: userId })
-            .select();
+            .upsert({ user_id: userId });
           
           if (insertError) {
             console.error('Error fixing admin status:', insertError);
@@ -103,13 +112,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               variant: "destructive"
             });
           } else {
-            console.log('Admin status fixed successfully');
+            console.log('Admin status fixed successfully via insert');
             setIsAdmin(true);
             toast({
               title: "Admin Privileges Granted",
               description: "You now have admin access to the application."
             });
           }
+        } else {
+          setIsAdmin(false);
         }
       }
     } catch (error) {
