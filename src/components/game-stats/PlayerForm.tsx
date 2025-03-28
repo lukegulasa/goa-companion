@@ -14,13 +14,14 @@ import {
 } from '@/components/ui/form';
 import { newPlayerSchema, NewPlayerFormValues } from '@/lib/game-stats-types';
 import { UserPlus } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 interface PlayerFormProps {
   onAddPlayer: (data: NewPlayerFormValues) => void;
-  isAdmin?: boolean;
 }
 
-export const PlayerForm: React.FC<PlayerFormProps> = ({ onAddPlayer, isAdmin = false }) => {
+export const PlayerForm: React.FC<PlayerFormProps> = ({ onAddPlayer }) => {
+  const { isAdmin } = useAuth();
   const form = useForm<NewPlayerFormValues>({
     resolver: zodResolver(newPlayerSchema),
     defaultValues: {

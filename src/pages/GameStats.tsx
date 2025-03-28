@@ -130,14 +130,13 @@ const GameStats: React.FC = () => {
         </TabsList>
         
         <TabsContent value="log-game" className="space-y-8">
-          <PlayerForm onAddPlayer={onAddPlayer} isAdmin={isAdmin} />
+          <PlayerForm onAddPlayer={onAddPlayer} />
           <GameLogger
             players={players as Player[]}
             heroes={heroes}
             gameParticipants={gameParticipants}
             setGameParticipants={setGameParticipants}
             onLogGame={onLogGame}
-            isAdmin={isAdmin}
           />
         </TabsContent>
         

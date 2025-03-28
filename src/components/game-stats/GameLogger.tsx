@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils';
 import { GameLogFormValues, gameLogSchema, GamePlayer } from '@/lib/game-stats-types';
 import { GameParticipants } from './GameParticipants';
 import { Hero } from '@/lib/types';
+import { useAuth } from '@/context/AuthContext';
 
 interface GameLoggerProps {
   players: { id: string; name: string }[];
@@ -32,7 +33,6 @@ interface GameLoggerProps {
   gameParticipants: GamePlayer[];
   setGameParticipants: React.Dispatch<React.SetStateAction<GamePlayer[]>>;
   onLogGame: (data: GameLogFormValues) => void;
-  isAdmin?: boolean;
 }
 
 export const GameLogger: React.FC<GameLoggerProps> = ({
@@ -41,8 +41,8 @@ export const GameLogger: React.FC<GameLoggerProps> = ({
   gameParticipants,
   setGameParticipants,
   onLogGame,
-  isAdmin = false,
 }) => {
+  const { isAdmin } = useAuth();
   const gameLogForm = useForm<GameLogFormValues>({
     resolver: zodResolver(gameLogSchema),
     defaultValues: {
