@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { TrophyIcon, Trash2, Pencil } from 'lucide-react';
@@ -45,8 +44,8 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
   const [gameToEdit, setGameToEdit] = useState<Game | null>(null);
   const { isAdmin: contextIsAdmin } = useAuth();
   
-  // Use either the prop or context admin status
-  const isAdmin = propIsAdmin || contextIsAdmin;
+  // Use either the prop or context admin status, prioritizing context
+  const isAdmin = contextIsAdmin || propIsAdmin;
   
   const handleDeleteGame = (gameId: string) => {
     if (!isAdmin) return;

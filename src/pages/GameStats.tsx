@@ -154,11 +154,21 @@ const GameStats: React.FC = () => {
     ));
   };
 
+  // Debug admin status
+  useEffect(() => {
+    console.log('GameStats component - isAdmin status:', isAdmin);
+  }, [isAdmin]);
+
   return (
     <div className="container max-w-6xl mx-auto py-8 px-4 sm:px-6">
       <header className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Game Statistics</h1>
         <p className="text-muted-foreground mt-1">Track your games and player statistics</p>
+        {isAdmin && (
+          <div className="mt-2 p-2 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-md text-sm inline-block">
+            Admin mode active - you can edit data
+          </div>
+        )}
       </header>
       
       <div className="mb-8">

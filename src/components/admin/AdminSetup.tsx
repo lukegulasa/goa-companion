@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { setupAdminUser } from '@/utils/admin-setup';
 import { Button } from '@/components/ui/button';
@@ -29,32 +30,12 @@ const AdminSetup: React.FC = () => {
   
   const checkForAdmin = async () => {
     try {
-      // First check for existing users/auth entries
-      const { data: usersData, error: usersError } = await supabase.auth.admin.listUsers();
-      
-      if (!usersError && usersData && usersData.users && usersData.users.length > 0) {
-        console.log('Users exist in auth system, not showing setup dialog');
-        setShowDialog(false);
-        return;
-      }
-      
-      // Check for the admin user - note: getUserByEmail doesn't exist, so we'll use a different approach
-      // Instead of trying to get user by email directly, we'll check through our admin_users table
-      const { data: adminUsers, error: adminError } = await supabase
-        .from('admin_users')
-        .select('*');
-        
-      if (!adminError && adminUsers && adminUsers.length > 0) {
-        console.log('Admin users exist in database, not showing setup dialog');
-        setShowDialog(false);
-        return;
-      }
-      
-      // Now check through RPC as a final verification
+      // Check for the admin user through RPC function to avoid recursion
       const { data: adminCount, error: countError } = await supabase.rpc('check_admin_count');
       
       if (countError) {
         console.error('Error checking admin count:', countError);
+        setShowDialog(false); // Don't show dialog if there's an error checking
         return;
       }
       

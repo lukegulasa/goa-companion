@@ -26,6 +26,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
   
+  // Simplified admin check function to avoid recursion issues
+  const checkAdminStatus = async (userId: string) => {
+    try {
+      console.log('Checking admin status for user:', userId);
+      
+      // Use the RPC function only, avoid direct table queries that might trigger RLS recursion
+      const { data: isAdminResult, error: rpcError } = await supabase
+        .rpc('is_admin', { user_id: userId });
+        
+      if (rpcError) {
+        console.error('Error in RPC admin check:', rpcError);
+        setIsAdmin(false);
+      } else {
+        console.log('Admin status from RPC:', isAdminResult);
+        setIsAdmin(!!isAdminResult);
+      }
+    } catch (error) {
+      console.error('Error in checkAdminStatus:', error);
+      setIsAdmin(false);
+    }
+  };
+  
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -56,48 +78,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     return () => subscription.unsubscribe();
   }, []);
-  
-  const checkAdminStatus = async (userId: string) => {
-    try {
-      console.log('Checking admin status for user:', userId);
-      
-      // Direct query approach - no need for the special upsert for the expected admin email
-      const { data: adminUser, error: adminUserError } = await supabase
-        .from('admin_users')
-        .select('*')
-        .eq('user_id', userId);
-      
-      if (adminUserError) {
-        console.error('Error checking admin status:', adminUserError);
-        
-        // Fall back to RPC function if direct query fails
-        const { data: isAdminResult, error: rpcError } = await supabase
-          .rpc('is_admin', { user_id: userId });
-          
-        if (rpcError) {
-          console.error('Error in RPC admin check:', rpcError);
-          setIsAdmin(false);
-        } else {
-          console.log('Admin status from RPC:', isAdminResult);
-          setIsAdmin(!!isAdminResult);
-        }
-        return;
-      }
-      
-      console.log('Admin user query result:', adminUser);
-      
-      if (adminUser && adminUser.length > 0) {
-        console.log('User is an admin based on table query');
-        setIsAdmin(true);
-      } else {
-        console.log('User is not an admin');
-        setIsAdmin(false);
-      }
-    } catch (error) {
-      console.error('Error in checkAdminStatus:', error);
-      setIsAdmin(false);
-    }
-  };
   
   const signOut = async () => {
     await supabase.auth.signOut();

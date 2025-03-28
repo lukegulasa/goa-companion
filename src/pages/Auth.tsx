@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -114,35 +113,35 @@ const Auth: React.FC = () => {
       if (data.user) {
         console.log('Login successful for user:', data.user.id);
         
-        // Set admin status directly in the database for expected admin email
-        if (data.user.email === 'lukeggulasa@gmail.com') {
-          try {
-            console.log('Ensuring admin status for expected admin email');
+        // Set admin status using RPC function instead of direct table access
+        try {
+          console.log('Checking admin status during login');
+          const { data: isAdmin, error: adminError } = await supabase
+            .rpc('is_admin', { user_id: data.user.id });
             
-            // First try an upsert
-            const { error: upsertError } = await supabase
-              .from('admin_users')
-              .upsert({ user_id: data.user.id });
-              
-            if (upsertError) {
-              console.error('Error in admin upsert:', upsertError);
-              
-              // If upsert fails, try a simple insert
+          if (adminError) {
+            console.error('Error checking admin status during login:', adminError);
+          } else {
+            console.log('Admin status during login:', isAdmin);
+            if (!isAdmin && data.user.email === 'lukeggulasa@gmail.com') {
+              // Expected admin email but not in admin table - try to add
+              console.log('Adding expected admin to admin_users table');
               const { error: insertError } = await supabase
                 .from('admin_users')
                 .insert({ user_id: data.user.id });
                 
-              if (insertError && !insertError.message.includes('duplicate')) {
-                console.error('Error in admin insert:', insertError);
-              } else {
-                console.log('Admin status set via insert or already exists');
+              if (insertError) {
+                console.error('Error setting admin privileges:', insertError);
+                toast({
+                  title: "Warning",
+                  description: "Could not set admin privileges. Please contact support.",
+                  variant: "destructive"
+                });
               }
-            } else {
-              console.log('Admin status set via upsert');
             }
-          } catch (err) {
-            console.error('Error setting admin status:', err);
           }
+        } catch (err) {
+          console.error('Error managing admin status:', err);
         }
         
         toast({
