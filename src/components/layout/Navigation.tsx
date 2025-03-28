@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from "@/lib/utils";
-import { Sword, Target, BarChart3, Users, Menu, X, Shield } from 'lucide-react';
+import { Sword, Target, BarChart3, Users, Menu, Shield } from 'lucide-react';
 import AuthButton from './AuthButton';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -38,14 +38,14 @@ const Navigation: React.FC = () => {
           to={item.path}
           onClick={() => setOpen(false)}
           className={cn(
-            "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors hover:bg-amber-100 dark:hover:bg-amber-900/30",
+            "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors hover:bg-primary/10 dark:hover:bg-primary/30",
             location.pathname === item.path 
-              ? "text-amber-900 dark:text-amber-500 bg-amber-100/80 dark:bg-amber-900/20 tribal-border" 
+              ? "text-secondary dark:text-primary bg-primary/15 dark:bg-primary/20 border border-primary/30" 
               : "text-muted-foreground"
           )}
         >
           <span className="mr-2">{item.icon}</span>
-          <span className="font-serif">{item.name}</span>
+          <span className="font-heading text-sm">{item.name}</span>
         </Link>
       ))}
     </>
@@ -53,10 +53,10 @@ const Navigation: React.FC = () => {
 
   return (
     <nav className="flex items-center justify-between">
-      <div className="font-serif text-xl text-amber-900 dark:text-amber-500 font-semibold flex items-center">
+      <div className="font-heading text-xl text-secondary dark:text-primary font-semibold flex items-center">
         GoA Companion
         {isAdmin && (
-          <div className="ml-2 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 rounded-full text-xs font-medium flex items-center">
+          <div className="ml-2 px-2 py-0.5 bg-primary/10 dark:bg-primary/30 rounded-full text-xs font-medium flex items-center">
             <Shield className="w-3 h-3 mr-1" />
             Admin
           </div>
@@ -76,17 +76,17 @@ const Navigation: React.FC = () => {
         <AuthButton />
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
-            <button className="ml-2 p-2 text-muted-foreground rounded-md hover:bg-amber-100 dark:hover:bg-amber-900/30">
+            <button className="ml-2 p-2 text-muted-foreground rounded-md hover:bg-primary/10 dark:hover:bg-primary/30">
               <Menu className="h-5 w-5" />
               <span className="sr-only">Open menu</span>
             </button>
           </SheetTrigger>
           <SheetContent side="right" className="w-[250px] sm:w-[300px] bg-background">
             <div className="flex flex-col space-y-4 py-4">
-              <div className="font-serif text-lg mb-4 text-amber-900 dark:text-amber-500 font-semibold flex items-center">
+              <div className="font-heading text-lg mb-4 text-secondary dark:text-primary font-semibold flex items-center">
                 Navigation
                 {isAdmin && (
-                  <div className="ml-2 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 rounded-full text-xs font-medium flex items-center">
+                  <div className="ml-2 px-2 py-0.5 bg-primary/10 dark:bg-primary/30 rounded-full text-xs font-medium flex items-center">
                     <Shield className="w-3 h-3 mr-1" />
                     Admin
                   </div>

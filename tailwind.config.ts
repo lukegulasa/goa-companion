@@ -78,7 +78,8 @@ export default {
 				}
 			},
 			fontFamily: {
-				sans: ['Inter', 'sans-serif'],
+				sans: ['Hind', 'sans-serif'],
+				heading: ['Montserrat', 'sans-serif'],
 				serif: ['Cinzel', 'serif'],
 				rune: ['Metamorphous', 'serif'],
 			},
