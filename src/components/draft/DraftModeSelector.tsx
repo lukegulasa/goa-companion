@@ -43,33 +43,30 @@ const DraftModeSelector: React.FC<DraftModeSelectorProps> = ({
   };
 
   return (
-    <div className="w-full flex flex-col">
+    <div className="w-full">
       <Tabs 
         defaultValue="all-random" 
-        className="w-full flex flex-col" 
+        className="w-full"
         onValueChange={(value) => onModeChange(value as DraftMode)}
+        value={selectedMode}
       >
-        {/* TabsList with fixed height to prevent content overlap */}
-        <div className={`${isMobile ? 'min-h-[340px]' : 'min-h-[180px]'}`}>
-          <TabsList className={`${isMobile ? 'flex flex-col space-y-1' : 'grid grid-cols-3 gap-1'} w-full`}>
-            {Object.keys(modeDescriptions).map((mode) => (
-              <TabsTrigger 
-                key={mode} 
-                value={mode} 
-                className="flex items-center justify-start px-3 py-2 h-auto"
-              >
-                {modeIcons[mode as DraftMode]}
-                <span className="whitespace-nowrap">{mode.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </div>
+        <TabsList className={`${isMobile ? 'grid grid-cols-2 gap-1' : 'grid grid-cols-3 gap-1'} w-full mb-4`}>
+          {Object.keys(modeDescriptions).map((mode) => (
+            <TabsTrigger 
+              key={mode} 
+              value={mode} 
+              className="flex items-center justify-start px-3 py-2 h-auto"
+            >
+              {modeIcons[mode as DraftMode]}
+              <span className="text-sm whitespace-nowrap">{mode.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
         
-        {/* Description section with fixed position relative to the container */}
-        <div className="w-full mt-4">
+        <div className="mt-2 border-t pt-3">
           {Object.entries(modeDescriptions).map(([mode, description]) => (
-            <TabsContent key={mode} value={mode} className="space-y-4">
-              <p className="text-muted-foreground text-sm">{description}</p>
+            <TabsContent key={mode} value={mode}>
+              <p className="text-sm text-muted-foreground">{description}</p>
             </TabsContent>
           ))}
         </div>
