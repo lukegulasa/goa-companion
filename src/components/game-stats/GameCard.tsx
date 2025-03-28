@@ -77,7 +77,7 @@ export const GameCard: React.FC<GameCardProps> = ({
       
       {isMobile ? (
         // Mobile view - full width
-        <div className="w-full">
+        <div className="w-full max-w-full overflow-visible">
           <GameMobileView players={game.players} />
         </div>
       ) : (
