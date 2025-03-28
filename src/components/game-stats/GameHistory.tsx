@@ -25,6 +25,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { EditGameDialog } from './EditGameDialog';
+import { useAuth } from '@/context/AuthContext';
 
 interface GameHistoryProps {
   games: Game[];
@@ -37,11 +38,15 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
   games, 
   onDeleteGame,
   onEditGame,
-  isAdmin = false
+  isAdmin: propIsAdmin = false
 }) => {
   const { toast } = useToast();
   const [gameToDelete, setGameToDelete] = useState<string | null>(null);
   const [gameToEdit, setGameToEdit] = useState<Game | null>(null);
+  const { isAdmin: contextIsAdmin } = useAuth();
+  
+  // Use either the prop or context admin status
+  const isAdmin = propIsAdmin || contextIsAdmin;
   
   const handleDeleteGame = (gameId: string) => {
     if (!isAdmin) return;

@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/card';
 import { LogIn } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import AdminSetup from '@/components/admin/AdminSetup';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Auth: React.FC = () => {
@@ -115,20 +114,34 @@ const Auth: React.FC = () => {
       if (data.user) {
         console.log('Login successful for user:', data.user.id);
         
-        // After successful login, ensure admin status for the expected admin email
+        // Set admin status directly in the database for expected admin email
         if (data.user.email === 'lukeggulasa@gmail.com') {
           try {
-            const { error: adminError } = await supabase
+            console.log('Ensuring admin status for expected admin email');
+            
+            // First try an upsert
+            const { error: upsertError } = await supabase
               .from('admin_users')
               .upsert({ user_id: data.user.id });
-            
-            if (adminError) {
-              console.error('Error setting admin status on login:', adminError);
+              
+            if (upsertError) {
+              console.error('Error in admin upsert:', upsertError);
+              
+              // If upsert fails, try a simple insert
+              const { error: insertError } = await supabase
+                .from('admin_users')
+                .insert({ user_id: data.user.id });
+                
+              if (insertError && !insertError.message.includes('duplicate')) {
+                console.error('Error in admin insert:', insertError);
+              } else {
+                console.log('Admin status set via insert or already exists');
+              }
             } else {
-              console.log('Admin status ensured on login');
+              console.log('Admin status set via upsert');
             }
           } catch (err) {
-            console.error('Error ensuring admin status:', err);
+            console.error('Error setting admin status:', err);
           }
         }
         
@@ -153,9 +166,6 @@ const Auth: React.FC = () => {
   
   return (
     <div className="container max-w-md mx-auto py-8">
-      {/* First time admin setup component */}
-      <AdminSetup />
-      
       {confirmationSuccess && (
         <Alert className="mb-4 bg-green-50 border-green-200 text-green-800">
           <AlertDescription>

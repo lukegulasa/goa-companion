@@ -21,55 +21,54 @@ const ADMIN_NAME = 'luke';
 const AdminSetup: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
-  const [adminExists, setAdminExists] = useState(true); // Default to true to prevent flashing
   const { toast } = useToast();
   
   useEffect(() => {
+    // Only check for admin on initial load
     checkForAdmin();
   }, []);
   
   const checkForAdmin = async () => {
     try {
-      console.log('Checking for existing admin users...');
+      // First check for existing users/auth entries
+      const { data: usersData, error: usersError } = await supabase.auth.admin.listUsers();
       
-      // First check if the current user is an admin
-      const { data: session } = await supabase.auth.getSession();
-      if (session?.session?.user) {
-        const { data: adminData } = await supabase
-          .from('admin_users')
-          .select('*')
-          .limit(1);
-          
-        console.log('Admin data from direct query:', adminData);
-        
-        if (adminData && adminData.length > 0) {
-          console.log('Admin already exists, not showing setup dialog');
-          setAdminExists(true);
-          setShowDialog(false);
-          return;
-        }
-      }
-      
-      // Fall back to the RPC function as a secondary check
-      const { data, error } = await supabase.rpc('check_admin_count');
-      
-      if (error) {
-        console.error('Error checking admin count:', error);
+      if (!usersError && usersData && usersData.users && usersData.users.length > 0) {
+        console.log('Users exist in auth system, not showing setup dialog');
+        setShowDialog(false);
         return;
       }
       
-      console.log('Admin count from RPC:', data);
-      setAdminExists(data > 0);
+      // Then check specifically for the admin user by email
+      const { data: adminByEmail } = await supabase.auth.admin.getUserByEmail(ADMIN_EMAIL);
+      if (adminByEmail) {
+        console.log('Admin user already exists by email, not showing setup dialog');
+        setShowDialog(false);
+        return;
+      }
       
-      // Only show the dialog if no admin exists
-      if (data === 0) {
+      // Now check through RPC as a final verification
+      const { data: adminCount, error: countError } = await supabase.rpc('check_admin_count');
+      
+      if (countError) {
+        console.error('Error checking admin count:', countError);
+        return;
+      }
+      
+      console.log('Admin count from RPC:', adminCount);
+      
+      // Only show dialog if absolutely no admin exists
+      if (adminCount === 0) {
         console.log('No admin exists, showing setup dialog');
         setShowDialog(true);
       } else {
         console.log('Admin already exists, not showing setup dialog');
+        setShowDialog(false);
       }
     } catch (error) {
       console.error('Error in checkForAdmin:', error);
+      // In case of any error, don't show the dialog to prevent duplicate admins
+      setShowDialog(false);
     }
   };
   
@@ -92,7 +91,6 @@ const AdminSetup: React.FC = () => {
           description: result.message || `Admin account for ${ADMIN_EMAIL} was created. Please check your email to confirm your account before logging in.`
         });
         setShowDialog(false);
-        setAdminExists(true);
       } else {
         toast({
           title: "Failed to create admin",

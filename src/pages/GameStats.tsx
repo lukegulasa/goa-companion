@@ -56,23 +56,52 @@ const GameStats: React.FC = () => {
   }, [playersSyncStatus, gamesSyncStatus, toast]);
 
   const onAddPlayer = (data: NewPlayerFormValues) => {
-    if (!isAdmin) return;
+    if (!isAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "You need admin privileges to add players.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     const newPlayer: Player = {
       id: Date.now().toString(),
       name: data.playerName.trim(),
     };
     setPlayers([...players, newPlayer]);
+    
+    toast({
+      title: "Player Added",
+      description: `${data.playerName.trim()} has been added to the players list.`
+    });
   };
 
   const onLogGame = (data: GameLogFormValues) => {
-    if (!isAdmin) return;
+    if (!isAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "You need admin privileges to log games.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     if (gameParticipants.length < 2) {
+      toast({
+        title: "Not Enough Players",
+        description: "You need at least 2 players to log a game.",
+        variant: "destructive"
+      });
       return;
     }
     
     if (gameParticipants.some(p => !p.heroId)) {
+      toast({
+        title: "Missing Hero Selection",
+        description: "All players must have a hero selected.",
+        variant: "destructive"
+      });
       return;
     }
     
@@ -96,13 +125,27 @@ const GameStats: React.FC = () => {
   };
 
   const onDeleteGame = (gameId: string) => {
-    if (!isAdmin) return;
+    if (!isAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "You need admin privileges to delete games.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     setGameLogs(gameLogs.filter(game => (game as Game).id !== gameId));
   };
 
   const onEditGame = (gameId: string, updatedGameData: Partial<Game>) => {
-    if (!isAdmin) return;
+    if (!isAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "You need admin privileges to edit games.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     setGameLogs(gameLogs.map(game => 
       (game as Game).id === gameId 

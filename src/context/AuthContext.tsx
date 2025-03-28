@@ -36,10 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // If user is set, check if they're an admin
         if (session?.user) {
-          setTimeout(() => {
-            // Use setTimeout to prevent potential auth deadlocks
-            checkAdminStatus(session.user.id);
-          }, 0);
+          checkAdminStatus(session.user.id);
         } else {
           setIsAdmin(false);
         }
@@ -64,49 +61,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.log('Checking admin status for user:', userId);
       
-      // Simplest approach: insert the admin user directly if it matches expected email
-      if (user?.email === 'lukeggulasa@gmail.com') {
-        console.log('Expected admin email detected, ensuring admin status');
-        
-        // Direct insert without using single() which can cause issues
-        const { error: insertError } = await supabase
-          .from('admin_users')
-          .upsert({ user_id: userId });
-        
-        if (insertError) {
-          console.error('Error setting admin status via direct insert:', insertError);
-          
-          // Try alternative approach with insert only
-          const { error: altInsertError } = await supabase
-            .from('admin_users')
-            .insert({ user_id: userId })
-            .select();
-            
-          if (altInsertError && !altInsertError.message.includes('duplicate')) {
-            console.error('Error in alternative admin insert:', altInsertError);
-            toast({
-              title: "Admin Setup Error",
-              description: "Could not set admin privileges. Please try logging out and back in.",
-              variant: "destructive"
-            });
-          } else {
-            console.log('Admin status fixed successfully (insert or already exists)');
-            setIsAdmin(true);
-          }
-        } else {
-          console.log('Admin status set successfully via upsert');
-          setIsAdmin(true);
-        }
-        return;
-      }
-      
-      // For non-admin emails, just check if they exist in the admin_users table
+      // Direct query approach - no need for the special upsert for the expected admin email
       const { data: adminUser, error: adminUserError } = await supabase
         .from('admin_users')
         .select('*')
         .eq('user_id', userId);
       
-      console.log('Admin user query result:', adminUser, adminUserError);
+      if (adminUserError) {
+        console.error('Error checking admin status:', adminUserError);
+        
+        // Fall back to RPC function if direct query fails
+        const { data: isAdminResult, error: rpcError } = await supabase
+          .rpc('is_admin', { user_id: userId });
+          
+        if (rpcError) {
+          console.error('Error in RPC admin check:', rpcError);
+          setIsAdmin(false);
+        } else {
+          console.log('Admin status from RPC:', isAdminResult);
+          setIsAdmin(!!isAdminResult);
+        }
+        return;
+      }
+      
+      console.log('Admin user query result:', adminUser);
       
       if (adminUser && adminUser.length > 0) {
         console.log('User is an admin based on table query');
