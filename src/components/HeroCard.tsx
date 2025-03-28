@@ -33,7 +33,8 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
   const getHeroImagePath = (heroName: string) => {
     // Handle special cases
     if (heroName === "Widget and Pyro") return "/heroes/widget.jpg";
-    if (heroName === "Ignatia") return "/heroes/ignatia.jpg"; // Fixed typo in filename
+    if (heroName === "Widget And Pyro") return "/heroes/widget.jpg";
+    if (heroName === "Ignatia") return "/heroes/ignatia.jpg";
     
     // Default case
     return `/heroes/${heroName.toLowerCase()}.jpg`;
@@ -43,7 +44,7 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
   
   return (
     <Card 
-      className="overflow-hidden cursor-pointer transition-all hover:scale-[1.02] hover:shadow-md glass-panel"
+      className="overflow-hidden cursor-pointer transition-all hover:scale-[1.02] hover:shadow-md bg-[#EEEDE8] border-[#A47F48]/30"
       onClick={handleClick}
     >
       <CardContent className="p-4">
@@ -51,7 +52,7 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
           {/* Hero Image and Name row */}
           <div className="flex items-start">
             {/* Hero Image Container */}
-            <div className="w-20 h-20 bg-amber-800/20 border border-amber-700/30 rounded-md overflow-hidden flex-shrink-0">
+            <div className="w-20 h-20 bg-[#262125]/10 border border-[#A47F48]/40 rounded-md overflow-hidden flex-shrink-0">
               <img 
                 src={heroImagePath} 
                 alt={hero.name}
@@ -59,20 +60,20 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
                 onError={(e) => {
                   // If image fails to load, show placeholder text
                   e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML += '<span class="text-xs text-amber-600/60 font-rune">Hero Image</span>';
+                  e.currentTarget.parentElement!.innerHTML += '<span class="text-xs text-[#A47F48]/80 font-rune">Hero Image</span>';
                 }}
               />
             </div>
             
             {/* Hero name and details column */}
             <div className="ml-3 flex flex-col">
-              <h3 className="font-semibold truncate">{hero.name}</h3>
+              <h3 className="font-semibold truncate text-[#262125]">{hero.name}</h3>
               
               <div className="flex items-center">
                 {Array.from({ length: hero.stars }).map((_, i) => (
                   <Star
                     key={i}
-                    className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400"
+                    className="w-3.5 h-3.5 fill-[#A47F48] text-[#A47F48]"
                     strokeWidth={1}
                   />
                 ))}
@@ -89,7 +90,7 @@ const HeroCard: React.FC<HeroCardProps> = ({ hero, onClick }) => {
           </div>
           
           {/* Stats in a more spread out layout */}
-          <div className="grid grid-cols-4 gap-1 mt-3 text-xs text-muted-foreground">
+          <div className="grid grid-cols-4 gap-1 mt-3 text-xs text-[#656C74]">
             <div className="text-center">
               <span className="font-medium">ATK</span>
               <div>{hero.stats.attack.base}</div>

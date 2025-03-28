@@ -8,9 +8,9 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-[#EEEDE8] text-[#656C74]">
       {/* Decorative header with modern style */}
-      <header className="w-full border-b border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10">
+      <header className="w-full border-b border-[#A47F48]/30 bg-gradient-to-r from-[#A47F48]/10 via-[#A47F48]/5 to-[#A47F48]/10">
         <div className="container max-w-6xl mx-auto py-4 px-4 sm:px-6">
           <Navigation />
         </div>
@@ -24,12 +24,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </main>
       
       {/* Footer with modern pattern */}
-      <footer className="mt-8 py-6 border-t border-primary/20 text-center text-sm text-muted-foreground">
+      <footer className="mt-8 py-6 border-t border-[#A47F48]/20 text-center text-sm text-[#656C74]">
         <div className="container mx-auto">
           <div className="flex justify-center space-x-2 mb-2">
-            <div className="w-8 h-0.5 bg-primary/50"></div>
-            <div className="w-2 h-0.5 bg-primary/50"></div>
-            <div className="w-4 h-0.5 bg-primary/50"></div>
+            <div className="w-8 h-0.5 bg-[#A47F48]/50"></div>
+            <div className="w-2 h-0.5 bg-[#A47F48]/50"></div>
+            <div className="w-4 h-0.5 bg-[#A47F48]/50"></div>
           </div>
           <p className="font-heading text-sm">GoA Companion</p>
         </div>
