@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import HeroCard from '@/components/HeroCard';
 import { User } from 'lucide-react';
 import { Hero } from '@/lib/types';
+import { Player as GamePlayer } from '@/lib/game-stats-types';
+import { getPlayers } from '@/lib/db';
 
 interface Player {
   id: number;

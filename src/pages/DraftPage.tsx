@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { useToast } from '@/hooks/use-toast';
@@ -8,6 +7,8 @@ import DraftSetupCard from '@/components/draft/DraftSetupCard';
 import DraftInProgress from '@/components/draft/DraftInProgress';
 import DraftResults from '@/components/draft/DraftResults';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { getPlayers } from '@/lib/db';
+import { Player } from '@/lib/game-stats-types';
 
 export type DraftMode = 'all-random' | 'all-pick' | 'single-draft' | 'random-draft' | 'player-draft' | 'pick-ban';
 export type DraftState = 'setup' | 'in-progress' | 'completed';
@@ -21,6 +22,19 @@ const DraftPage = () => {
   const [completedDraftData, setCompletedDraftData] = useState<any[]>([]);
   const { toast } = useToast();
   const isMobile = useIsMobile();
+
+  useEffect(() => {
+    const loadDBPlayers = async () => {
+      try {
+        const dbPlayers = await getPlayers();
+        console.log("Loaded players from database:", dbPlayers);
+      } catch (error) {
+        console.error("Error loading players from database:", error);
+      }
+    };
+    
+    loadDBPlayers();
+  }, []);
 
   const modeDescriptions = {
     'all-random': 'Randomly select heroes for each player.',

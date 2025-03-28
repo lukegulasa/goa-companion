@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { PlayerWithStats } from '@/lib/team-balance-utils';
+import { getPlayers } from '@/lib/db';
 
 interface PlayerSelectorProps {
   playerStats: PlayerWithStats[];
@@ -17,6 +18,25 @@ const PlayerSelector: React.FC<PlayerSelectorProps> = ({
   teamSize,
   onPlayerSelect,
 }) => {
+  // We're not modifying this component's core functionality since it gets playerStats passed as a prop
+  // But we'll add logging to verify the data is coming from the correct source
+  
+  useEffect(() => {
+    console.log("PlayerSelector received playerStats:", playerStats);
+    
+    // For comparison, let's log what's in the database
+    const loadDbPlayers = async () => {
+      try {
+        const dbPlayers = await getPlayers();
+        console.log("Database players:", dbPlayers);
+      } catch (error) {
+        console.error("Error loading players:", error);
+      }
+    };
+    
+    loadDbPlayers();
+  }, [playerStats]);
+
   return (
     <div>
       <Label className="text-base mb-2 block">Select Players</Label>
