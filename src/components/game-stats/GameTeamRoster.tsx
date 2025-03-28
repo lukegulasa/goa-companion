@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { TrophyIcon } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { GamePlayer } from '@/lib/game-stats-types';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 interface GameTeamRosterProps {
   teamPlayers: GamePlayer[];
@@ -10,57 +9,47 @@ interface GameTeamRosterProps {
   winningTeam: 'Red' | 'Blue';
 }
 
-export const GameTeamRoster: React.FC<GameTeamRosterProps> = ({
-  teamPlayers,
-  teamName,
-  winningTeam
+export const GameTeamRoster: React.FC<GameTeamRosterProps> = ({ 
+  teamPlayers, 
+  teamName, 
+  winningTeam 
 }) => {
-  const teamColorClass = teamName === 'Blue' 
-    ? "bg-blue-50/50 dark:bg-blue-950/20" 
-    : "bg-red-50/50 dark:bg-red-950/20";
-  
-  const headerColorClass = teamName === 'Blue'
-    ? "bg-blue-100 dark:bg-blue-900/30 border-b text-blue-800 dark:text-blue-300"
-    : "bg-red-100 dark:bg-red-900/30 border-b text-red-800 dark:text-red-300";
-  
-  const borderColorClass = teamName === 'Blue'
-    ? "border border-blue-200 dark:border-blue-800"
-    : "border border-red-200 dark:border-red-800";
+  // Create hero image path with special cases
+  const getHeroImagePath = (heroName: string) => {
+    // Handle special cases consistently
+    if (heroName === "Widget and Pyro" || heroName === "Widget And Pyro") return "/heroes/widget.jpg";
+    if (heroName === "Ignatia") return "/heroes/ignatia.jpg";
+    
+    // Default case
+    return `/heroes/${heroName.toLowerCase()}.jpg`;
+  };
 
+  const isWinningTeam = teamName === winningTeam;
+  
   return (
-    <div className={`rounded-md border ${teamColorClass}`}>
-      <div className={`py-2 px-4 ${headerColorClass}`}>
-        <h4 className="font-medium">{teamName} Team</h4>
+    <div className={`p-3 rounded-md border ${isWinningTeam ? 'bg-amber-50/30 border-amber-200/50' : 'bg-muted/10'}`}>
+      <div className="flex items-center mb-2">
+        <div className={`w-3 h-3 rounded-full mr-2 ${teamName === 'Red' ? 'bg-red-500' : 'bg-blue-500'}`}></div>
+        <h4 className="font-medium">{teamName} Team {isWinningTeam && '(Winner)'}</h4>
       </div>
-      <div className="p-3">
-        {teamPlayers.length > 0 ? (
-          <ul className="divide-y">
-            {teamPlayers.map((player) => (
-              <li key={player.playerId} className="py-2 flex items-center">
-                <div className="mr-3">
-                  <Avatar className={`h-8 w-8 ${borderColorClass}`}>
-                    <AvatarImage src={`/heroes/${player.heroName.toLowerCase()}.jpg`} alt={player.heroName} />
-                    <AvatarFallback className={teamName === 'Blue' 
-                      ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                      : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                    }>
-                      {player.heroName.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-                <div>
-                  <div className="font-medium">{player.playerName}</div>
-                  <div className="text-sm text-muted-foreground">{player.heroName}</div>
-                </div>
-                {winningTeam === teamName && (
-                  <TrophyIcon className="h-4 w-4 ml-auto text-yellow-500" />
-                )}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-muted-foreground p-2">No players on {teamName} Team</p>
-        )}
+      
+      <div className="space-y-2">
+        {teamPlayers.map((player) => (
+          <div key={player.playerId} className="flex items-center">
+            <Avatar className="w-8 h-8 mr-2">
+              <AvatarImage 
+                src={getHeroImagePath(player.heroName)} 
+                alt={player.heroName} 
+              />
+              <AvatarFallback className="text-xs font-rune">{player.heroName.substring(0, 2)}</AvatarFallback>
+            </Avatar>
+            
+            <div>
+              <span className="text-sm font-medium">{player.playerName}</span>
+              <div className="text-xs text-muted-foreground">{player.heroName}</div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

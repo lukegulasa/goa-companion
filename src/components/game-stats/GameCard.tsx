@@ -28,6 +28,16 @@ export const GameCard: React.FC<GameCardProps> = ({
     return game.players.filter(player => player.team === team);
   };
 
+  // Helper function for getting hero image path
+  const getHeroImagePath = (heroName: string) => {
+    // Handle special cases - ensure consistent handling
+    if (heroName === "Widget and Pyro" || heroName === "Widget And Pyro") return "/heroes/widget.jpg";
+    if (heroName === "Ignatia") return "/heroes/ignatia.jpg";
+    
+    // Default case
+    return `/heroes/${heroName.toLowerCase()}.jpg`;
+  };
+
   return (
     <div className={`rounded-md border ${isMobile ? 'p-1' : 'p-3 sm:p-4'} w-full`}>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-1 sm:mb-2">
