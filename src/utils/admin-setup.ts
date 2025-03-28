@@ -24,6 +24,10 @@ export const setupAdminUser = async (
       return { success: false, error: 'An admin user already exists' };
     }
     
+    // Get the current site URL for redirection
+    const siteUrl = window.location.origin;
+    console.log('Using site URL for redirection:', siteUrl);
+    
     // Sign up the user with email confirmation enabled
     console.log('Creating user account with email:', email);
     const { data: authData, error: signupError } = await supabase.auth.signUp({
@@ -33,7 +37,7 @@ export const setupAdminUser = async (
         data: {
           name
         },
-        emailRedirectTo: `${window.location.origin}/auth`
+        emailRedirectTo: `${siteUrl}/auth`
       }
     });
     
