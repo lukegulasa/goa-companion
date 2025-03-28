@@ -21,7 +21,7 @@ const ADMIN_NAME = 'luke';
 const AdminSetup: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
-  const [adminExists, setAdminExists] = useState(false);
+  const [adminExists, setAdminExists] = useState(true); // Default to true to prevent flashing
   const { toast } = useToast();
   
   useEffect(() => {
@@ -31,6 +31,26 @@ const AdminSetup: React.FC = () => {
   const checkForAdmin = async () => {
     try {
       console.log('Checking for existing admin users...');
+      
+      // First check if the current user is an admin
+      const { data: session } = await supabase.auth.getSession();
+      if (session?.session?.user) {
+        const { data: adminData } = await supabase
+          .from('admin_users')
+          .select('*')
+          .limit(1);
+          
+        console.log('Admin data from direct query:', adminData);
+        
+        if (adminData && adminData.length > 0) {
+          console.log('Admin already exists, not showing setup dialog');
+          setAdminExists(true);
+          setShowDialog(false);
+          return;
+        }
+      }
+      
+      // Fall back to the RPC function as a secondary check
       const { data, error } = await supabase.rpc('check_admin_count');
       
       if (error) {
@@ -38,7 +58,7 @@ const AdminSetup: React.FC = () => {
         return;
       }
       
-      console.log('Admin count:', data);
+      console.log('Admin count from RPC:', data);
       setAdminExists(data > 0);
       
       // Only show the dialog if no admin exists

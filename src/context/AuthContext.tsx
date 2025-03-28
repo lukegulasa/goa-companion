@@ -64,64 +64,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.log('Checking admin status for user:', userId);
       
-      // First, directly query the admin_users table
+      // Simplest approach: insert the admin user directly if it matches expected email
+      if (user?.email === 'lukeggulasa@gmail.com') {
+        console.log('Expected admin email detected, ensuring admin status');
+        
+        // Direct insert without using single() which can cause issues
+        const { error: insertError } = await supabase
+          .from('admin_users')
+          .upsert({ user_id: userId });
+        
+        if (insertError) {
+          console.error('Error setting admin status via direct insert:', insertError);
+          
+          // Try alternative approach with insert only
+          const { error: altInsertError } = await supabase
+            .from('admin_users')
+            .insert({ user_id: userId })
+            .select();
+            
+          if (altInsertError && !altInsertError.message.includes('duplicate')) {
+            console.error('Error in alternative admin insert:', altInsertError);
+            toast({
+              title: "Admin Setup Error",
+              description: "Could not set admin privileges. Please try logging out and back in.",
+              variant: "destructive"
+            });
+          } else {
+            console.log('Admin status fixed successfully (insert or already exists)');
+            setIsAdmin(true);
+          }
+        } else {
+          console.log('Admin status set successfully via upsert');
+          setIsAdmin(true);
+        }
+        return;
+      }
+      
+      // For non-admin emails, just check if they exist in the admin_users table
       const { data: adminUser, error: adminUserError } = await supabase
         .from('admin_users')
         .select('*')
         .eq('user_id', userId);
       
-      console.log('Admin user direct query result:', adminUser, adminUserError);
+      console.log('Admin user query result:', adminUser, adminUserError);
       
-      // Check if the user exists in the admin_users table
       if (adminUser && adminUser.length > 0) {
-        console.log('User is an admin based on direct table query');
+        console.log('User is an admin based on table query');
         setIsAdmin(true);
-        return;
-      }
-      
-      // Fall back to RPC function
-      const { data: isAdminResult, error } = await supabase.rpc('is_admin', { user_id: userId });
-      
-      if (error) {
-        console.error('Error checking admin status via RPC:', error);
-        // Don't return here, continue to auto-fix attempt
       } else {
-        console.log('Admin status RPC result:', isAdminResult);
-        if (isAdminResult) {
-          setIsAdmin(true);
-          return;
-        }
-      }
-      
-      // Auto-fix attempt for specific admin email
-      if (userId) {
-        const userEmail = user?.email;
-        console.log('Auto-fix check - Current user email:', userEmail);
-        
-        if (userEmail === 'lukeggulasa@gmail.com') {
-          console.log('Attempting to fix admin status for expected admin user');
-          const { error: insertError } = await supabase
-            .from('admin_users')
-            .upsert({ user_id: userId });
-          
-          if (insertError) {
-            console.error('Error fixing admin status:', insertError);
-            toast({
-              title: "Admin Setup Error",
-              description: "Could not set admin privileges. Please contact support.",
-              variant: "destructive"
-            });
-          } else {
-            console.log('Admin status fixed successfully via insert');
-            setIsAdmin(true);
-            toast({
-              title: "Admin Privileges Granted",
-              description: "You now have admin access to the application."
-            });
-          }
-        } else {
-          setIsAdmin(false);
-        }
+        console.log('User is not an admin');
+        setIsAdmin(false);
       }
     } catch (error) {
       console.error('Error in checkAdminStatus:', error);

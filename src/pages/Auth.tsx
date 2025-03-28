@@ -114,9 +114,27 @@ const Auth: React.FC = () => {
       
       if (data.user) {
         console.log('Login successful for user:', data.user.id);
+        
+        // After successful login, ensure admin status for the expected admin email
+        if (data.user.email === 'lukeggulasa@gmail.com') {
+          try {
+            const { error: adminError } = await supabase
+              .from('admin_users')
+              .upsert({ user_id: data.user.id });
+            
+            if (adminError) {
+              console.error('Error setting admin status on login:', adminError);
+            } else {
+              console.log('Admin status ensured on login');
+            }
+          } catch (err) {
+            console.error('Error ensuring admin status:', err);
+          }
+        }
+        
         toast({
           title: "Login successful",
-          description: "You are now logged in as an admin"
+          description: "You are now logged in"
         });
         navigate('/');
       }
