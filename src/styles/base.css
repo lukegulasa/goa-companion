@@ -1,0 +1,120 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 36 30% 96%;
+    --foreground: 20 14% 4%;
+
+    --card: 30 20% 97%;
+    --card-foreground: 20 14% 4%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14% 4%;
+
+    --primary: 26 83% 14%;
+    --primary-foreground: 30 43% 96%;
+
+    --secondary: 60 10% 96%;
+    --secondary-foreground: 24 9% 10%;
+
+    --muted: 60 4.8% 95.9%;
+    --muted-foreground: 25 5% 45%;
+
+    --accent: 12 60% 45%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 20 5% 80%;
+    --input: 20 5% 80%;
+    --ring: 28 83% 28%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 24 23% 92%;
+    --sidebar-foreground: 20 6% 25%;
+    --sidebar-primary: 28 89% 20%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 24 4.8% 90%;
+    --sidebar-accent-foreground: 24 9% 10%;
+    --sidebar-border: 25 13% 80%;
+    --sidebar-ring: 28 83% 28%;
+  }
+
+  .dark {
+    --background: 20 14% 4%;
+    --foreground: 60 9% 98%;
+
+    --card: 20 14% 8%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 20 14% 9%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 35 91% 33%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 12 6% 15%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 12 6% 15%;
+    --muted-foreground: 24 5% 65%;
+
+    --accent: 35 91% 33%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 12 6% 15%;
+    --input: 12 6% 15%;
+    --ring: 35 91% 33%;
+
+    --sidebar-background: 20 14% 8%;
+    --sidebar-foreground: 60 9% 98%;
+    --sidebar-primary: 35 91% 33%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 12 6% 15%;
+    --sidebar-accent-foreground: 60 9% 98%;
+    --sidebar-border: 12 6% 15%;
+    --sidebar-ring: 35 91% 33%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-roboto;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/40 rounded-full border-2 border-background;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/60;
+  }
+}
