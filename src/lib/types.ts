@@ -1,4 +1,3 @@
-
 export interface Stat {
   base: number;
   boosted?: number;
@@ -40,7 +39,9 @@ export type SortOption =
   | 'defenseAsc'
   | 'defenseDesc'
   | 'movementAsc'
-  | 'movementDesc';
+  | 'movementDesc'
+  | 'winRateAsc'
+  | 'winRateDesc';
 
 export interface GalleryContextType {
   heroes: Hero[];

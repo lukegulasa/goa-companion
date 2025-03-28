@@ -1,7 +1,7 @@
-
 import React, { createContext, useState, useContext, useEffect, useMemo } from 'react';
 import { heroes, getAllTags } from '@/lib/data';
 import { GalleryContextType, Hero, SortOption } from '@/lib/types';
+import { useHeroStats } from '@/hooks/use-hero-stats';
 
 // Create the context
 const GalleryContext = createContext<GalleryContextType | undefined>(undefined);
@@ -13,6 +13,7 @@ export const GalleryProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [tagFilters, setTagFilters] = useState<string[]>([]);
   const [starFilters, setStarFilters] = useState<number[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>('nameAsc');
+  const { heroStats } = useHeroStats();
 
   // Apply filters and sorting
   const filteredHeroes = useMemo(() => {
@@ -60,7 +61,24 @@ export const GalleryProvider: React.FC<{ children: React.ReactNode }> = ({ child
           return totalB - totalA;
         });
         break;
-      // New sorting options for individual stats
+      case 'winRateAsc':
+        filtered.sort((a, b) => {
+          const statsA = heroStats.find(stats => stats.heroId === a.id);
+          const statsB = heroStats.find(stats => stats.heroId === b.id);
+          const winRateA = statsA ? statsA.winRate : 0;
+          const winRateB = statsB ? statsB.winRate : 0;
+          return winRateA - winRateB;
+        });
+        break;
+      case 'winRateDesc':
+        filtered.sort((a, b) => {
+          const statsA = heroStats.find(stats => stats.heroId === a.id);
+          const statsB = heroStats.find(stats => stats.heroId === b.id);
+          const winRateA = statsA ? statsA.winRate : 0;
+          const winRateB = statsB ? statsB.winRate : 0;
+          return winRateB - winRateA;
+        });
+        break;
       case 'attackAsc':
         filtered.sort((a, b) => {
           const statA = a.stats.attack.boosted || a.stats.attack.base;
@@ -122,7 +140,7 @@ export const GalleryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
 
     return filtered;
-  }, [heroes, tagFilters, starFilters, sortOption]);
+  }, [heroes, tagFilters, starFilters, sortOption, heroStats]);
 
   // Select a hero and open the modal
   const selectHero = (hero: Hero) => {

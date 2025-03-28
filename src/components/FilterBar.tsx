@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { getAllTags } from '@/lib/data';
 import { useGallery } from '@/context/GalleryContext';
 import TagBadge from './TagBadge';
-import { Star, Filter, SortAsc, SortDesc, X, ArrowUpAZ, ArrowDownAZ, Star as StarIcon, Gauge, Shield, Zap, MoveHorizontal } from 'lucide-react';
+import { Star, Filter, SortAsc, SortDesc, X, ArrowUpAZ, ArrowDownAZ, Star as StarIcon, Gauge, Shield, Zap, MoveHorizontal, BarChart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -172,6 +172,22 @@ const FilterBar: React.FC = () => {
               >
                 <SortDesc className="h-4 w-4" />
                 Stat Total (High to Low)
+              </DropdownMenuItem>
+
+              {/* Win Rate sorting options */}
+              <DropdownMenuItem 
+                onClick={() => setSortOption('winRateAsc')}
+                className={cn("flex gap-2", sortOption === 'winRateAsc' && "bg-muted")}
+              >
+                <BarChart className="h-4 w-4 text-blue-500" />
+                Win Rate (Low to High)
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setSortOption('winRateDesc')}
+                className={cn("flex gap-2", sortOption === 'winRateDesc' && "bg-muted")}
+              >
+                <BarChart className="h-4 w-4 text-green-500" />
+                Win Rate (High to Low)
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
