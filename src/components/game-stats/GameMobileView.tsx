@@ -18,23 +18,23 @@ interface GameMobileViewProps {
 
 export const GameMobileView: React.FC<GameMobileViewProps> = ({ players }) => {
   return (
-    <div className="rounded-md border w-full overflow-hidden">
-      <div className="overflow-x-auto w-full">
+    <div className="rounded-md border w-full">
+      <div className="w-full">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[33%]">Player</TableHead>
-              <TableHead className="w-[25%]">Team</TableHead>
-              <TableHead className="w-[42%]">Hero</TableHead>
+              <TableHead className="w-[34%] px-2">Player</TableHead>
+              <TableHead className="w-[26%] px-2 text-center">Team</TableHead>
+              <TableHead className="w-[40%] px-2">Hero</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {players.map((player) => (
               <TableRow key={player.playerId}>
-                <TableCell className="py-3 whitespace-normal break-words">{player.playerName}</TableCell>
-                <TableCell className="py-3">
+                <TableCell className="py-2 px-2 whitespace-normal break-words">{player.playerName}</TableCell>
+                <TableCell className="py-2 px-2 text-center">
                   <span className={cn(
-                    "px-2 py-1 rounded-full text-xs font-medium",
+                    "px-2 py-1 rounded-full text-xs font-medium inline-block",
                     player.team === "Blue" 
                       ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300" 
                       : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
@@ -42,7 +42,7 @@ export const GameMobileView: React.FC<GameMobileViewProps> = ({ players }) => {
                     {player.team}
                   </span>
                 </TableCell>
-                <TableCell className="flex items-center gap-2 py-3">
+                <TableCell className="flex items-center gap-2 py-2 px-2">
                   <Avatar className="h-6 w-6 flex-shrink-0">
                     <AvatarImage src={`/heroes/${player.heroName.toLowerCase()}.jpg`} alt={player.heroName} />
                     <AvatarFallback className="text-xs bg-amber-100 text-amber-800">{player.heroName.charAt(0)}</AvatarFallback>
