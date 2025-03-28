@@ -32,7 +32,7 @@ const GameStatsPage: React.FC = () => {
   } = useCloudSync<'games'>('games', []);
 
   const [gameParticipants, setGameParticipants] = useState<GamePlayer[]>([]);
-  const [activeTab, setActiveTab] = useState('log-game');
+  const [activeTab, setActiveTab] = useState('game-history');
   
   // Show toast notification when sync status changes
   useEffect(() => {
@@ -167,21 +167,10 @@ const GameStatsPage: React.FC = () => {
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList>
-          <TabsTrigger value="log-game">Log a Game</TabsTrigger>
           <TabsTrigger value="game-history">Game History</TabsTrigger>
           <TabsTrigger value="player-stats">Player Stats</TabsTrigger>
+          <TabsTrigger value="log-game">Log a Game</TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="log-game" className="space-y-8">
-          <GameLoggerTab 
-            players={players as Player[]} 
-            gameParticipants={gameParticipants}
-            setGameParticipants={setGameParticipants}
-            onAddPlayer={handleAddPlayer} 
-            onLogGame={handleLogGame}
-            isAdmin={isAdmin}
-          />
-        </TabsContent>
         
         <TabsContent value="game-history" className="space-y-6">
           <GameHistoryTab 
@@ -196,6 +185,17 @@ const GameStatsPage: React.FC = () => {
           <PlayerStatsTab 
             players={players as Player[]} 
             games={gameLogs as Game[]} 
+          />
+        </TabsContent>
+
+        <TabsContent value="log-game" className="space-y-8">
+          <GameLoggerTab 
+            players={players as Player[]} 
+            gameParticipants={gameParticipants}
+            setGameParticipants={setGameParticipants}
+            onAddPlayer={handleAddPlayer} 
+            onLogGame={handleLogGame}
+            isAdmin={isAdmin}
           />
         </TabsContent>
       </Tabs>
