@@ -12,7 +12,7 @@ const FilterBar: React.FC = () => {
   const hasActiveFilters = tagFilters.length > 0 || starFilters.length > 0;
   
   return (
-    <div className="w-full sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+    <div className="w-full sticky top-0 z-10 bg-background/80 dark:bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container max-w-6xl mx-auto py-4 px-4 sm:px-6">
         <div className="flex flex-wrap gap-2 items-center justify-between">
           {/* Filter section */}

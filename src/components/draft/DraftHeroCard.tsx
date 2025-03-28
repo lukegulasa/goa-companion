@@ -51,7 +51,7 @@ export const DraftHeroCard: React.FC<DraftHeroCardProps> = ({
           {/* Hero Image and Name row */}
           <div className="flex items-start">
             {/* Hero Image Container */}
-            <div className="w-16 h-16 bg-amber-800/20 border border-amber-700/30 rounded-md overflow-hidden flex-shrink-0">
+            <div className="w-16 h-16 bg-muted/40 border border-border rounded-md overflow-hidden flex-shrink-0">
               <img 
                 src={heroImagePath} 
                 alt={hero.name}
@@ -59,7 +59,7 @@ export const DraftHeroCard: React.FC<DraftHeroCardProps> = ({
                 onError={(e) => {
                   // If image fails to load, show placeholder text
                   e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML += '<span class="text-xs text-amber-600/60 font-rune">Hero Image</span>';
+                  e.currentTarget.parentElement!.innerHTML += '<span class="text-xs text-primary/60 font-rune">Hero Image</span>';
                 }}
               />
             </div>
