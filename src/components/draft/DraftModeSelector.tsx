@@ -45,20 +45,21 @@ const DraftModeSelector: React.FC<DraftModeSelectorProps> = ({
   return (
     <div className="w-full">
       <Tabs defaultValue="all-random" className="w-full" onValueChange={(value) => onModeChange(value as DraftMode)}>
-        <TabsList className={`grid ${isMobile ? 'grid-cols-2 gap-1' : 'grid-cols-2 md:grid-cols-3'} w-full`}>
+        {/* Updated TabsList with better spacing for desktop and mobile */}
+        <TabsList className={`${isMobile ? 'flex flex-col space-y-1' : 'grid grid-cols-3 gap-1'} w-full`}>
           {Object.keys(modeDescriptions).map((mode) => (
             <TabsTrigger 
               key={mode} 
               value={mode} 
-              className={`flex items-center justify-center ${isMobile ? 'text-xs py-1.5 px-1' : ''}`}
+              className="flex items-center justify-start px-3 py-2 h-auto"
             >
               {modeIcons[mode as DraftMode]}
-              <span>{mode.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</span>
+              <span className="whitespace-nowrap">{mode.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</span>
             </TabsTrigger>
           ))}
         </TabsList>
         
-        <div className={`${isMobile ? 'pt-14' : 'pt-6'}`}>
+        <div className="mt-4 pt-2">
           {Object.entries(modeDescriptions).map(([mode, description]) => (
             <TabsContent key={mode} value={mode} className="space-y-4">
               <p className="text-muted-foreground text-sm">{description}</p>
