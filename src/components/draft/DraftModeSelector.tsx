@@ -59,7 +59,8 @@ const DraftModeSelector: React.FC<DraftModeSelectorProps> = ({
           ))}
         </TabsList>
         
-        <div className="mt-4 pt-2">
+        {/* Added more vertical spacing between the tabs and content */}
+        <div className="mt-8 pt-2">
           {Object.entries(modeDescriptions).map(([mode, description]) => (
             <TabsContent key={mode} value={mode} className="space-y-4">
               <p className="text-muted-foreground text-sm">{description}</p>
