@@ -29,8 +29,8 @@ export const GameCard: React.FC<GameCardProps> = ({
   };
 
   return (
-    <div className={`rounded-md border ${isMobile ? 'p-1 sm:p-2' : 'p-3 sm:p-4'} w-full`}>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
+    <div className={`rounded-md border ${isMobile ? 'p-1' : 'p-3 sm:p-4'} w-full`}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-1 sm:mb-2">
         <div>
           <h3 className={`font-medium ${isMobile ? 'text-sm' : ''}`}>
             Game on {format(new Date(game.date), 'MMMM d, yyyy')}

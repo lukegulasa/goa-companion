@@ -104,7 +104,7 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
       />
       
       {filteredAndSortedGames.length > 0 ? (
-        <div className={`space-y-3 ${isMobile ? 'mt-2' : 'mt-4'}`}>
+        <div className={`space-y-2 ${isMobile ? 'mt-2' : 'mt-4'}`}>
           {filteredAndSortedGames.map((game) => (
             <GameCard 
               key={game.id}

@@ -149,15 +149,29 @@
   /* Table utilities */
   .table-condensed th,
   .table-condensed td {
-    padding: 0.15rem 0.15rem;
-    font-size: 0.7rem;
+    padding: 0.1rem 0.1rem;
+    font-size: 0.75rem;
+    line-height: 1.1;
   }
   
   .table-condensed th {
     font-weight: 500;
+    font-size: 0.7rem;
   }
   
-  /* New fantasy-themed components */
+  .table-condensed .avatar {
+    height: 1rem;
+    width: 1rem;
+  }
+  
+  /* Hide scrollbar for the game table on mobile while maintaining functionality */
+  @media (max-width: 640px) {
+    .overflow-x-auto::-webkit-scrollbar {
+      height: 0;
+      width: 0;
+    }
+  }
+  
   .arcane-card {
     @apply bg-card border border-amber-900/20 rounded-md overflow-hidden;
     background-image: 

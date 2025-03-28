@@ -45,7 +45,7 @@ const GameStatsPage: React.FC = () => {
   const onEditGame = (gameId: string, updatedGame: any) => handleEditGame(gameId, updatedGame, isAdmin);
 
   return (
-    <div className={`container mx-auto ${isMobile ? 'px-2 py-4' : 'py-8 px-4 sm:px-6'} max-w-6xl`}>
+    <div className={`container mx-auto ${isMobile ? 'px-0 py-2' : 'py-8 px-4 sm:px-6'} max-w-6xl`}>
       <GameStatsHeader isAdmin={isAdmin} />
       
       <SyncStatusNotifications 
@@ -53,18 +53,18 @@ const GameStatsPage: React.FC = () => {
         gamesSyncStatus={gamesSyncStatus}
       />
       
-      <div className="mb-6">
+      <div className={isMobile ? "mb-2 px-2" : "mb-6"}>
         <DataPersistence />
       </div>
       
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className={`space-y-2 ${isMobile ? 'px-2' : ''}`}>
         <TabsList className="w-full">
           <TabsTrigger value="game-history" className="flex-1">Game History</TabsTrigger>
           <TabsTrigger value="player-stats" className="flex-1">Player Stats</TabsTrigger>
           <TabsTrigger value="log-game" className="flex-1">Log a Game</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="game-history" className="space-y-4">
+        <TabsContent value="game-history" className={`space-y-4 ${isMobile ? 'px-0' : ''}`}>
           <GameHistoryTab 
             games={gameLogs}
             onDeleteGame={onDeleteGame}

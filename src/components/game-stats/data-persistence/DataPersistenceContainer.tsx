@@ -30,10 +30,10 @@ export const DataPersistenceContainer: React.FC = () => {
     playersSyncStatus === 'synced' && gamesSyncStatus === 'synced' ? 'synced' : 'idle';
   
   return (
-    <div className={`bg-card rounded-lg border shadow-sm ${isMobile ? 'p-3' : 'p-6'} space-y-2`}>
-      <div className="flex flex-col space-y-2">
+    <div className={`bg-card rounded-lg border shadow-sm ${isMobile ? 'p-2' : 'p-6'} space-y-1 sm:space-y-2`}>
+      <div className="flex flex-col space-y-1 sm:space-y-2">
         <div className="flex items-center justify-between">
-          <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold`}>Game Database</h2>
+          <h2 className={`${isMobile ? 'text-base' : 'text-xl'} font-semibold`}>Game Database</h2>
           <CloudSyncIndicator 
             syncStatus={combinedStatus}
             onSyncNow={handleSyncNow}
