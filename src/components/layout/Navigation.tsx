@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from "@/lib/utils";
-import { Sword, Target, BarChart3, Users, Menu, X } from 'lucide-react';
+import { Sword, Target, BarChart3, Users, Menu, X, Shield } from 'lucide-react';
 import AuthButton from './AuthButton';
+import { useAuth } from '@/context/AuthContext';
 import {
   Sheet,
   SheetContent,
@@ -26,6 +27,7 @@ const NavItems: NavItemProps[] = [
 const Navigation: React.FC = () => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const { isAdmin } = useAuth();
 
   // Desktop navigation items
   const NavLinks = () => (
@@ -51,8 +53,14 @@ const Navigation: React.FC = () => {
 
   return (
     <nav className="flex items-center justify-between">
-      <div className="font-serif text-xl text-amber-900 dark:text-amber-500 font-semibold">
+      <div className="font-serif text-xl text-amber-900 dark:text-amber-500 font-semibold flex items-center">
         GoA Companion
+        {isAdmin && (
+          <div className="ml-2 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 rounded-full text-xs font-medium flex items-center">
+            <Shield className="w-3 h-3 mr-1" />
+            Admin
+          </div>
+        )}
       </div>
       
       {/* Desktop Navigation */}
@@ -75,8 +83,14 @@ const Navigation: React.FC = () => {
           </SheetTrigger>
           <SheetContent side="right" className="w-[250px] sm:w-[300px] bg-background">
             <div className="flex flex-col space-y-4 py-4">
-              <div className="font-serif text-lg mb-4 text-amber-900 dark:text-amber-500 font-semibold">
+              <div className="font-serif text-lg mb-4 text-amber-900 dark:text-amber-500 font-semibold flex items-center">
                 Navigation
+                {isAdmin && (
+                  <div className="ml-2 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 rounded-full text-xs font-medium flex items-center">
+                    <Shield className="w-3 h-3 mr-1" />
+                    Admin
+                  </div>
+                )}
               </div>
               <div className="flex flex-col space-y-1">
                 <NavLinks />
