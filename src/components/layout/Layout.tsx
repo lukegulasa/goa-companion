@@ -31,7 +31,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div className="w-2 h-0.5 bg-amber-700/50"></div>
             <div className="w-4 h-0.5 bg-amber-700/50"></div>
           </div>
-          <p>GoA Companion</p>
+          <p className="font-roboto">GoA Companion</p>
         </div>
       </footer>
     </div>

@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -79,7 +78,7 @@ export default {
 			},
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],
-				serif: ['Cinzel', 'serif'],
+				roboto: ['Roboto', 'sans-serif'],
 				rune: ['Metamorphous', 'serif'],
 			},
 			borderRadius: {

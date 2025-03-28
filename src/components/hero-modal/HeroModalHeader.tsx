@@ -10,7 +10,7 @@ interface HeroModalHeaderProps {
 export const HeroModalHeader: React.FC<HeroModalHeaderProps> = ({ fullName }) => {
   return (
     <DialogHeader className="p-6 pb-2">
-      <DialogTitle className="text-2xl">
+      <DialogTitle className="text-2xl font-roboto">
         <span>{fullName}</span>
       </DialogTitle>
     </DialogHeader>

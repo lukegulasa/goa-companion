@@ -45,7 +45,7 @@ const Navigation: React.FC = () => {
           )}
         >
           <span className="mr-2">{item.icon}</span>
-          <span className="font-serif">{item.name}</span>
+          <span className="font-roboto">{item.name}</span>
         </Link>
       ))}
     </>
@@ -53,7 +53,7 @@ const Navigation: React.FC = () => {
 
   return (
     <nav className="flex items-center justify-between">
-      <div className="font-serif text-xl text-amber-900 dark:text-amber-500 font-semibold flex items-center">
+      <div className="font-roboto text-xl text-amber-900 dark:text-amber-500 font-semibold flex items-center">
         GoA Companion
         {isAdmin && (
           <div className="ml-2 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 rounded-full text-xs font-medium flex items-center">
@@ -83,7 +83,7 @@ const Navigation: React.FC = () => {
           </SheetTrigger>
           <SheetContent side="right" className="w-[250px] sm:w-[300px] bg-background">
             <div className="flex flex-col space-y-4 py-4">
-              <div className="font-serif text-lg mb-4 text-amber-900 dark:text-amber-500 font-semibold flex items-center">
+              <div className="font-roboto text-lg mb-4 text-amber-900 dark:text-amber-500 font-semibold flex items-center">
                 Navigation
                 {isAdmin && (
                   <div className="ml-2 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 rounded-full text-xs font-medium flex items-center">
