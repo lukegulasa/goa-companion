@@ -22,16 +22,16 @@ export const GameMobileView: React.FC<GameMobileViewProps> = ({ players }) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Player</TableHead>
-            <TableHead>Team</TableHead>
-            <TableHead>Hero</TableHead>
+            <TableHead className="w-1/3">Player</TableHead>
+            <TableHead className="w-1/3">Team</TableHead>
+            <TableHead className="w-1/3">Hero</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {players.map((player) => (
             <TableRow key={player.playerId}>
-              <TableCell>{player.playerName}</TableCell>
-              <TableCell>
+              <TableCell className="py-3">{player.playerName}</TableCell>
+              <TableCell className="py-3">
                 <span className={cn(
                   "px-2 py-1 rounded-full text-xs font-medium",
                   player.team === "Blue" 
@@ -41,12 +41,12 @@ export const GameMobileView: React.FC<GameMobileViewProps> = ({ players }) => {
                   {player.team}
                 </span>
               </TableCell>
-              <TableCell className="flex items-center gap-2">
+              <TableCell className="flex items-center gap-2 py-3">
                 <Avatar className="h-6 w-6">
                   <AvatarImage src={`/heroes/${player.heroName.toLowerCase()}.jpg`} alt={player.heroName} />
                   <AvatarFallback className="text-xs bg-amber-100 text-amber-800">{player.heroName.charAt(0)}</AvatarFallback>
                 </Avatar>
-                {player.heroName}
+                <span className="truncate">{player.heroName}</span>
               </TableCell>
             </TableRow>
           ))}

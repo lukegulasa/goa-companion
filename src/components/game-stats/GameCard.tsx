@@ -76,8 +76,10 @@ export const GameCard: React.FC<GameCardProps> = ({
       </div>
       
       {isMobile ? (
-        // Mobile view
-        <GameMobileView players={game.players} />
+        // Mobile view - full width
+        <div className="w-full">
+          <GameMobileView players={game.players} />
+        </div>
       ) : (
         // Desktop view - team-based layout
         <div className="grid grid-cols-2 gap-4">
