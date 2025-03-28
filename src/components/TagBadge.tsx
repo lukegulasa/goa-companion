@@ -19,7 +19,7 @@ const TagBadge: React.FC<TagBadgeProps> = ({
   size = 'medium'
 }) => {
   const isClickable = !!onClick;
-  const colorClass = tagColors[tag] || 'bg-[#262125]';
+  const colorClass = tagColors[tag] || 'bg-gray-500';
   
   const sizeClasses = {
     small: 'text-[10px] py-0.5 px-1.5',
@@ -33,8 +33,8 @@ const TagBadge: React.FC<TagBadgeProps> = ({
         'hero-tag transition-all duration-150 inline-flex items-center justify-center',
         colorClass,
         sizeClasses[size],
-        isClickable && 'cursor-pointer hover:ring-2 hover:ring-offset-1 hover:ring-offset-background hover:ring-[#A47F48]/50',
-        selected && 'ring-2 ring-offset-1 ring-offset-background ring-[#A47F48]',
+        isClickable && 'cursor-pointer hover:ring-2 hover:ring-offset-1 hover:ring-offset-background hover:ring-primary/50',
+        selected && 'ring-2 ring-offset-1 ring-offset-background ring-primary',
         className
       )}
       onClick={onClick}

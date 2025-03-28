@@ -28,8 +28,7 @@ export const DraftHeroCard: React.FC<DraftHeroCardProps> = ({
   const getHeroImagePath = (heroName: string) => {
     // Handle special cases
     if (heroName === "Widget and Pyro") return "/heroes/widget.jpg";
-    if (heroName === "Widget And Pyro") return "/heroes/widget.jpg";
-    if (heroName === "Ignatia") return "/heroes/ignatia.jpg";
+    if (heroName === "Ignatia") return "/heroes/ignatia.jpg"; // Fixed typo in filename
     
     // Default case
     return `/heroes/${heroName.toLowerCase()}.jpg`;
@@ -41,9 +40,9 @@ export const DraftHeroCard: React.FC<DraftHeroCardProps> = ({
     <Card 
       className={`
         overflow-hidden cursor-pointer transition-all 
-        ${isSelected ? 'ring-2 ring-[#A47F48] shadow-glow' : ''} 
+        ${isSelected ? 'ring-2 ring-primary shadow-glow' : ''} 
         ${isBanned ? 'opacity-40 grayscale' : 'hover:scale-[1.02] hover:shadow-md'} 
-        bg-[#EEEDE8] border-[#A47F48]/30
+        arcane-card
       `}
       onClick={isBanned ? undefined : onClick}
     >
@@ -52,7 +51,7 @@ export const DraftHeroCard: React.FC<DraftHeroCardProps> = ({
           {/* Hero Image and Name row */}
           <div className="flex items-start">
             {/* Hero Image Container */}
-            <div className="w-16 h-16 bg-[#262125]/10 border border-[#A47F48]/40 rounded-md overflow-hidden flex-shrink-0">
+            <div className="w-16 h-16 bg-amber-800/20 border border-amber-700/30 rounded-md overflow-hidden flex-shrink-0">
               <img 
                 src={heroImagePath} 
                 alt={hero.name}
@@ -60,20 +59,20 @@ export const DraftHeroCard: React.FC<DraftHeroCardProps> = ({
                 onError={(e) => {
                   // If image fails to load, show placeholder text
                   e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML += '<span class="text-xs text-[#A47F48]/80 font-rune">Hero Image</span>';
+                  e.currentTarget.parentElement!.innerHTML += '<span class="text-xs text-amber-600/60 font-rune">Hero Image</span>';
                 }}
               />
             </div>
             
             {/* Hero name and details column */}
             <div className="ml-2 flex flex-col">
-              <h3 className="font-serif font-semibold truncate text-sm text-[#262125]">{hero.name}</h3>
+              <h3 className="font-serif font-semibold truncate text-sm">{hero.name}</h3>
               
               <div className="flex items-center">
                 {Array.from({ length: hero.stars }).map((_, i) => (
                   <Star
                     key={i}
-                    className="w-3 h-3 fill-[#A47F48] text-[#A47F48]"
+                    className="w-3 h-3 fill-amber-400 text-amber-400"
                     strokeWidth={1}
                   />
                 ))}
@@ -90,7 +89,7 @@ export const DraftHeroCard: React.FC<DraftHeroCardProps> = ({
           </div>
           
           {/* Stats in a more spread out layout */}
-          <div className="grid grid-cols-4 gap-1 mt-2 text-xs text-[#656C74]">
+          <div className="grid grid-cols-4 gap-1 mt-2 text-xs text-muted-foreground">
             <div className="text-center font-rune">
               <span className="font-medium">ATK</span>
               <div>{hero.stats.attack.base}</div>

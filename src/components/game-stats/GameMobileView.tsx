@@ -23,38 +23,38 @@ export const GameMobileView: React.FC<GameMobileViewProps> = ({ players }) => {
   const redTeamPlayers = players.filter(p => p.team === 'Red');
   
   return (
-    <div className="space-y-4 p-3">
-      <div className="flex flex-row gap-3">
-        <div className="w-4 h-4 rounded-full bg-blue-500 mt-2"></div>
-        <div className="flex flex-wrap gap-2">
+    <div className="space-y-3 p-2">
+      <div className="flex flex-row gap-2">
+        <div className="w-3 h-3 rounded-full bg-blue-500 mt-1.5"></div>
+        <div className="flex flex-wrap gap-1.5">
           {blueTeamPlayers.map((player) => (
-            <div key={player.playerId} className="flex items-center border rounded-full pl-1.5 pr-3 py-1.5 bg-blue-50/40">
-              <Avatar className="w-6 h-6 mr-2">
+            <div key={player.playerId} className="flex items-center border rounded-full pl-1 pr-2.5 py-1 bg-blue-50/30">
+              <Avatar className="w-5 h-5 mr-1.5">
                 <AvatarImage 
                   src={getHeroImagePath(player.heroName)} 
                   alt={player.heroName} 
                 />
-                <AvatarFallback className="text-[10px]">{player.heroName.substring(0, 1)}</AvatarFallback>
+                <AvatarFallback className="text-[9px]">{player.heroName.substring(0, 1)}</AvatarFallback>
               </Avatar>
-              <span className="text-sm">{player.playerName}</span>
+              <span className="text-xs">{player.playerName}</span>
             </div>
           ))}
         </div>
       </div>
       
-      <div className="flex flex-row gap-3">
-        <div className="w-4 h-4 rounded-full bg-red-500 mt-2"></div>
-        <div className="flex flex-wrap gap-2">
+      <div className="flex flex-row gap-2">
+        <div className="w-3 h-3 rounded-full bg-red-500 mt-1.5"></div>
+        <div className="flex flex-wrap gap-1.5">
           {redTeamPlayers.map((player) => (
-            <div key={player.playerId} className="flex items-center border rounded-full pl-1.5 pr-3 py-1.5 bg-red-50/40">
-              <Avatar className="w-6 h-6 mr-2">
+            <div key={player.playerId} className="flex items-center border rounded-full pl-1 pr-2.5 py-1 bg-red-50/30">
+              <Avatar className="w-5 h-5 mr-1.5">
                 <AvatarImage 
                   src={getHeroImagePath(player.heroName)} 
                   alt={player.heroName} 
                 />
-                <AvatarFallback className="text-[10px]">{player.heroName.substring(0, 1)}</AvatarFallback>
+                <AvatarFallback className="text-[9px]">{player.heroName.substring(0, 1)}</AvatarFallback>
               </Avatar>
-              <span className="text-sm">{player.playerName}</span>
+              <span className="text-xs">{player.playerName}</span>
             </div>
           ))}
         </div>
