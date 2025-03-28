@@ -6,6 +6,7 @@ import { GameCard } from './GameCard';
 import { DeleteGameDialog, EditGameDialogWrapper } from './GameDialogs';
 import { useAuth } from '@/context/AuthContext';
 import { GameHistoryFilters } from './GameHistoryFilters';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface GameHistoryProps {
   games: Game[];
@@ -24,6 +25,7 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
   const [gameToDelete, setGameToDelete] = useState<string | null>(null);
   const [gameToEdit, setGameToEdit] = useState<Game | null>(null);
   const { isAdmin: contextIsAdmin } = useAuth();
+  const isMobile = useIsMobile();
   
   // Use either the prop or context admin status, prioritizing context
   const isAdmin = contextIsAdmin || propIsAdmin;
@@ -89,8 +91,8 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
   }, [games, playerFilter, heroFilter, sortDirection]);
   
   return (
-    <div className="bg-card rounded-lg border shadow-sm p-4 sm:p-6 w-full">
-      <h2 className="text-xl font-semibold mb-4">Game History</h2>
+    <div className={`bg-card rounded-lg border shadow-sm ${isMobile ? 'p-2' : 'p-4 sm:p-6'} w-full`}>
+      <h2 className="text-xl font-semibold mb-3">Game History</h2>
       
       <GameHistoryFilters 
         playerFilter={playerFilter}
@@ -102,7 +104,7 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
       />
       
       {filteredAndSortedGames.length > 0 ? (
-        <div className="space-y-6 mt-4">
+        <div className={`space-y-3 ${isMobile ? 'mt-2' : 'mt-4'}`}>
           {filteredAndSortedGames.map((game) => (
             <GameCard 
               key={game.id}
@@ -114,7 +116,7 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
           ))}
         </div>
       ) : (
-        <div className="flex h-[200px] items-center justify-center rounded-md border border-dashed w-full mt-4">
+        <div className="flex h-[200px] items-center justify-center rounded-md border border-dashed w-full mt-3">
           <p className="text-muted-foreground">
             {games.length > 0 ? "No games match your filters." : "No games logged yet."}
           </p>

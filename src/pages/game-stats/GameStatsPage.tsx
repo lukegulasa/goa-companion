@@ -14,10 +14,12 @@ import { PlayerStatsTab } from './tabs/PlayerStatsTab';
 import { GameStatsHeader } from '@/components/game-stats/GameStatsHeader';
 import { SyncStatusNotifications } from '@/components/game-stats/SyncStatusNotifications';
 import { useGameStats } from '@/hooks/use-game-stats';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const GameStatsPage: React.FC = () => {
   const { isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState('game-history');
+  const isMobile = useIsMobile();
   
   const {
     players,
@@ -43,7 +45,7 @@ const GameStatsPage: React.FC = () => {
   const onEditGame = (gameId: string, updatedGame: any) => handleEditGame(gameId, updatedGame, isAdmin);
 
   return (
-    <div className="container max-w-6xl mx-auto py-8 px-4 sm:px-6">
+    <div className={`container mx-auto ${isMobile ? 'px-2 py-4' : 'py-8 px-4 sm:px-6'} max-w-6xl`}>
       <GameStatsHeader isAdmin={isAdmin} />
       
       <SyncStatusNotifications 
@@ -51,18 +53,18 @@ const GameStatsPage: React.FC = () => {
         gamesSyncStatus={gamesSyncStatus}
       />
       
-      <div className="mb-8">
+      <div className="mb-6">
         <DataPersistence />
       </div>
       
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="game-history">Game History</TabsTrigger>
-          <TabsTrigger value="player-stats">Player Stats</TabsTrigger>
-          <TabsTrigger value="log-game">Log a Game</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="w-full">
+          <TabsTrigger value="game-history" className="flex-1">Game History</TabsTrigger>
+          <TabsTrigger value="player-stats" className="flex-1">Player Stats</TabsTrigger>
+          <TabsTrigger value="log-game" className="flex-1">Log a Game</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="game-history" className="space-y-6">
+        <TabsContent value="game-history" className="space-y-4">
           <GameHistoryTab 
             games={gameLogs}
             onDeleteGame={onDeleteGame}
@@ -71,14 +73,14 @@ const GameStatsPage: React.FC = () => {
           />
         </TabsContent>
         
-        <TabsContent value="player-stats" className="space-y-6">
+        <TabsContent value="player-stats" className="space-y-4">
           <PlayerStatsTab 
             players={players} 
             games={gameLogs} 
           />
         </TabsContent>
 
-        <TabsContent value="log-game" className="space-y-8">
+        <TabsContent value="log-game" className="space-y-6">
           <GameLoggerTab 
             players={players} 
             gameParticipants={gameParticipants}

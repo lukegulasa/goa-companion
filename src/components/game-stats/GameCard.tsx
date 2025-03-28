@@ -29,8 +29,8 @@ export const GameCard: React.FC<GameCardProps> = ({
   };
 
   return (
-    <div className={`rounded-md border ${isMobile ? 'p-2' : 'p-3 sm:p-4'} w-full`}>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 sm:mb-4">
+    <div className={`rounded-md border ${isMobile ? 'p-1 sm:p-2' : 'p-3 sm:p-4'} w-full`}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
         <div>
           <h3 className={`font-medium ${isMobile ? 'text-sm' : ''}`}>
             Game on {format(new Date(game.date), 'MMMM d, yyyy')}
@@ -76,7 +76,7 @@ export const GameCard: React.FC<GameCardProps> = ({
       </div>
       
       {isMobile ? (
-        // Mobile view - full width with no excess margins
+        // Mobile view - full width with minimal margins
         <div className="w-full mt-1">
           <GameMobileView players={game.players} />
         </div>

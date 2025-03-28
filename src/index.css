@@ -149,8 +149,8 @@
   /* Table utilities */
   .table-condensed th,
   .table-condensed td {
-    padding: 0.25rem 0.25rem;
-    font-size: 0.75rem;
+    padding: 0.15rem 0.15rem;
+    font-size: 0.7rem;
   }
   
   .table-condensed th {
