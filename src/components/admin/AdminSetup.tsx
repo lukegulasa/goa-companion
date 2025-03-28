@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { setupAdminUser } from '@/utils/admin-setup';
 import { Button } from '@/components/ui/button';
@@ -39,10 +38,14 @@ const AdminSetup: React.FC = () => {
         return;
       }
       
-      // Then check specifically for the admin user by email
-      const { data: adminByEmail } = await supabase.auth.admin.getUserByEmail(ADMIN_EMAIL);
-      if (adminByEmail) {
-        console.log('Admin user already exists by email, not showing setup dialog');
+      // Check for the admin user - note: getUserByEmail doesn't exist, so we'll use a different approach
+      // Instead of trying to get user by email directly, we'll check through our admin_users table
+      const { data: adminUsers, error: adminError } = await supabase
+        .from('admin_users')
+        .select('*');
+        
+      if (!adminError && adminUsers && adminUsers.length > 0) {
+        console.log('Admin users exist in database, not showing setup dialog');
         setShowDialog(false);
         return;
       }
